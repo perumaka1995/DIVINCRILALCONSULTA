@@ -1,1 +1,298 @@
-# DIVINCRILALCONSULTA
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIVINCRI LA LIBERTAD - CONSULTAS</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    body {
+      background: #e7f1e7;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .header-bg {
+      background: linear-gradient(90deg, #064b22 0%, #0b5a2a 50%, #8bb68f 100%);
+    }
+
+    .logo-box {
+      background: #064b22;
+      border: 2px solid #f4c400;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+    }
+
+    .menu-container {
+      margin-top: -22px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .menu-item {
+      background: #075826;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: 2px solid #f4c400;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .menu-item:hover {
+      background: #f4c400;
+      color: #064b22;
+      transform: translateY(-2px);
+    }
+
+    .menu-active {
+      background: #f4c400;
+      color: #064b22;
+    }
+
+    .card-top {
+      border-top: 5px solid #075826;
+    }
+
+    .section-box {
+      border-left: 7px solid #075826;
+    }
+
+    .btn-green {
+      background: #075826;
+      color: white;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-green:hover {
+      background: #043f1a;
+    }
+
+    .titulo {
+      color: #064b22;
+    }
+
+    .table-head {
+      background: #075826;
+      color: white;
+    }
+
+    .massive-label {
+      color: #075826;
+      font-weight: bold;
+      margin-top: 5px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PORTADA -->
+  <section class="header-bg text-white">
+    <div class="max-w-7xl mx-auto px-8 py-8">
+      <div class="flex flex-col md:flex-row items-center gap-8">
+
+        <!-- LOGO -->
+        <div class="logo-box">
+          <img src="portada.png" class="w-60 md:w-64">
+        </div>
+
+        <!-- TEXTO -->
+        <div class="text-center md:text-left">
+          <h2 class="text-yellow-400 text-3xl md:text-4xl font-extrabold">
+            LA LIBERTAD
+          </h2>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h1 class="text-6xl md:text-7xl font-extrabold text-white">
+            DIVINCRI
+          </h1>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h3 class="text-yellow-400 text-2xl md:text-3xl font-bold">
+            REGIÓN POLICIAL LA LIBERTAD
+          </h3>
+
+          <p class="mt-3 text-lg">
+            Sistema de Consulta y Registro de Números Telefónicos
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MENÚ SEPARADO EN CUADROS -->
+  <nav class="menu-container">
+    <div class="max-w-7xl mx-auto px-8 flex justify-center">
+      <div class="flex flex-wrap gap-5 justify-center">
+        <a href="#" class="menu-item menu-active">
+          Inicio
+        </a>
+
+        <a href="#consulta" class="menu-item">
+          Consulta
+        </a>
+
+        <a href="#registro" class="menu-item">
+          Registrar
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <main class="max-w-7xl mx-auto p-6 mt-8">
+
+    <!-- TARJETAS -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-phone text-5xl text-green-900"></i>
+        <h2 id="totalNumeros" class="text-5xl font-bold mt-4">0</h2>
+        <p class="font-semibold mt-2">Números Registrados</p>
+      </div>
+
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-search text-5xl text-green-700"></i>
+        <h2 id="totalConsultas" class="text-5xl font-bold mt-4">0</h2>
+        <p class="font-semibold mt-2">Consultas Realizadas</p>
+      </div>
+
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-users text-5xl text-orange-500"></i>
+        <h2 class="text-5xl font-bold mt-4">1</h2>
+        <p class="font-semibold mt-2">Usuarios Activos</p>
+      </div>
+
+    </div>
+
+    <!-- CONSULTAR -->
+    <section id="consulta" class="section-box bg-white p-7 rounded-xl shadow mb-8">
+      <h2 class="text-3xl font-bold titulo mb-2">
+        <i class="fa fa-search mr-3"></i> Consultar Números Masivos
+      </h2>
+
+
+      <div class="flex flex-col md:flex-row gap-4 mt-3">
+        <input type="text" id="buscarNumero" placeholder="Ingrese número"
+          class="border p-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-700">
+
+        <button onclick="consultarNumero()" class="btn-green px-10 py-4 rounded">
+          Buscar
+        </button>
+      </div>
+
+      <div id="resultadoConsulta" class="mt-5"></div>
+    </section>
+
+    <!-- REGISTRAR -->
+    <section id="registro" class="section-box bg-white p-7 rounded-xl shadow mb-8">
+      <h2 class="text-3xl font-bold titulo mb-5">
+        <i class="fa fa-plus-circle mr-3"></i> Registrar Número
+      </h2>
+
+      <input type="text" id="nuevoNumero" placeholder="Número Telefónico"
+        class="border p-4 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-green-700">
+
+      <input type="text" id="observacion" placeholder="Observación"
+        class="border p-4 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-green-700">
+
+      <button onclick="registrarNumero()" class="btn-green px-10 py-4 rounded">
+        Guardar Registro
+      </button>
+    </section>
+
+    <!-- TABLA -->
+    <section class="bg-white p-7 rounded-xl shadow border-l-8 border-yellow-400">
+      <h2 class="text-3xl font-bold titulo mb-5">
+        Últimos Registros
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border">
+          <thead>
+            <tr class="table-head">
+              <th class="p-4 border">Número</th>
+              <th class="p-4 border">Observación</th>
+              <th class="p-4 border">Fecha</th>
+            </tr>
+          </thead>
+
+          <tbody id="tablaNumeros"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let numeros = JSON.parse(localStorage.getItem("numeros")) || [];
+    let consultas = parseInt(localStorage.getItem("consultas")) || 0;
+
+    actualizarTabla();
+
+    function registrarNumero() {
+      let numero = document.getElementById("nuevoNumero").value.trim();
+      let observacion = document.getElementById("observacion").value.trim();
+
+      if (numero === "") { alert("Ingrese un número"); return; }
+
+      numeros.push({ numero: numero, observacion: observacion, fecha: new Date().toLocaleDateString() });
+      localStorage.setItem("numeros", JSON.stringify(numeros));
+      actualizarTabla();
+      document.getElementById("nuevoNumero").value = "";
+      document.getElementById("observacion").value = "";
+      alert("Registro guardado correctamente");
+    }
+
+    function consultarNumero() {
+      let buscar = document.getElementById("buscarNumero").value.trim();
+      if (buscar === "") { alert("Ingrese un número para consultar"); return; }
+      consultas++;
+      localStorage.setItem("consultas", consultas);
+      document.getElementById("totalConsultas").innerHTML = consultas;
+
+      let encontrado = numeros.find(n => n.numero === buscar);
+      let resultado = document.getElementById("resultadoConsulta");
+
+      if (encontrado) {
+        resultado.innerHTML = `<div class="bg-green-100 p-5 rounded border border-green-600 text-green-900">
+        <b>Número:</b> ${encontrado.numero}<br>
+        <b>Observación:</b> ${encontrado.observacion}<br>
+        <b>Fecha:</b> ${encontrado.fecha}</div>`;
+      } else {
+        resultado.innerHTML = `<div class="bg-red-100 p-5 rounded border border-red-500 text-red-900">
+          Número no encontrado.
+        </div>`;
+      }
+    }
+
+    function actualizarTabla() {
+      let tabla = document.getElementById("tablaNumeros");
+      tabla.innerHTML = "";
+      numeros.forEach(item => {
+        tabla.innerHTML += `<tr class="border-b hover:bg-green-50">
+          <td class="p-4 border text-center">${item.numero}</td>
+          <td class="p-4 border text-center">${item.observacion}</td>
+          <td class="p-4 border text-center">${item.fecha}</td>
+        </tr>`;
+      });
+      document.getElementById("totalNumeros").innerHTML = numeros.length;
+      document.getElementById("totalConsultas").innerHTML = consultas;
+    }
+  </script>
+
+</body>
+</html>
