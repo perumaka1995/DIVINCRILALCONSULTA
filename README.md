@@ -103,7 +103,7 @@
       </h1>
 
       <h2 class="text-yellow-200 text-xl font-bold">
-        TRUJILLO
+        REGIÓN POLICIAL LA LIBERTAD
       </h2>
 
     </div>
