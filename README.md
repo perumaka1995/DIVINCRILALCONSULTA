@@ -118,9 +118,9 @@
 
   <img src="portada.png" class="logo">
 
-  <div class="title1">REGIÓN LA LIBERTAD</div>
+  <div class="title1">REGIÓN POLICIAL LA LIBERTAD</div>
   <div class="title2">DIVINCRI</div>
-  <div class="subtitle">REGIÓN POLICIAL LA LIBERTAD</div>
+  <div class="subtitle">Consulta de Whatsapp Records</div>
 
 </div>
 
