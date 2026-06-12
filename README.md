@@ -15,40 +15,40 @@
       font-family: Arial;
     }
 
-    /* HEADER GRANDE */
     .header {
       background: linear-gradient(90deg, #064b22, #0b5a2a);
       color: white;
-      padding: 40px 20px;
+      padding: 40px;
+      text-align: center;
     }
 
-    .logo-big {
-      width: 180px;
-      height: 180px;
-      object-fit: contain;
+    .logo {
+      width: 160px;
+      height: 160px;
       background: white;
       border: 3px solid gold;
       border-radius: 12px;
-      padding: 10px;
+      padding: 8px;
+      object-fit: contain;
+      margin: auto;
     }
 
-    .title-yellow {
+    .title1 {
       color: #ffd700;
       font-size: 3rem;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 3px;
+      margin-top: 10px;
     }
 
-    .title-main {
-      font-size: 4.5rem;
+    .title2 {
+      font-size: 4rem;
       font-weight: 900;
       letter-spacing: 6px;
     }
 
     .subtitle {
       color: #fef08a;
-      font-size: 1.2rem;
       font-weight: bold;
     }
 
@@ -72,7 +72,7 @@
     }
 
     .btn-blue {
-      background: blue;
+      background: #2563eb;
       color: white;
       padding: 5px 10px;
       border-radius: 6px;
@@ -113,36 +113,17 @@
 
 <body>
 
-<!-- HEADER CON IMAGEN A LA IZQUIERDA -->
+<!-- HEADER -->
 <div class="header">
 
-  <div class="flex items-center justify-center gap-10 flex-wrap">
+  <img src="portada.png" class="logo">
 
-    <!-- IMAGEN GRANDE -->
-    <img src="portada.png" class="logo-big">
-
-    <!-- TEXTO -->
-    <div class="text-center">
-
-      <h1 class="title-yellow">
-        REGIÓN POLICIAL LA LIBERTAD
-      </h1>
-
-      <h1 class="title-main">
-        DIVINCRI
-      </h1>
-
-      <h2 class="subtitle">
-       Consulta de Whatsapp Records
-      </h2>
-
-    </div>
-
-  </div>
+  <div class="title1">REGIÓN LA LIBERTAD</div>
+  <div class="title2">DIVINCRI</div>
+  <div class="subtitle">REGIÓN POLICIAL LA LIBERTAD</div>
 
 </div>
 
-<!-- CONTENIDO -->
 <div class="box">
 
   <!-- REGISTRO -->
@@ -155,7 +136,10 @@
     <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
     <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
 
-    <button class="btn" onclick="guardar()">Guardar</button>
+    <!-- ARCHIVO -->
+    <input type="file" id="archivo" class="border p-2 w-full mb-2 rounded">
+
+    <button class="btn" onclick="guardar()">Guardar Registro</button>
 
   </div>
 
@@ -184,6 +168,7 @@
           <th>Solicitante</th>
           <th>Observación</th>
           <th>Vinculaciones</th>
+          <th>Archivo</th>
           <th>Acción</th>
         </tr>
       </thead>
@@ -203,26 +188,43 @@ render();
 
 function guardar() {
 
+  let file = document.getElementById("archivo").files[0];
+
   let obj = {
     numero: numero.value,
     solicitante: solicitante.value,
     observacion: observacion.value,
     vinculados: vinculados.value,
+    archivo: "",
     fecha: new Date().toLocaleDateString()
   };
 
   if (obj.numero === "") return alert("Ingrese número");
 
-  if (editIndex === -1) {
-    datos.push(obj);
-  } else {
-    datos[editIndex] = obj;
-    editIndex = -1;
+  function saveData(fileData = "") {
+    obj.archivo = fileData;
+
+    if (editIndex === -1) {
+      datos.push(obj);
+    } else {
+      datos[editIndex] = obj;
+      editIndex = -1;
+    }
+
+    localStorage.setItem("datos", JSON.stringify(datos));
+    limpiar();
+    render();
   }
 
-  localStorage.setItem("datos", JSON.stringify(datos));
-  limpiar();
-  render();
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = function (e) {
+      saveData(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    saveData();
+  }
 }
 
 function consultar() {
@@ -233,7 +235,7 @@ function consultar() {
     resultado.innerHTML = `
       <div style="background:#d1fae5;padding:10px;border-radius:8px">
         ✔ Encontrado <br>
-        ${r.numero} - ${r.solicitante} - ${r.observacion}
+        ${r.numero} - ${r.solicitante}
       </div>`;
   } else {
     resultado.innerHTML = `
@@ -254,6 +256,9 @@ function render() {
         <td>${d.solicitante}</td>
         <td>${d.observacion}</td>
         <td>${d.vinculados}</td>
+        <td>
+          ${d.archivo ? `<a download href="${d.archivo}" class="btn-blue">Descargar</a>` : "Sin archivo"}
+        </td>
         <td>
           <button class="btn-blue" onclick="editar(${i})">Editar</button>
           <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
@@ -285,6 +290,7 @@ function limpiar(){
   solicitante.value="";
   observacion.value="";
   vinculados.value="";
+  archivo.value="";
 }
 </script>
 
