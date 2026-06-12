@@ -3,173 +3,67 @@
 
 <head>
   <meta charset="UTF-8">
+  <title>DIVINCRI PRO SYSTEM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIVINCRI LA LIBERTAD</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
-    body {
-      background: #e7f1e7;
-      font-family: Arial;
-    }
-
-    .header {
-      background: linear-gradient(90deg, #064b22, #0b5a2a);
-      color: white;
-      padding: 40px;
-      text-align: center;
-    }
-
-    .logo {
-      width: 160px;
-      height: 160px;
-      background: white;
-      border: 3px solid gold;
-      border-radius: 12px;
-      padding: 8px;
-      object-fit: contain;
-      margin: auto;
-    }
-
-    .title1 {
-      color: #ffd700;
-      font-size: 3rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      margin-top: 10px;
-    }
-
-    .title2 {
-      font-size: 4rem;
-      font-weight: 900;
-      letter-spacing: 6px;
-    }
-
-    .subtitle {
-      color: #fef08a;
-      font-weight: bold;
-    }
-
-    .btn {
-      background: #075826;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-
-    .btn:hover {
-      background: #043f1a;
-    }
-
-    .btn-red {
-      background: red;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
-    }
-
-    .btn-blue {
-      background: #2563eb;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      background: #075826;
-      color: white;
-      padding: 10px;
-    }
-
-    td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .box {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .section {
-      background: white;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-      border-left: 6px solid #075826;
-    }
+    body { background:#e7f1e7; font-family: Arial; }
+    .card { background:white; padding:20px; border-radius:10px; }
+    .btn { background:#075826; color:white; padding:10px; border-radius:8px; width:100%; }
+    .btn:hover { background:#043f1a; }
+    .hidden { display:none; }
   </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
+<!-- LOGIN -->
+<div id="loginBox" class="card max-w-md mx-auto mt-20">
+  <h2 class="text-2xl font-bold mb-4">LOGIN DIVINCRI</h2>
 
-  <img src="portada.png" class="logo">
+  <input id="email" placeholder="Correo" class="border p-2 w-full mb-2">
+  <input id="password" type="password" placeholder="Contraseña" class="border p-2 w-full mb-2">
 
-  <div class="title1">REGIÓN POLICIAL LA LIBERTAD</div>
-  <div class="title2">DIVINCRI</div>
-  <div class="subtitle">Consulta de Whatsapp Records</div>
-
+  <button class="btn" onclick="login()">Ingresar</button>
+  <button class="mt-2 text-blue-600" onclick="register()">Crear cuenta</button>
 </div>
 
-<div class="box">
+<!-- APP -->
+<div id="app" class="hidden max-w-6xl mx-auto p-6">
 
-  <!-- REGISTRO -->
-  <div class="section">
+  <h1 class="text-3xl font-bold text-center mb-4">DIVINCRI LA LIBERTAD</h1>
 
-    <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
+  <button class="bg-red-600 text-white p-2 rounded" onclick="logout()">Salir</button>
 
-    <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
-    <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
-    <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
-    <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
+  <div class="card mt-4">
 
-    <!-- ARCHIVO -->
-    <input type="file" id="archivo" class="border p-2 w-full mb-2 rounded">
+    <h2 class="text-xl font-bold mb-3">Registrar Número</h2>
 
-    <button class="btn" onclick="guardar()">Guardar Registro</button>
+    <input id="numero" placeholder="Número" class="border p-2 w-full mb-2">
+    <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2">
+    <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2">
 
-  </div>
-
-  <!-- CONSULTA -->
-  <div class="section">
-
-    <h2 class="text-2xl font-bold mb-2">Consultar Número</h2>
-
-    <input id="buscar" placeholder="Ingrese número" class="border p-2 w-full mb-2 rounded">
-
-    <button class="btn" onclick="consultar()">Buscar</button>
-
-    <div id="resultado" class="mt-3"></div>
+    <button class="btn" onclick="guardar()">Guardar</button>
 
   </div>
 
-  <!-- TABLA -->
-  <div class="section">
+  <div class="card mt-4">
 
-    <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
+    <h2 class="text-xl font-bold mb-3">Registros</h2>
 
-    <table>
+    <table class="w-full border">
       <thead>
-        <tr>
+        <tr class="bg-green-800 text-white">
           <th>Número</th>
           <th>Solicitante</th>
           <th>Observación</th>
-          <th>Vinculaciones</th>
-          <th>Archivo</th>
-          <th>Acción</th>
         </tr>
       </thead>
 
@@ -181,117 +75,89 @@
 </div>
 
 <script>
-let datos = JSON.parse(localStorage.getItem("datos")) || [];
-let editIndex = -1;
 
-render();
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT.firebaseapp.com",
+  projectId: "TU_PROJECT",
+  appId: "TU_APP"
+};
 
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// LOGIN
+function login() {
+  auth.signInWithEmailAndPassword(email.value, password.value)
+  .then(() => {
+    loginBox.classList.add("hidden");
+    app.classList.remove("hidden");
+    cargar();
+  })
+  .catch(e => alert(e.message));
+}
+
+// REGISTER
+function register() {
+  auth.createUserWithEmailAndPassword(email.value, password.value)
+  .then(() => alert("Cuenta creada"))
+  .catch(e => alert(e.message));
+}
+
+// LOGOUT
+function logout() {
+  auth.signOut();
+  location.reload();
+}
+
+// AUTH STATE
+auth.onAuthStateChanged(user => {
+  if (user) {
+    loginBox.classList.add("hidden");
+    app.classList.remove("hidden");
+    cargar();
+  }
+});
+
+// GUARDAR
 function guardar() {
-
-  let file = document.getElementById("archivo").files[0];
-
-  let obj = {
+  db.collection("registros").add({
     numero: numero.value,
     solicitante: solicitante.value,
     observacion: observacion.value,
-    vinculados: vinculados.value,
-    archivo: "",
     fecha: new Date().toLocaleDateString()
-  };
-
-  if (obj.numero === "") return alert("Ingrese número");
-
-  function saveData(fileData = "") {
-    obj.archivo = fileData;
-
-    if (editIndex === -1) {
-      datos.push(obj);
-    } else {
-      datos[editIndex] = obj;
-      editIndex = -1;
-    }
-
-    localStorage.setItem("datos", JSON.stringify(datos));
-    limpiar();
-    render();
-  }
-
-  if (file) {
-    let reader = new FileReader();
-    reader.onload = function (e) {
-      saveData(e.target.result);
-    };
-    reader.readAsDataURL(file);
-  } else {
-    saveData();
-  }
-}
-
-function consultar() {
-  let num = buscar.value;
-  let r = datos.find(x => x.numero === num);
-
-  if (r) {
-    resultado.innerHTML = `
-      <div style="background:#d1fae5;padding:10px;border-radius:8px">
-        ✔ Encontrado <br>
-        ${r.numero} - ${r.solicitante}
-      </div>`;
-  } else {
-    resultado.innerHTML = `
-      <div style="background:#fee2e2;padding:10px;border-radius:8px">
-        ❌ No encontrado
-      </div>`;
-  }
-}
-
-function render() {
-  let t = document.getElementById("tabla");
-  t.innerHTML = "";
-
-  datos.forEach((d, i) => {
-    t.innerHTML += `
-      <tr>
-        <td>${d.numero}</td>
-        <td>${d.solicitante}</td>
-        <td>${d.observacion}</td>
-        <td>${d.vinculados}</td>
-        <td>
-          ${d.archivo ? `<a download href="${d.archivo}" class="btn-blue">Descargar</a>` : "Sin archivo"}
-        </td>
-        <td>
-          <button class="btn-blue" onclick="editar(${i})">Editar</button>
-          <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
-        </td>
-      </tr>
-    `;
   });
-}
 
-function eliminar(i){
-  datos.splice(i,1);
-  localStorage.setItem("datos", JSON.stringify(datos));
-  render();
-}
-
-function editar(i){
-  let d = datos[i];
-
-  numero.value = d.numero;
-  solicitante.value = d.solicitante;
-  observacion.value = d.observacion;
-  vinculados.value = d.vinculados;
-
-  editIndex = i;
-}
-
-function limpiar(){
   numero.value="";
   solicitante.value="";
   observacion.value="";
-  vinculados.value="";
-  archivo.value="";
 }
+
+// CARGAR
+function cargar() {
+  db.collection("registros").onSnapshot(snap => {
+
+    let t = document.getElementById("tabla");
+    t.innerHTML = "";
+
+    snap.forEach(doc => {
+      let d = doc.data();
+
+      t.innerHTML += `
+        <tr class="border">
+          <td>${d.numero}</td>
+          <td>${d.solicitante}</td>
+          <td>${d.observacion}</td>
+        </tr>
+      `;
+    });
+
+  });
+}
+
 </script>
 
 </body>
