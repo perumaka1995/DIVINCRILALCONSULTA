@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIVINCRI LA LIBERTAD - WhatsApp Records</title>
+  <title>DIVINCRI LA LIBERTAD - CONSULTAS</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,145 +12,216 @@
   <style>
     body {
       background: #e7f1e7;
-      font-family: Arial;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .header {
-      background: linear-gradient(90deg, #064b22, #0b5a2a);
-      color: white;
-      padding: 25px;
+    .header-bg {
+      background: linear-gradient(90deg, #064b22 0%, #0b5a2a 50%, #8bb68f 100%);
     }
 
-    .card {
-      background: white;
+    .logo-box {
+      background: #064b22;
+      border: 2px solid #f4c400;
       border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.35);
     }
 
-    .section {
-      border-left: 6px solid #075826;
+    .menu-container {
+      margin-top: -22px;
+      position: relative;
+      z-index: 10;
     }
 
-    .btn {
+    .menu-item {
+      background: #075826;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: 2px solid #f4c400;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .menu-item:hover {
+      background: #f4c400;
+      color: #064b22;
+      transform: translateY(-2px);
+    }
+
+    .menu-active {
+      background: #f4c400;
+      color: #064b22;
+    }
+
+    .section-box {
+      border-left: 7px solid #075826;
+    }
+
+    .btn-green {
       background: #075826;
       color: white;
-      padding: 10px 18px;
-      border-radius: 8px;
       font-weight: bold;
     }
 
-    .btn:hover {
+    .btn-green:hover {
       background: #043f1a;
     }
 
-    .btn-red {
-      background: #c53030;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
+    .titulo {
+      color: #064b22;
     }
 
-    .btn-blue {
-      background: #2b6cb0;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
+    .table-head {
       background: #075826;
       color: white;
-      padding: 10px;
     }
 
-    td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
+    .massive-label {
+      color: #075826;
+      font-weight: bold;
+      margin-top: 5px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <div class="header flex items-center gap-6">
-    <img src="portada.png" class="w-40 border-2 border-yellow-400 rounded-lg p-2">
-    <div>
-      <h1 class="text-4xl font-bold">DIVINCRI LA LIBERTAD</h1>
-      <p class="text-yellow-300 font-semibold">
-        Sistema de Registro y Consulta de Whatsapp Records
-      </p>
+  <!-- PORTADA -->
+  <section class="header-bg text-white">
+    <div class="max-w-7xl mx-auto px-8 py-8">
+      <div class="flex flex-col md:flex-row items-center gap-8">
+
+        <!-- LOGO -->
+        <div class="logo-box">
+          <img src="portada.png" class="w-60 md:w-64">
+        </div>
+
+        <!-- TEXTO -->
+        <div class="text-center md:text-left">
+
+          <h2 class="text-yellow-400 text-3xl md:text-4xl font-extrabold">
+            LA LIBERTAD
+          </h2>
+
+          <!-- 🔥 NUEVO TÍTULO CENTRAL -->
+          <h1 class="text-yellow-300 text-5xl md:text-6xl font-extrabold uppercase text-center tracking-widest">
+            REGIÓN LA LIBERTAD
+          </h1>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h1 class="text-6xl md:text-7xl font-extrabold text-white text-center md:text-left">
+            DIVINCRI
+          </h1>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h3 class="text-yellow-400 text-2xl md:text-3xl font-bold">
+            REGIÓN POLICIAL LA LIBERTAD
+          </h3>
+
+          <p class="mt-3 text-lg">
+            Sistema de Consulta y Registro de Números Telefónicos
+          </p>
+
+        </div>
+
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- CARDS -->
-  <div class="grid grid-cols-3 gap-6 p-6">
+  <!-- MENÚ -->
+  <nav class="menu-container">
+    <div class="max-w-7xl mx-auto px-8 flex justify-center">
+      <div class="flex flex-wrap gap-5 justify-center">
+        <a href="#" class="menu-item menu-active">Inicio</a>
+        <a href="#consulta" class="menu-item">Consulta</a>
+        <a href="#registro" class="menu-item">Registrar</a>
+      </div>
+    </div>
+  </nav>
 
-    <div class="card">
-      <i class="fa fa-phone text-4xl text-green-700"></i>
-      <h2 id="total" class="text-3xl font-bold">0</h2>
-      <p>Números Registrados</p>
+  <!-- CONTENIDO -->
+  <main class="max-w-7xl mx-auto p-6 mt-8">
+
+    <!-- TARJETAS -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+
+      <div class="bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-phone text-5xl text-green-900"></i>
+        <h2 id="totalNumeros" class="text-5xl font-bold mt-4">0</h2>
+        <p>Números Registrados</p>
+      </div>
+
+      <div class="bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-search text-5xl text-green-700"></i>
+        <h2 id="totalConsultas" class="text-5xl font-bold mt-4">0</h2>
+        <p>Consultas Realizadas</p>
+      </div>
+
+      <div class="bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-users text-5xl text-orange-500"></i>
+        <h2 class="text-5xl font-bold mt-4">1</h2>
+        <p>Usuarios Activos</p>
+      </div>
+
     </div>
 
-    <div class="card">
-      <i class="fa fa-search text-4xl text-green-600"></i>
-      <h2 id="consultas" class="text-3xl font-bold">0</h2>
-      <p>Consultas</p>
-    </div>
+    <!-- REGISTRO -->
+    <section id="registro" class="section-box bg-white p-7 rounded-xl shadow mb-8">
 
-    <div class="card">
-      <i class="fa fa-users text-4xl text-orange-500"></i>
-      <h2>1</h2>
-      <p>Usuarios Activos</p>
-    </div>
+      <h2 class="text-3xl font-bold titulo mb-5">
+        Registrar Número
+      </h2>
 
-  </div>
+      <input type="text" id="nuevoNumero" placeholder="Número Telefónico"
+        class="border p-4 rounded w-full mb-4">
 
-  <!-- REGISTRO -->
-  <div class="p-6 max-w-6xl mx-auto section bg-white rounded shadow">
+      <input type="text" id="solicitante" placeholder="Solicitante"
+        class="border p-4 rounded w-full mb-4">
 
-    <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
+      <input type="text" id="observacion" placeholder="Observación"
+        class="border p-4 rounded w-full mb-4">
 
-    <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
+      <input type="text" id="vinculados" placeholder="Vinculaciones"
+        class="border p-4 rounded w-full mb-4">
 
-    <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
+      <button onclick="registrarNumero()" class="btn-green px-8 py-3 rounded">
+        Guardar Registro
+      </button>
 
-    <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
+    </section>
 
-    <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
+    <!-- TABLA -->
+    <section class="bg-white p-7 rounded-xl shadow border-l-8 border-yellow-400">
 
-    <button class="btn" onclick="guardar()">Guardar Registro</button>
+      <h2 class="text-3xl font-bold titulo mb-5">
+        Últimos Registros
+      </h2>
 
-  </div>
+      <table class="w-full border">
+        <thead>
+          <tr class="table-head">
+            <th>Número</th>
+            <th>Solicitante</th>
+            <th>Observación</th>
+            <th>Vinculaciones</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
 
-  <!-- TABLA -->
-  <div class="p-6 max-w-6xl mx-auto bg-white rounded shadow mt-6">
+        <tbody id="tablaNumeros"></tbody>
+      </table>
 
-    <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
+    </section>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Solicitante</th>
-          <th>Observación</th>
-          <th>Vinculaciones</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-
-      <tbody id="tabla"></tbody>
-    </table>
-
-  </div>
+  </main>
 
   <script>
     let datos = JSON.parse(localStorage.getItem("datos")) || [];
@@ -158,9 +229,10 @@
 
     render();
 
-    function guardar() {
+    function registrarNumero() {
+
       let obj = {
-        numero: document.getElementById("numero").value,
+        numero: document.getElementById("nuevoNumero").value,
         solicitante: document.getElementById("solicitante").value,
         observacion: document.getElementById("observacion").value,
         vinculados: document.getElementById("vinculados").value,
@@ -182,7 +254,7 @@
     }
 
     function render() {
-      let t = document.getElementById("tabla");
+      let t = document.getElementById("tablaNumeros");
       t.innerHTML = "";
 
       datos.forEach((d, i) => {
@@ -192,15 +264,16 @@
             <td>${d.solicitante}</td>
             <td>${d.observacion}</td>
             <td>${d.vinculados}</td>
+            <td>${d.fecha}</td>
             <td>
-              <button class="btn-blue" onclick="editar(${i})">Editar</button>
-              <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
+              <button onclick="editar(${i})" class="bg-blue-600 text-white px-3 py-1 rounded">Editar</button>
+              <button onclick="eliminar(${i})" class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
             </td>
           </tr>
         `;
       });
 
-      document.getElementById("total").innerText = datos.length;
+      document.getElementById("totalNumeros").innerText = datos.length;
     }
 
     function eliminar(i) {
@@ -214,7 +287,7 @@
     function editar(i) {
       let d = datos[i];
 
-      document.getElementById("numero").value = d.numero;
+      document.getElementById("nuevoNumero").value = d.numero;
       document.getElementById("solicitante").value = d.solicitante;
       document.getElementById("observacion").value = d.observacion;
       document.getElementById("vinculados").value = d.vinculados;
@@ -223,11 +296,12 @@
     }
 
     function limpiar() {
-      document.getElementById("numero").value = "";
+      document.getElementById("nuevoNumero").value = "";
       document.getElementById("solicitante").value = "";
       document.getElementById("observacion").value = "";
       document.getElementById("vinculados").value = "";
     }
+
   </script>
 
 </body>
