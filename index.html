@@ -171,7 +171,7 @@
       </div>
 
       <div class="card-top bg-white p-8 rounded-xl shadow text-center">
-        <i class="fa fa-users text-5xl text-orange-500"></i>
+        <i class="fa fa-users text-5xl font-bold text-orange-500"></i>
         <h2 class="text-5xl font-bold mt-4">1</h2>
         <p class="font-semibold mt-2">Usuarios Activos</p>
       </div>
@@ -183,7 +183,6 @@
       <h2 class="text-3xl font-bold titulo mb-2">
         <i class="fa fa-search mr-3"></i> Consultar Números Masivos
       </h2>
-
 
       <div class="flex flex-col md:flex-row gap-4 mt-3">
         <input type="text" id="buscarNumero" placeholder="Ingrese número"
@@ -227,6 +226,7 @@
               <th class="p-4 border">Número</th>
               <th class="p-4 border">Observación</th>
               <th class="p-4 border">Fecha</th>
+              <th class="p-4 border">Acción</th>
             </tr>
           </thead>
 
@@ -279,14 +279,27 @@
       }
     }
 
+    function eliminarNumero(index) {
+      if (confirm("¿Desea eliminar este registro?")) {
+        numeros.splice(index, 1);
+        localStorage.setItem("numeros", JSON.stringify(numeros));
+        actualizarTabla();
+      }
+    }
+
     function actualizarTabla() {
       let tabla = document.getElementById("tablaNumeros");
       tabla.innerHTML = "";
-      numeros.forEach(item => {
+      numeros.forEach((item, index) => {
         tabla.innerHTML += `<tr class="border-b hover:bg-green-50">
           <td class="p-4 border text-center">${item.numero}</td>
           <td class="p-4 border text-center">${item.observacion}</td>
           <td class="p-4 border text-center">${item.fecha}</td>
+          <td class="p-4 border text-center">
+            <button onclick="eliminarNumero(${index})" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+              Eliminar
+            </button>
+          </td>
         </tr>`;
       });
       document.getElementById("totalNumeros").innerHTML = numeros.length;
