@@ -125,7 +125,7 @@
     <div class="text-center">
 
       <h1 class="title-yellow">
-        REGIÓN LA LIBERTAD
+        REGIÓN POLICIAL LA LIBERTAD
       </h1>
 
       <h1 class="title-main">
@@ -133,7 +133,7 @@
       </h1>
 
       <h2 class="subtitle">
-        REGIÓN POLICIAL LA LIBERTAD
+       Consulta de Whatsapp Records
       </h2>
 
     </div>
