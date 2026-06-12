@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIVINCRI LA LIBERTAD - SISTEMA</title>
+  <title>DIVINCRI LA LIBERTAD - CONSULTAS</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,190 +12,204 @@
   <style>
     body {
       background: #e7f1e7;
-      font-family: Arial;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .header {
-      background: linear-gradient(90deg, #064b22, #0b5a2a);
-      color: white;
-      padding: 25px;
+    .header-bg {
+      background: linear-gradient(90deg, #064b22 0%, #0b5a2a 50%, #8bb68f 100%);
     }
 
-    .box {
-      border-left: 6px solid #075826;
+    .logo-box {
+      background: #064b22;
+      border: 2px solid #f4c400;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.35);
     }
 
-    .btn {
+    .menu-container {
+      margin-top: -22px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .menu-item {
+      background: #075826;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: 2px solid #f4c400;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .menu-item:hover {
+      background: #f4c400;
+      color: #064b22;
+      transform: translateY(-2px);
+    }
+
+    .menu-active {
+      background: #f4c400;
+      color: #064b22;
+    }
+
+    .section-box {
+      border-left: 7px solid #075826;
+    }
+
+    .btn-green {
       background: #075826;
       color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
       font-weight: bold;
     }
 
-    .btn:hover {
+    .btn-green:hover {
       background: #043f1a;
     }
 
-    .btn-red {
-      background: #c53030;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
+    .titulo {
+      color: #064b22;
     }
 
-    .btn-blue {
-      background: #2b6cb0;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
+    .table-head {
       background: #075826;
       color: white;
-      padding: 10px;
-    }
-
-    td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <div class="header text-center">
-    <h1 class="text-3xl font-bold">DIVINCRI - LA LIBERTAD</h1>
-    <p>Sistema de Registro de Números</p>
-  </div>
+  <!-- PORTADA -->
+  <section class="header-bg text-white">
+    <div class="max-w-7xl mx-auto px-8 py-8 flex items-center gap-6">
 
-  <div class="p-6 max-w-6xl mx-auto">
+      <div class="logo-box">
+        <img src="portada.png" class="w-60">
+      </div>
 
-    <!-- REGISTRO -->
-    <div class="box bg-white p-5 rounded mb-6">
+      <div>
+        <h1 class="text-5xl font-bold">DIVINCRI - LA LIBERTAD</h1>
+        <p>Sistema de Consulta y Registro</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- REGISTRAR -->
+  <section class="p-6 max-w-6xl mx-auto">
+
+    <div class="bg-white p-6 rounded shadow mb-6">
 
       <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
 
-      <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
-      <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
-      <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
-      <input id="vinculados" placeholder="Números Vinculados" class="border p-2 w-full mb-2 rounded">
+      <input id="nuevoNumero" placeholder="Número Telefónico"
+        class="border p-2 w-full mb-2 rounded">
 
-      <button class="btn" onclick="guardar()">Guardar</button>
+      <input id="solicitante" placeholder="Solicitante"
+        class="border p-2 w-full mb-2 rounded">
+
+      <input id="observacion" placeholder="Observación"
+        class="border p-2 w-full mb-2 rounded">
+
+      <input id="vinculados" placeholder="Vinculaciones"
+        class="border p-2 w-full mb-2 rounded">
+
+      <button onclick="registrarNumero()" class="btn-green px-4 py-2 rounded">
+        Guardar
+      </button>
+
     </div>
 
     <!-- TABLA -->
-    <div class="box bg-white p-5 rounded">
+    <div class="bg-white p-6 rounded shadow">
 
       <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
 
-      <table>
+      <table class="w-full border">
         <thead>
-          <tr>
-            <th>Número</th>
-            <th>Solicitante</th>
-            <th>Observación</th>
-            <th>Vinculados</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
+          <tr class="table-head">
+            <th class="p-2 border">Número</th>
+            <th class="p-2 border">Solicitante</th>
+            <th class="p-2 border">Observación</th>
+            <th class="p-2 border">Vinculaciones</th>
+            <th class="p-2 border">Fecha</th>
+            <th class="p-2 border">Acción</th>
           </tr>
         </thead>
 
-        <tbody id="tabla"></tbody>
+        <tbody id="tablaNumeros"></tbody>
       </table>
 
     </div>
 
-  </div>
+  </section>
 
   <script>
-    let datos = JSON.parse(localStorage.getItem("datos")) || [];
-    let editIndex = -1;
+    let numeros = JSON.parse(localStorage.getItem("numeros")) || [];
 
-    render();
+    actualizarTabla();
 
-    function guardar() {
-      let numero = document.getElementById("numero").value;
-      let solicitante = document.getElementById("solicitante").value;
-      let observacion = document.getElementById("observacion").value;
-      let vinculados = document.getElementById("vinculados").value;
+    function registrarNumero() {
+      let numero = document.getElementById("nuevoNumero").value.trim();
+      let solicitante = document.getElementById("solicitante").value.trim();
+      let observacion = document.getElementById("observacion").value.trim();
+      let vinculados = document.getElementById("vinculados").value.trim();
 
-      if (numero === "") return alert("Ingrese número");
+      if (numero === "") {
+        alert("Ingrese número");
+        return;
+      }
 
-      let obj = {
+      numeros.push({
         numero,
         solicitante,
         observacion,
         vinculados,
         fecha: new Date().toLocaleDateString()
-      };
+      });
 
-      if (editIndex === -1) {
-        datos.push(obj);
-      } else {
-        datos[editIndex] = obj;
-        editIndex = -1;
-      }
+      localStorage.setItem("numeros", JSON.stringify(numeros));
+      actualizarTabla();
 
-      localStorage.setItem("datos", JSON.stringify(datos));
-      limpiar();
-      render();
+      document.getElementById("nuevoNumero").value = "";
+      document.getElementById("solicitante").value = "";
+      document.getElementById("observacion").value = "";
+      document.getElementById("vinculados").value = "";
     }
 
-    function render() {
-      let tabla = document.getElementById("tabla");
+    function eliminarNumero(i) {
+      if (confirm("¿Eliminar registro?")) {
+        numeros.splice(i, 1);
+        localStorage.setItem("numeros", JSON.stringify(numeros));
+        actualizarTabla();
+      }
+    }
+
+    function actualizarTabla() {
+      let tabla = document.getElementById("tablaNumeros");
       tabla.innerHTML = "";
 
-      datos.forEach((d, i) => {
+      numeros.forEach((item, i) => {
         tabla.innerHTML += `
           <tr>
-            <td>${d.numero}</td>
-            <td>${d.solicitante}</td>
-            <td>${d.observacion}</td>
-            <td>${d.vinculados}</td>
-            <td>${d.fecha}</td>
-            <td>
-              <button class="btn-blue" onclick="editar(${i})">Editar</button>
-              <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
+            <td class="p-2 border">${item.numero}</td>
+            <td class="p-2 border">${item.solicitante}</td>
+            <td class="p-2 border">${item.observacion}</td>
+            <td class="p-2 border">${item.vinculados}</td>
+            <td class="p-2 border">${item.fecha}</td>
+            <td class="p-2 border">
+              <button onclick="eliminarNumero(${i})" class="bg-red-600 text-white px-2 py-1 rounded">
+                Eliminar
+              </button>
             </td>
           </tr>
         `;
       });
-    }
-
-    function eliminar(i) {
-      if (confirm("¿Eliminar registro?")) {
-        datos.splice(i, 1);
-        localStorage.setItem("datos", JSON.stringify(datos));
-        render();
-      }
-    }
-
-    function editar(i) {
-      let d = datos[i];
-
-      document.getElementById("numero").value = d.numero;
-      document.getElementById("solicitante").value = d.solicitante;
-      document.getElementById("observacion").value = d.observacion;
-      document.getElementById("vinculados").value = d.vinculados;
-
-      editIndex = i;
-    }
-
-    function limpiar() {
-      document.getElementById("numero").value = "";
-      document.getElementById("solicitante").value = "";
-      document.getElementById("observacion").value = "";
-      document.getElementById("vinculados").value = "";
     }
   </script>
 
