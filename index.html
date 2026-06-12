@@ -15,20 +15,42 @@
       font-family: Arial;
     }
 
-    /* HEADER EXACTO */
+    /* HEADER GRANDE CENTRADO */
     .header {
       background: linear-gradient(90deg, #064b22, #0b5a2a);
-      padding: 30px;
+      padding: 40px 20px;
       color: white;
+      text-align: center;
     }
 
     .logo {
-      width: 140px;
-      height: 140px;
-      border: 2px solid gold;
+      width: 150px;
+      height: 150px;
+      border: 3px solid gold;
       padding: 8px;
-      border-radius: 10px;
       background: white;
+      border-radius: 12px;
+      margin: 0 auto;
+    }
+
+    .title-yellow {
+      color: #ffd700;
+      font-size: 3rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .title-main {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+    }
+
+    .subtitle {
+      color: #fef08a;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
 
     .btn {
@@ -74,111 +96,93 @@
       text-align: center;
     }
 
-    .card {
+    .box {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .section {
       background: white;
       padding: 20px;
+      margin-top: 20px;
       border-radius: 10px;
-      text-align: center;
+      border-left: 6px solid #075826;
     }
   </style>
 </head>
 
 <body>
 
-<!-- HEADER LIMPIO (IGUAL A TU IMAGEN) -->
+<!-- HEADER CENTRADO GRANDE -->
 <div class="header">
 
-  <div class="flex items-center gap-6">
+  <img src="portada.png" class="logo">
 
-    <img src="portada.png" class="logo">
-
-    <div class="text-left">
-
-      <h1 class="text-yellow-300 text-4xl font-extrabold">
-        REGIÓN LA LIBERTAD
-      </h1>
-
-      <h1 class="text-white text-6xl font-extrabold tracking-widest">
-        DIVINCRI
-      </h1>
-
-      <h2 class="text-yellow-200 text-xl font-bold">
-        TRUJILLO
-      </h2>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- CARDS -->
-<div class="grid grid-cols-3 gap-6 p-6">
-
-  <div class="card">
-    <i class="fa fa-phone text-3xl text-green-700"></i>
-    <h2 id="total">0</h2>
-    <p>Números</p>
+  <div class="title-yellow mt-4">
+    REGIÓN LA LIBERTAD
   </div>
 
-  <div class="card">
-    <i class="fa fa-search text-3xl text-green-600"></i>
-    <h2 id="cons">0</h2>
-    <p>Consultas</p>
+  <div class="title-main">
+    DIVINCRI
   </div>
 
-  <div class="card">
-    <i class="fa fa-users text-3xl text-orange-500"></i>
-    <h2>1</h2>
-    <p>Usuarios</p>
+  <div class="subtitle">
+    Consulta de Numeros de Whatsapp Records
   </div>
 
 </div>
 
-<!-- REGISTRO -->
-<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow">
+<!-- CONTENIDO -->
+<div class="box">
 
-  <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
+  <!-- REGISTRO -->
+  <div class="section">
 
-  <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
-  <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
-  <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
-  <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
+    <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
 
-  <button class="btn" onclick="guardar()">Guardar</button>
+    <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
+    <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
+    <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
+    <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
 
-</div>
+    <button class="btn" onclick="guardar()">Guardar</button>
 
-<!-- CONSULTA (AGREGADO FUNCIONAL) -->
-<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow mt-5">
+  </div>
 
-  <h2 class="text-2xl font-bold mb-4">Consultar Número</h2>
+  <!-- CONSULTA -->
+  <div class="section">
 
-  <input id="buscar" placeholder="Ingrese número" class="border p-2 w-full mb-2 rounded">
+    <h2 class="text-2xl font-bold mb-2">Consultar Número</h2>
 
-  <button class="btn" onclick="consultar()">Buscar</button>
+    <input id="buscar" placeholder="Ingrese número" class="border p-2 w-full mb-2 rounded">
 
-  <div id="resultado" class="mt-3"></div>
+    <button class="btn" onclick="consultar()">Buscar</button>
 
-</div>
+    <div id="resultado" class="mt-3"></div>
 
-<!-- TABLA -->
-<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow mt-5">
+  </div>
 
-  <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
+  <!-- TABLA -->
+  <div class="section">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Número</th>
-        <th>Solicitante</th>
-        <th>Observación</th>
-        <th>Vinculaciones</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
+    <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
 
-    <tbody id="tabla"></tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Solicitante</th>
+          <th>Observación</th>
+          <th>Vinculaciones</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabla"></tbody>
+    </table>
+
+  </div>
 
 </div>
 
@@ -248,8 +252,6 @@ function render() {
       </tr>
     `;
   });
-
-  total.innerText = datos.length;
 }
 
 function eliminar(i){
