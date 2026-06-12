@@ -15,22 +15,21 @@
       font-family: Arial;
     }
 
-    /* HEADER GRANDE CENTRADO */
+    /* HEADER GRANDE */
     .header {
       background: linear-gradient(90deg, #064b22, #0b5a2a);
-      padding: 40px 20px;
       color: white;
-      text-align: center;
+      padding: 40px 20px;
     }
 
-    .logo {
-      width: 150px;
-      height: 150px;
-      border: 3px solid gold;
-      padding: 8px;
+    .logo-big {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
       background: white;
+      border: 3px solid gold;
       border-radius: 12px;
-      margin: 0 auto;
+      padding: 10px;
     }
 
     .title-yellow {
@@ -42,7 +41,7 @@
     }
 
     .title-main {
-      font-size: 4rem;
+      font-size: 4.5rem;
       font-weight: 900;
       letter-spacing: 6px;
     }
@@ -114,21 +113,31 @@
 
 <body>
 
-<!-- HEADER CENTRADO GRANDE -->
+<!-- HEADER CON IMAGEN A LA IZQUIERDA -->
 <div class="header">
 
-  <img src="portada.png" class="logo">
+  <div class="flex items-center justify-center gap-10 flex-wrap">
 
-  <div class="title-yellow mt-4">
-    REGIÓN LA LIBERTAD
-  </div>
+    <!-- IMAGEN GRANDE -->
+    <img src="portada.png" class="logo-big">
 
-  <div class="title-main">
-    DIVINCRI
-  </div>
+    <!-- TEXTO -->
+    <div class="text-center">
 
-  <div class="subtitle">
-    Consulta de Numeros de Whatsapp Records
+      <h1 class="title-yellow">
+        REGIÓN LA LIBERTAD
+      </h1>
+
+      <h1 class="title-main">
+        DIVINCRI
+      </h1>
+
+      <h2 class="subtitle">
+        REGIÓN POLICIAL LA LIBERTAD
+      </h2>
+
+    </div>
+
   </div>
 
 </div>
