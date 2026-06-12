@@ -57,6 +57,10 @@
       color: #064b22;
     }
 
+    .card-top {
+      border-top: 5px solid #075826;
+    }
+
     .section-box {
       border-left: 7px solid #075826;
     }
@@ -65,6 +69,7 @@
       background: #075826;
       color: white;
       font-weight: bold;
+      transition: 0.3s;
     }
 
     .btn-green:hover {
@@ -79,6 +84,13 @@
       background: #075826;
       color: white;
     }
+
+    .massive-label {
+      color: #075826;
+      font-weight: bold;
+      margin-top: 5px;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 
@@ -86,105 +98,190 @@
 
   <!-- PORTADA -->
   <section class="header-bg text-white">
-    <div class="max-w-7xl mx-auto px-8 py-8 flex items-center gap-6">
+    <div class="max-w-7xl mx-auto px-8 py-8">
+      <div class="flex flex-col md:flex-row items-center gap-8">
 
-      <div class="logo-box">
-        <img src="portada.png" class="w-60">
+        <!-- LOGO -->
+        <div class="logo-box">
+          <img src="portada.png" class="w-60 md:w-64">
+        </div>
+
+        <!-- TEXTO -->
+        <div class="text-center md:text-left">
+          <h2 class="text-yellow-400 text-3xl md:text-4xl font-extrabold">
+            LA LIBERTAD
+          </h2>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h1 class="text-6xl md:text-7xl font-extrabold text-white">
+            DIVINCRI
+          </h1>
+
+          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
+
+          <h3 class="text-yellow-400 text-2xl md:text-3xl font-bold">
+            REGIÓN POLICIAL LA LIBERTAD
+          </h3>
+
+          <p class="mt-3 text-lg">
+            Sistema de Consulta y Registro de Números Telefónicos
+          </p>
+        </div>
+
       </div>
-
-      <div>
-        <h1 class="text-5xl font-bold">DIVINCRI - LA LIBERTAD</h1>
-        <p>Sistema de Consulta y Registro</p>
-      </div>
-
     </div>
   </section>
 
-  <!-- REGISTRAR -->
-  <section class="p-6 max-w-6xl mx-auto">
+  <!-- MENÚ SEPARADO EN CUADROS -->
+  <nav class="menu-container">
+    <div class="max-w-7xl mx-auto px-8 flex justify-center">
+      <div class="flex flex-wrap gap-5 justify-center">
+        <a href="#" class="menu-item menu-active">
+          Inicio
+        </a>
 
-    <div class="bg-white p-6 rounded shadow mb-6">
+        <a href="#consulta" class="menu-item">
+          Consulta
+        </a>
 
-      <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
+        <a href="#registro" class="menu-item">
+          Registrar
+        </a>
+      </div>
+    </div>
+  </nav>
 
-      <input id="nuevoNumero" placeholder="Número Telefónico"
-        class="border p-2 w-full mb-2 rounded">
+  <!-- CONTENIDO -->
+  <main class="max-w-7xl mx-auto p-6 mt-8">
 
-      <input id="solicitante" placeholder="Solicitante"
-        class="border p-2 w-full mb-2 rounded">
+    <!-- TARJETAS -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
 
-      <input id="observacion" placeholder="Observación"
-        class="border p-2 w-full mb-2 rounded">
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-phone text-5xl text-green-900"></i>
+        <h2 id="totalNumeros" class="text-5xl font-bold mt-4">0</h2>
+        <p class="font-semibold mt-2">Números Registrados</p>
+      </div>
 
-      <input id="vinculados" placeholder="Vinculaciones"
-        class="border p-2 w-full mb-2 rounded">
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-search text-5xl text-green-700"></i>
+        <h2 id="totalConsultas" class="text-5xl font-bold mt-4">0</h2>
+        <p class="font-semibold mt-2">Consultas Realizadas</p>
+      </div>
 
-      <button onclick="registrarNumero()" class="btn-green px-4 py-2 rounded">
-        Guardar
-      </button>
+      <div class="card-top bg-white p-8 rounded-xl shadow text-center">
+        <i class="fa fa-users text-5xl font-bold text-orange-500"></i>
+        <h2 class="text-5xl font-bold mt-4">1</h2>
+        <p class="font-semibold mt-2">Usuarios Activos</p>
+      </div>
 
     </div>
+
+    <!-- CONSULTAR -->
+    <section id="consulta" class="section-box bg-white p-7 rounded-xl shadow mb-8">
+      <h2 class="text-3xl font-bold titulo mb-2">
+        <i class="fa fa-search mr-3"></i> Consultar Números Masivos
+      </h2>
+
+      <div class="flex flex-col md:flex-row gap-4 mt-3">
+        <input type="text" id="buscarNumero" placeholder="Ingrese número"
+          class="border p-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-700">
+
+        <button onclick="consultarNumero()" class="btn-green px-10 py-4 rounded">
+          Buscar
+        </button>
+      </div>
+
+      <div id="resultadoConsulta" class="mt-5"></div>
+    </section>
+
+    <!-- REGISTRAR -->
+    <section id="registro" class="section-box bg-white p-7 rounded-xl shadow mb-8">
+      <h2 class="text-3xl font-bold titulo mb-5">
+        <i class="fa fa-plus-circle mr-3"></i> Registrar Número
+      </h2>
+
+      <input type="text" id="nuevoNumero" placeholder="Número Telefónico"
+        class="border p-4 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-green-700">
+
+      <input type="text" id="observacion" placeholder="Observación"
+        class="border p-4 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-green-700">
+
+      <button onclick="registrarNumero()" class="btn-green px-10 py-4 rounded">
+        Guardar Registro
+      </button>
+    </section>
 
     <!-- TABLA -->
-    <div class="bg-white p-6 rounded shadow">
+    <section class="bg-white p-7 rounded-xl shadow border-l-8 border-yellow-400">
+      <h2 class="text-3xl font-bold titulo mb-5">
+        Últimos Registros
+      </h2>
 
-      <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full border">
+          <thead>
+            <tr class="table-head">
+              <th class="p-4 border">Número</th>
+              <th class="p-4 border">Observación</th>
+              <th class="p-4 border">Fecha</th>
+              <th class="p-4 border">Acción</th>
+            </tr>
+          </thead>
 
-      <table class="w-full border">
-        <thead>
-          <tr class="table-head">
-            <th class="p-2 border">Número</th>
-            <th class="p-2 border">Solicitante</th>
-            <th class="p-2 border">Observación</th>
-            <th class="p-2 border">Vinculaciones</th>
-            <th class="p-2 border">Fecha</th>
-            <th class="p-2 border">Acción</th>
-          </tr>
-        </thead>
+          <tbody id="tablaNumeros"></tbody>
+        </table>
+      </div>
+    </section>
 
-        <tbody id="tablaNumeros"></tbody>
-      </table>
-
-    </div>
-
-  </section>
+  </main>
 
   <script>
     let numeros = JSON.parse(localStorage.getItem("numeros")) || [];
+    let consultas = parseInt(localStorage.getItem("consultas")) || 0;
 
     actualizarTabla();
 
     function registrarNumero() {
       let numero = document.getElementById("nuevoNumero").value.trim();
-      let solicitante = document.getElementById("solicitante").value.trim();
       let observacion = document.getElementById("observacion").value.trim();
-      let vinculados = document.getElementById("vinculados").value.trim();
 
-      if (numero === "") {
-        alert("Ingrese número");
-        return;
-      }
+      if (numero === "") { alert("Ingrese un número"); return; }
 
-      numeros.push({
-        numero,
-        solicitante,
-        observacion,
-        vinculados,
-        fecha: new Date().toLocaleDateString()
-      });
-
+      numeros.push({ numero: numero, observacion: observacion, fecha: new Date().toLocaleDateString() });
       localStorage.setItem("numeros", JSON.stringify(numeros));
       actualizarTabla();
-
       document.getElementById("nuevoNumero").value = "";
-      document.getElementById("solicitante").value = "";
       document.getElementById("observacion").value = "";
-      document.getElementById("vinculados").value = "";
+      alert("Registro guardado correctamente");
     }
 
-    function eliminarNumero(i) {
-      if (confirm("¿Eliminar registro?")) {
-        numeros.splice(i, 1);
+    function consultarNumero() {
+      let buscar = document.getElementById("buscarNumero").value.trim();
+      if (buscar === "") { alert("Ingrese un número para consultar"); return; }
+      consultas++;
+      localStorage.setItem("consultas", consultas);
+      document.getElementById("totalConsultas").innerHTML = consultas;
+
+      let encontrado = numeros.find(n => n.numero === buscar);
+      let resultado = document.getElementById("resultadoConsulta");
+
+      if (encontrado) {
+        resultado.innerHTML = `<div class="bg-green-100 p-5 rounded border border-green-600 text-green-900">
+        <b>Número:</b> ${encontrado.numero}<br>
+        <b>Observación:</b> ${encontrado.observacion}<br>
+        <b>Fecha:</b> ${encontrado.fecha}</div>`;
+      } else {
+        resultado.innerHTML = `<div class="bg-red-100 p-5 rounded border border-red-500 text-red-900">
+          Número no encontrado.
+        </div>`;
+      }
+    }
+
+    function eliminarNumero(index) {
+      if (confirm("¿Desea eliminar este registro?")) {
+        numeros.splice(index, 1);
         localStorage.setItem("numeros", JSON.stringify(numeros));
         actualizarTabla();
       }
@@ -193,23 +290,20 @@
     function actualizarTabla() {
       let tabla = document.getElementById("tablaNumeros");
       tabla.innerHTML = "";
-
-      numeros.forEach((item, i) => {
-        tabla.innerHTML += `
-          <tr>
-            <td class="p-2 border">${item.numero}</td>
-            <td class="p-2 border">${item.solicitante}</td>
-            <td class="p-2 border">${item.observacion}</td>
-            <td class="p-2 border">${item.vinculados}</td>
-            <td class="p-2 border">${item.fecha}</td>
-            <td class="p-2 border">
-              <button onclick="eliminarNumero(${i})" class="bg-red-600 text-white px-2 py-1 rounded">
-                Eliminar
-              </button>
-            </td>
-          </tr>
-        `;
+      numeros.forEach((item, index) => {
+        tabla.innerHTML += `<tr class="border-b hover:bg-green-50">
+          <td class="p-4 border text-center">${item.numero}</td>
+          <td class="p-4 border text-center">${item.observacion}</td>
+          <td class="p-4 border text-center">${item.fecha}</td>
+          <td class="p-4 border text-center">
+            <button onclick="eliminarNumero(${index})" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+              Eliminar
+            </button>
+          </td>
+        </tr>`;
       });
+      document.getElementById("totalNumeros").innerHTML = numeros.length;
+      document.getElementById("totalConsultas").innerHTML = consultas;
     }
   </script>
 
