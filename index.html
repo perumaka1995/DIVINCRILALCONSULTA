@@ -10,6 +10,12 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- FIREBASE COMPAT (IMPORTANTE) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
 <style>
 body{
   font-family: Arial;
@@ -87,7 +93,8 @@ td{
 
 <!-- LOGIN -->
 <div id="loginBox" class="card">
-  <h2>LOGIN</h2>
+  <h2 class="text-xl font-bold mb-3">LOGIN</h2>
+
   <input id="email" placeholder="Correo">
   <input id="password" type="password" placeholder="Contraseña">
 
@@ -100,9 +107,10 @@ td{
 
 <!-- REGISTRO -->
 <div class="card">
-<h2>Registrar Número</h2>
 
-<input id="numero" placeholder="Número">
+<h2 class="text-xl font-bold mb-3">Registrar Número</h2>
+
+<input id="numero" placeholder="Número Telefónico">
 <input id="solicitante" placeholder="Solicitante">
 <input id="observacion" placeholder="Observación">
 <input id="vinculados" placeholder="Vinculaciones">
@@ -110,11 +118,13 @@ td{
 <input type="file" id="archivo">
 
 <button class="btn" onclick="guardar()">Guardar</button>
+
 </div>
 
 <!-- TABLA -->
 <div class="card">
-<h2>Registros</h2>
+
+<h2 class="text-xl font-bold mb-3">Registros</h2>
 
 <table>
 <thead>
@@ -124,7 +134,7 @@ td{
 <th>Observación</th>
 <th>Vinculados</th>
 <th>Archivo</th>
-<th>Acciones</th>
+<th>Acción</th>
 </tr>
 </thead>
 
@@ -135,22 +145,16 @@ td{
 
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
 <script>
 
-// CONFIG REAL
+// 🔥 TU CONFIG REAL (IMPORTANTE)
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT.firebaseapp.com",
-  projectId: "TU_PROJECT",
-  storageBucket: "TU_PROJECT.appspot.com",
-  messagingSenderId: "TU_ID",
-  appId: "TU_APP"
+  apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
+  authDomain: "divincri-la-libertad.firebaseapp.com",
+  projectId: "divincri-la-libertad",
+  storageBucket: "divincri-la-libertad.appspot.com",
+  messagingSenderId: "1004762981616",
+  appId: "1:1004762981616:web:e889f1cc1f4ce373d48e35"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -179,7 +183,7 @@ auth.createUserWithEmailAndPassword(email.value,password.value)
 .catch(e=>alert(e.message));
 }
 
-// AUTH
+// AUTH STATE
 auth.onAuthStateChanged(user=>{
 if(user){
 loginBox.style.display="none";
@@ -251,7 +255,6 @@ t.innerHTML+=`
 </td>
 </tr>
 `;
-
 });
 
 });
