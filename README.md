@@ -1,29 +1,281 @@
-<!-- HEADER -->
-<section class="bg-green-900 text-white py-8">
+<!DOCTYPE html>
+<html lang="es">
 
-  <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIVINCRI LA LIBERTAD</title>
 
-    <!-- LOGO (ARREGLADO) -->
-    <img src="portada.png" 
-         class="w-40 h-40 object-contain border-2 border-yellow-400 rounded-xl p-2 bg-white">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- TEXTO CENTRADO GRANDE -->
-    <div class="text-center">
+  <style>
+    body {
+      background: #e7f1e7;
+      font-family: Arial;
+    }
 
-      <h1 class="text-yellow-300 text-5xl md:text-6xl font-extrabold uppercase tracking-widest">
+    /* HEADER EXACTO */
+    .header {
+      background: linear-gradient(90deg, #064b22, #0b5a2a);
+      padding: 30px;
+      color: white;
+    }
+
+    .logo {
+      width: 140px;
+      height: 140px;
+      border: 2px solid gold;
+      padding: 8px;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .btn {
+      background: #075826;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background: #043f1a;
+    }
+
+    .btn-red {
+      background: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    .btn-blue {
+      background: blue;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #075826;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER LIMPIO (IGUAL A TU IMAGEN) -->
+<div class="header">
+
+  <div class="flex items-center gap-6">
+
+    <img src="portada.png" class="logo">
+
+    <div class="text-left">
+
+      <h1 class="text-yellow-300 text-4xl font-extrabold">
         REGIÓN LA LIBERTAD
       </h1>
 
-      <h1 class="text-white text-6xl md:text-7xl font-extrabold tracking-wide">
+      <h1 class="text-white text-6xl font-extrabold tracking-widest">
         DIVINCRI
       </h1>
 
-      <h2 class="text-yellow-200 text-xl md:text-2xl font-bold mt-2">
-        REGIÓN POLICIAL LA LIBERTAD
+      <h2 class="text-yellow-200 text-xl font-bold">
+        TRUJILLO
       </h2>
 
     </div>
 
   </div>
+</div>
 
-</section>
+<!-- CARDS -->
+<div class="grid grid-cols-3 gap-6 p-6">
+
+  <div class="card">
+    <i class="fa fa-phone text-3xl text-green-700"></i>
+    <h2 id="total">0</h2>
+    <p>Números</p>
+  </div>
+
+  <div class="card">
+    <i class="fa fa-search text-3xl text-green-600"></i>
+    <h2 id="cons">0</h2>
+    <p>Consultas</p>
+  </div>
+
+  <div class="card">
+    <i class="fa fa-users text-3xl text-orange-500"></i>
+    <h2>1</h2>
+    <p>Usuarios</p>
+  </div>
+
+</div>
+
+<!-- REGISTRO -->
+<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow">
+
+  <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
+
+  <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
+  <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
+  <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
+  <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
+
+  <button class="btn" onclick="guardar()">Guardar</button>
+
+</div>
+
+<!-- CONSULTA (AGREGADO FUNCIONAL) -->
+<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow mt-5">
+
+  <h2 class="text-2xl font-bold mb-4">Consultar Número</h2>
+
+  <input id="buscar" placeholder="Ingrese número" class="border p-2 w-full mb-2 rounded">
+
+  <button class="btn" onclick="consultar()">Buscar</button>
+
+  <div id="resultado" class="mt-3"></div>
+
+</div>
+
+<!-- TABLA -->
+<div class="p-6 max-w-6xl mx-auto bg-white rounded shadow mt-5">
+
+  <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Solicitante</th>
+        <th>Observación</th>
+        <th>Vinculaciones</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+
+    <tbody id="tabla"></tbody>
+  </table>
+
+</div>
+
+<script>
+let datos = JSON.parse(localStorage.getItem("datos")) || [];
+let editIndex = -1;
+
+render();
+
+function guardar() {
+
+  let obj = {
+    numero: numero.value,
+    solicitante: solicitante.value,
+    observacion: observacion.value,
+    vinculados: vinculados.value,
+    fecha: new Date().toLocaleDateString()
+  };
+
+  if (obj.numero === "") return alert("Ingrese número");
+
+  if (editIndex === -1) {
+    datos.push(obj);
+  } else {
+    datos[editIndex] = obj;
+    editIndex = -1;
+  }
+
+  localStorage.setItem("datos", JSON.stringify(datos));
+  limpiar();
+  render();
+}
+
+function consultar() {
+  let num = buscar.value;
+  let r = datos.find(x => x.numero === num);
+
+  if (r) {
+    resultado.innerHTML = `
+      <div style="background:#d1fae5;padding:10px;border-radius:8px">
+        ✔ Encontrado <br>
+        ${r.numero} - ${r.solicitante} - ${r.observacion}
+      </div>`;
+  } else {
+    resultado.innerHTML = `
+      <div style="background:#fee2e2;padding:10px;border-radius:8px">
+        ❌ No encontrado
+      </div>`;
+  }
+}
+
+function render() {
+  let t = document.getElementById("tabla");
+  t.innerHTML = "";
+
+  datos.forEach((d, i) => {
+    t.innerHTML += `
+      <tr>
+        <td>${d.numero}</td>
+        <td>${d.solicitante}</td>
+        <td>${d.observacion}</td>
+        <td>${d.vinculados}</td>
+        <td>
+          <button class="btn-blue" onclick="editar(${i})">Editar</button>
+          <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  total.innerText = datos.length;
+}
+
+function eliminar(i){
+  datos.splice(i,1);
+  localStorage.setItem("datos", JSON.stringify(datos));
+  render();
+}
+
+function editar(i){
+  let d = datos[i];
+
+  numero.value = d.numero;
+  solicitante.value = d.solicitante;
+  observacion.value = d.observacion;
+  vinculados.value = d.vinculados;
+
+  editIndex = i;
+}
+
+function limpiar(){
+  numero.value="";
+  solicitante.value="";
+  observacion.value="";
+  vinculados.value="";
+}
+</script>
+
+</body>
+</html>
