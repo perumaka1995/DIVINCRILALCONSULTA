@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIVINCRI LA LIBERTAD - CONSULTAS</title>
+  <title>DIVINCRI LA LIBERTAD</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,216 +12,142 @@
   <style>
     body {
       background: #e7f1e7;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial;
     }
 
-    .header-bg {
-      background: linear-gradient(90deg, #064b22 0%, #0b5a2a 50%, #8bb68f 100%);
+    .header {
+      background: linear-gradient(90deg, #064b22, #0b5a2a);
+      color: white;
+      padding: 25px;
+      text-align: center;
     }
 
-    .logo-box {
-      background: #064b22;
-      border: 2px solid #f4c400;
+    .card {
+      background: white;
+      padding: 20px;
       border-radius: 12px;
-      padding: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.35);
+      text-align: center;
     }
 
-    .menu-container {
-      margin-top: -22px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .menu-item {
-      background: #075826;
-      color: #ffffff;
-      font-weight: bold;
-      padding: 14px 28px;
-      border-radius: 10px;
-      border: 2px solid #f4c400;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .menu-item:hover {
-      background: #f4c400;
-      color: #064b22;
-      transform: translateY(-2px);
-    }
-
-    .menu-active {
-      background: #f4c400;
-      color: #064b22;
-    }
-
-    .section-box {
-      border-left: 7px solid #075826;
-    }
-
-    .btn-green {
+    .btn {
       background: #075826;
       color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
       font-weight: bold;
     }
 
-    .btn-green:hover {
+    .btn:hover {
       background: #043f1a;
     }
 
-    .titulo {
-      color: #064b22;
+    .btn-red {
+      background: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
     }
 
-    .table-head {
+    .btn-blue {
+      background: blue;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
       background: #075826;
       color: white;
+      padding: 10px;
     }
 
-    .massive-label {
-      color: #075826;
-      font-weight: bold;
-      margin-top: 5px;
-      font-size: 1.2rem;
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .box {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .section {
+      border-left: 6px solid #075826;
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- PORTADA -->
-  <section class="header-bg text-white">
-    <div class="max-w-7xl mx-auto px-8 py-8">
-      <div class="flex flex-col md:flex-row items-center gap-8">
+  <!-- HEADER LIMPIO (SIN DUPLICADOS) -->
+  <div class="header">
+    <h3 class="text-yellow-300 text-2xl font-bold">REGIÓN LA LIBERTAD</h3>
+    <h1 class="text-5xl font-extrabold">DIVINCRI</h1>
+    <p>REGIÓN POLICIAL LA LIBERTAD</p>
+  </div>
 
-        <!-- LOGO -->
-        <div class="logo-box">
-          <img src="portada.png" class="w-60 md:w-64">
-        </div>
-
-        <!-- TEXTO -->
-        <div class="text-center md:text-left">
-
-          <h2 class="text-yellow-400 text-3xl md:text-4xl font-extrabold">
-            LA LIBERTAD
-          </h2>
-
-          <!-- 🔥 NUEVO TÍTULO CENTRAL -->
-          <h1 class="text-yellow-300 text-5xl md:text-6xl font-extrabold uppercase text-center tracking-widest">
-            REGIÓN LA LIBERTAD
-          </h1>
-
-          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
-
-          <h1 class="text-6xl md:text-7xl font-extrabold text-white text-center md:text-left">
-            DIVINCRI
-          </h1>
-
-          <div class="border-t-2 border-yellow-400 my-3 w-full md:w-[500px]"></div>
-
-          <h3 class="text-yellow-400 text-2xl md:text-3xl font-bold">
-            REGIÓN POLICIAL LA LIBERTAD
-          </h3>
-
-          <p class="mt-3 text-lg">
-            Sistema de Consulta y Registro de Números Telefónicos
-          </p>
-
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- MENÚ -->
-  <nav class="menu-container">
-    <div class="max-w-7xl mx-auto px-8 flex justify-center">
-      <div class="flex flex-wrap gap-5 justify-center">
-        <a href="#" class="menu-item menu-active">Inicio</a>
-        <a href="#consulta" class="menu-item">Consulta</a>
-        <a href="#registro" class="menu-item">Registrar</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- CONTENIDO -->
-  <main class="max-w-7xl mx-auto p-6 mt-8">
-
-    <!-- TARJETAS -->
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
-
-      <div class="bg-white p-8 rounded-xl shadow text-center">
-        <i class="fa fa-phone text-5xl text-green-900"></i>
-        <h2 id="totalNumeros" class="text-5xl font-bold mt-4">0</h2>
-        <p>Números Registrados</p>
-      </div>
-
-      <div class="bg-white p-8 rounded-xl shadow text-center">
-        <i class="fa fa-search text-5xl text-green-700"></i>
-        <h2 id="totalConsultas" class="text-5xl font-bold mt-4">0</h2>
-        <p>Consultas Realizadas</p>
-      </div>
-
-      <div class="bg-white p-8 rounded-xl shadow text-center">
-        <i class="fa fa-users text-5xl text-orange-500"></i>
-        <h2 class="text-5xl font-bold mt-4">1</h2>
-        <p>Usuarios Activos</p>
-      </div>
-
-    </div>
+  <div class="box">
 
     <!-- REGISTRO -->
-    <section id="registro" class="section-box bg-white p-7 rounded-xl shadow mb-8">
+    <div class="section">
 
-      <h2 class="text-3xl font-bold titulo mb-5">
-        Registrar Número
-      </h2>
+      <h2 class="text-2xl font-bold mb-4">Registrar Número</h2>
 
-      <input type="text" id="nuevoNumero" placeholder="Número Telefónico"
-        class="border p-4 rounded w-full mb-4">
+      <input id="numero" placeholder="Número Telefónico" class="border p-2 w-full mb-2 rounded">
+      <input id="solicitante" placeholder="Solicitante" class="border p-2 w-full mb-2 rounded">
+      <input id="observacion" placeholder="Observación" class="border p-2 w-full mb-2 rounded">
+      <input id="vinculados" placeholder="Vinculaciones" class="border p-2 w-full mb-2 rounded">
 
-      <input type="text" id="solicitante" placeholder="Solicitante"
-        class="border p-4 rounded w-full mb-4">
+      <button onclick="guardar()" class="btn">Guardar</button>
 
-      <input type="text" id="observacion" placeholder="Observación"
-        class="border p-4 rounded w-full mb-4">
+    </div>
 
-      <input type="text" id="vinculados" placeholder="Vinculaciones"
-        class="border p-4 rounded w-full mb-4">
+    <!-- CONSULTA -->
+    <div class="section">
 
-      <button onclick="registrarNumero()" class="btn-green px-8 py-3 rounded">
-        Guardar Registro
-      </button>
+      <h2 class="text-2xl font-bold mb-2">Consultar Número</h2>
 
-    </section>
+      <input id="buscar" placeholder="Ingrese número" class="border p-2 w-full mb-2 rounded">
+
+      <button onclick="consultar()" class="btn">Buscar</button>
+
+      <div id="resultado" class="mt-3"></div>
+
+    </div>
 
     <!-- TABLA -->
-    <section class="bg-white p-7 rounded-xl shadow border-l-8 border-yellow-400">
+    <div class="section">
 
-      <h2 class="text-3xl font-bold titulo mb-5">
-        Últimos Registros
-      </h2>
+      <h2 class="text-2xl font-bold mb-4">Últimos Registros</h2>
 
-      <table class="w-full border">
+      <table>
         <thead>
-          <tr class="table-head">
+          <tr>
             <th>Número</th>
             <th>Solicitante</th>
             <th>Observación</th>
             <th>Vinculaciones</th>
-            <th>Fecha</th>
             <th>Acción</th>
           </tr>
         </thead>
 
-        <tbody id="tablaNumeros"></tbody>
+        <tbody id="tabla"></tbody>
       </table>
 
-    </section>
+    </div>
 
-  </main>
+  </div>
 
   <script>
     let datos = JSON.parse(localStorage.getItem("datos")) || [];
@@ -229,10 +155,9 @@
 
     render();
 
-    function registrarNumero() {
-
+    function guardar() {
       let obj = {
-        numero: document.getElementById("nuevoNumero").value,
+        numero: document.getElementById("numero").value,
         solicitante: document.getElementById("solicitante").value,
         observacion: document.getElementById("observacion").value,
         vinculados: document.getElementById("vinculados").value,
@@ -253,8 +178,25 @@
       render();
     }
 
+    function consultar() {
+      let num = document.getElementById("buscar").value;
+      let r = document.getElementById("resultado");
+
+      let f = datos.find(x => x.numero === num);
+
+      if (f) {
+        r.innerHTML = `
+          <div style="background:#d1fae5;padding:10px;border-radius:8px">
+            ✔ Encontrado<br>
+            ${f.numero} - ${f.solicitante} - ${f.observacion}
+          </div>`;
+      } else {
+        r.innerHTML = `<div style="background:#fee2e2;padding:10px;border-radius:8px">❌ No encontrado</div>`;
+      }
+    }
+
     function render() {
-      let t = document.getElementById("tablaNumeros");
+      let t = document.getElementById("tabla");
       t.innerHTML = "";
 
       datos.forEach((d, i) => {
@@ -264,30 +206,25 @@
             <td>${d.solicitante}</td>
             <td>${d.observacion}</td>
             <td>${d.vinculados}</td>
-            <td>${d.fecha}</td>
             <td>
-              <button onclick="editar(${i})" class="bg-blue-600 text-white px-3 py-1 rounded">Editar</button>
-              <button onclick="eliminar(${i})" class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
+              <button class="btn-blue" onclick="editar(${i})">Editar</button>
+              <button class="btn-red" onclick="eliminar(${i})">Eliminar</button>
             </td>
           </tr>
         `;
       });
-
-      document.getElementById("totalNumeros").innerText = datos.length;
     }
 
     function eliminar(i) {
-      if (confirm("¿Eliminar registro?")) {
-        datos.splice(i, 1);
-        localStorage.setItem("datos", JSON.stringify(datos));
-        render();
-      }
+      datos.splice(i, 1);
+      localStorage.setItem("datos", JSON.stringify(datos));
+      render();
     }
 
     function editar(i) {
       let d = datos[i];
 
-      document.getElementById("nuevoNumero").value = d.numero;
+      document.getElementById("numero").value = d.numero;
       document.getElementById("solicitante").value = d.solicitante;
       document.getElementById("observacion").value = d.observacion;
       document.getElementById("vinculados").value = d.vinculados;
@@ -296,12 +233,11 @@
     }
 
     function limpiar() {
-      document.getElementById("nuevoNumero").value = "";
+      document.getElementById("numero").value = "";
       document.getElementById("solicitante").value = "";
       document.getElementById("observacion").value = "";
       document.getElementById("vinculados").value = "";
     }
-
   </script>
 
 </body>
