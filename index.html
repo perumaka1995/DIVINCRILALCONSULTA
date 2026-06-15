@@ -75,8 +75,8 @@
       top:0;
       height:100vh;
       background:
-        linear-gradient(180deg, rgba(6,39,20,.97), rgba(9,56,29,.98)),
-        url('portada.png');
+        linear-gradient(180deg, rgba(6,39,20,.78), rgba(9,56,29,.82)),
+        url('./portada.png');
       background-size:cover;
       background-position:center;
       color:white;
@@ -236,8 +236,8 @@
       padding:26px;
       color:white;
       background:
-        linear-gradient(110deg, rgba(6,39,20,.96), rgba(14,74,39,.88)),
-        url('PORTADA.PNG');
+        linear-gradient(110deg, rgba(6,39,20,.70), rgba(14,74,39,.55)),
+        url('./portada.png');
       background-size:cover;
       background-position:center;
       box-shadow:var(--shadow);
@@ -964,7 +964,7 @@
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <img src="PORTADA.PNG" alt="DIVINCRI La Libertad" class="brand-logo" />
+        <img src="./portada.png" alt="DIVINCRI La Libertad" class="brand-logo" />
         <div class="brand-title">
           <small>LA LIBERTAD</small>
           <h1>DIVINCRI</h1>
@@ -1688,7 +1688,7 @@
 
       contenedor.innerHTML = `
         <div class="report-head">
-          <img src="PORTADA.PNG" alt="DIVINCRI" class="report-logo">
+          <img src="./portada.png" alt="DIVINCRI" class="report-logo">
           <div class="report-title">
             <h2>REPORTE DE REGISTROS TELEFÓNICOS</h2>
             <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
