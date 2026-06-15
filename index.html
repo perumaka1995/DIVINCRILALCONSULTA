@@ -1,290 +1,839 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DIVINCRI LA LIBERTAD</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIVINCRI La Libertad - Trujillo</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --verde-oscuro:#005323;
+      --verde:#006b2b;
+      --verde-claro:#eaf3ea;
+      --amarillo:#ffc400;
+      --naranja:#ff6b00;
+      --blanco:#ffffff;
+      --gris:#f5f5f5;
+      --texto:#003d1b;
+      --borde:#d9d9d9;
+      --rojo:#c62828;
+    }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:Arial, Helvetica, sans-serif;
+    }
 
-<!-- FIREBASE COMPAT (IMPORTANTE) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    body{
+      background:var(--verde-claro);
+      color:var(--texto);
+    }
 
-<style>
-body{
-  font-family: Arial;
-  background:#e7f1e7;
-}
+    header{
+      background:linear-gradient(90deg,#004d20,#3a8150);
+      color:white;
+      padding:15px 20px;
+      text-align:center;
+    }
 
-.header{
-  background:linear-gradient(90deg,#064b22,#0b5a2a);
-  color:white;
-  text-align:center;
-  padding:30px;
-}
+    .header-content{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+    }
 
-.title{
-  font-size:3rem;
-  font-weight:900;
-  color:#ffd700;
-}
+    .logo{
+      width:140px;
+      height:125px;
+      object-fit:contain;
+      border:2px solid var(--amarillo);
+      border-radius:6px;
+      background:#06491f;
+      padding:5px;
+    }
 
-.card{
-  background:white;
-  padding:20px;
-  margin:20px auto;
-  max-width:1000px;
-  border-radius:10px;
-  border-left:6px solid #075826;
-}
+    .titulo h2{
+      color:var(--amarillo);
+      font-size:22px;
+      letter-spacing:2px;
+      text-align:left;
+    }
 
-input{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-}
+    .titulo h1{
+      font-size:42px;
+      letter-spacing:3px;
+      border-top:1px solid var(--amarillo);
+      border-bottom:1px solid var(--amarillo);
+      padding:5px 0;
+      text-align:left;
+    }
 
-.btn{
-  background:#075826;
-  color:white;
-  padding:10px;
-  border-radius:6px;
-  width:100%;
-  margin-top:10px;
-}
+    .titulo h3{
+      color:var(--amarillo);
+      font-size:16px;
+      text-align:left;
+      margin-top:5px;
+    }
 
-.btn:hover{background:#043f1a}
+    .titulo p{
+      font-size:12px;
+      text-align:left;
+      margin-top:4px;
+    }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-}
+    nav{
+      text-align:center;
+      margin-top:12px;
+    }
 
-th{
-  background:#075826;
-  color:white;
-  padding:10px;
-}
+    nav button{
+      border:none;
+      background:var(--verde-oscuro);
+      color:white;
+      padding:10px 18px;
+      border-radius:5px;
+      margin:4px;
+      cursor:pointer;
+      font-weight:bold;
+      box-shadow:0 3px 6px rgba(0,0,0,.25);
+    }
 
-td{
-  border:1px solid #ddd;
-  padding:10px;
-  text-align:center;
-}
-</style>
+    nav button:hover{
+      background:var(--amarillo);
+      color:#003d1b;
+    }
 
+    .container{
+      max-width:1050px;
+      margin:25px auto;
+      padding:0 15px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:white;
+      border-top:3px solid var(--verde);
+      border-radius:8px;
+      padding:20px;
+      text-align:center;
+      box-shadow:0 1px 5px rgba(0,0,0,.08);
+    }
+
+    .card .icon{
+      font-size:30px;
+      margin-bottom:6px;
+    }
+
+    .card h2{
+      font-size:30px;
+      color:#000;
+    }
+
+    .card p{
+      font-size:12px;
+      font-weight:bold;
+    }
+
+    section{
+      background:white;
+      border-radius:8px;
+      margin-bottom:18px;
+      padding:18px;
+      border-left:4px solid var(--verde);
+      box-shadow:0 1px 4px rgba(0,0,0,.08);
+    }
+
+    section h2{
+      font-size:20px;
+      margin-bottom:12px;
+      color:var(--verde-oscuro);
+    }
+
+    .busqueda{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    input, textarea, select{
+      width:100%;
+      padding:11px;
+      border:1px solid var(--borde);
+      border-radius:3px;
+      outline:none;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:70px;
+    }
+
+    .busqueda input{
+      flex:1;
+      margin-bottom:0;
+    }
+
+    button{
+      border:none;
+      padding:11px 16px;
+      background:var(--verde-oscuro);
+      color:white;
+      border-radius:4px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    button:hover{
+      opacity:.9;
+    }
+
+    .btn-amarillo{
+      background:var(--amarillo);
+      color:#003d1b;
+    }
+
+    .btn-rojo{
+      background:var(--rojo);
+      color:white;
+    }
+
+    .btn-naranja{
+      background:var(--naranja);
+      color:white;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .full{
+      grid-column:1/3;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:13px;
+    }
+
+    th{
+      background:var(--verde-oscuro);
+      color:white;
+      padding:11px;
+      border:1px solid white;
+      text-align:center;
+    }
+
+    td{
+      border:1px solid var(--borde);
+      padding:9px;
+      text-align:center;
+      vertical-align:top;
+    }
+
+    tr:nth-child(even){
+      background:#fafafa;
+    }
+
+    .acciones{
+      display:flex;
+      gap:5px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .archivo-item{
+      background:#eef7ef;
+      border:1px solid #cfe3d2;
+      padding:6px;
+      border-radius:4px;
+      margin:3px 0;
+      font-size:12px;
+    }
+
+    .archivo-item a{
+      color:var(--verde-oscuro);
+      font-weight:bold;
+      text-decoration:none;
+    }
+
+    .preview-box{
+      border:1px dashed var(--verde);
+      padding:10px;
+      border-radius:5px;
+      background:#f9fff9;
+      margin-bottom:10px;
+      font-size:13px;
+      display:none;
+    }
+
+    footer{
+      text-align:center;
+      background:var(--verde-oscuro);
+      color:white;
+      padding:14px;
+      margin-top:30px;
+      font-size:12px;
+    }
+
+    .alerta{
+      background:#fff8d8;
+      border-left:4px solid var(--amarillo);
+      padding:10px;
+      font-size:13px;
+      margin-bottom:12px;
+      color:#4b3a00;
+    }
+
+    @media(max-width:800px){
+      .stats{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+
+      .full{
+        grid-column:1/2;
+      }
+
+      .titulo h1{
+        font-size:30px;
+        text-align:center;
+      }
+
+      .titulo h2,
+      .titulo h3,
+      .titulo p{
+        text-align:center;
+      }
+
+      table{
+        font-size:11px;
+      }
+
+      th,td{
+        padding:6px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <h1 class="title">DIVINCRI LA LIBERTAD</h1>
-  <p>Sistema de Registro y Consulta</p>
-</div>
+  <header>
+    <div class="header-content">
+      <img src="PORTADA.PNG" alt="DIVINCRI La Libertad" class="logo">
 
-<!-- LOGIN -->
-<div id="loginBox" class="card">
-  <h2 class="text-xl font-bold mb-3">LOGIN</h2>
+      <div class="titulo">
+        <h2>LA LIBERTAD</h2>
+        <h1>DIVINCRI</h1>
+        <h3>REGIÓN POLICIAL LA LIBERTAD - TRUJILLO</h3>
+        <p>Sistema de Consulta, Registro, Archivos, Solicitantes y Vinculaciones</p>
+      </div>
+    </div>
 
-  <input id="email" placeholder="Correo">
-  <input id="password" type="password" placeholder="Contraseña">
+    <nav>
+      <button onclick="irA('inicio')">Inicio</button>
+      <button onclick="irA('consulta')">Consulta</button>
+      <button onclick="irA('registro')">Registrar</button>
+      <button onclick="irA('tabla')">Registros</button>
+    </nav>
+  </header>
 
-  <button class="btn" onclick="login()">Ingresar</button>
-  <button class="btn" onclick="register()">Crear cuenta</button>
-</div>
+  <main class="container" id="inicio">
 
-<!-- APP -->
-<div id="app" style="display:none">
+    <div class="stats">
+      <div class="card">
+        <div class="icon">📞</div>
+        <h2 id="totalNumeros">0</h2>
+        <p>Números Registrados</p>
+      </div>
 
-<!-- REGISTRO -->
-<div class="card">
+      <div class="card">
+        <div class="icon">🔍</div>
+        <h2 id="totalConsultas">0</h2>
+        <p>Consultas Realizadas</p>
+      </div>
 
-<h2 class="text-xl font-bold mb-3">Registrar Número</h2>
+      <div class="card">
+        <div class="icon">👥</div>
+        <h2 id="totalSolicitantes">0</h2>
+        <p>Solicitantes Registrados</p>
+      </div>
 
-<input id="numero" placeholder="Número Telefónico">
-<input id="solicitante" placeholder="Solicitante">
-<input id="observacion" placeholder="Observación">
-<input id="vinculados" placeholder="Vinculaciones">
+      <div class="card">
+        <div class="icon">📎</div>
+        <h2 id="totalArchivos">0</h2>
+        <p>Archivos Subidos</p>
+      </div>
+    </div>
 
-<input type="file" id="archivo">
+    <section id="consulta">
+      <h2>🔍 Consultar Números Masivos</h2>
 
-<button class="btn" onclick="guardar()">Guardar</button>
+      <div class="busqueda">
+        <input type="text" id="buscarTexto" placeholder="Ingrese número, solicitante, vinculación u observación">
+        <button onclick="buscarRegistro()">Buscar</button>
+        <button class="btn-amarillo" onclick="limpiarBusqueda()">Limpiar</button>
+      </div>
+    </section>
 
-</div>
+    <section id="registro">
+      <h2>➕ Registrar Número</h2>
 
-<!-- TABLA -->
-<div class="card">
+      <div class="alerta">
+        Esta versión guarda la información en el navegador mediante almacenamiento local. Para uso institucional real debe implementarse con base de datos, usuario, contraseña, permisos y respaldo seguro.
+      </div>
 
-<h2 class="text-xl font-bold mb-3">Registros</h2>
+      <div class="form-grid">
+        <div>
+          <input type="text" id="numero" placeholder="Número telefónico">
+        </div>
 
-<table>
-<thead>
-<tr>
-<th>Número</th>
-<th>Solicitante</th>
-<th>Observación</th>
-<th>Vinculados</th>
-<th>Archivo</th>
-<th>Acción</th>
-</tr>
-</thead>
+        <div>
+          <input type="text" id="solicitante" placeholder="Solicitante">
+        </div>
 
-<tbody id="tabla"></tbody>
-</table>
+        <div>
+          <select id="vinculacion">
+            <option value="">Seleccione vinculación</option>
+            <option value="Investigado">Investigado</option>
+            <option value="Denunciante">Denunciante</option>
+            <option value="Agraviado">Agraviado</option>
+            <option value="Testigo">Testigo</option>
+            <option value="Familiar">Familiar</option>
+            <option value="Contacto frecuente">Contacto frecuente</option>
+            <option value="Sospechoso">Sospechoso</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
 
-</div>
+        <div>
+          <input type="date" id="fecha">
+        </div>
 
-</div>
+        <div class="full">
+          <textarea id="observacion" placeholder="Observación"></textarea>
+        </div>
 
-<script>
+        <div class="full">
+          <input type="file" id="archivos" multiple onchange="previsualizarArchivos()">
+          <div id="previewArchivos" class="preview-box"></div>
+        </div>
+      </div>
 
-// 🔥 TU CONFIG REAL (IMPORTANTE)
-const firebaseConfig = {
-  apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
-  authDomain: "divincri-la-libertad.firebaseapp.com",
-  projectId: "divincri-la-libertad",
-  storageBucket: "divincri-la-libertad.appspot.com",
-  messagingSenderId: "1004762981616",
-  appId: "1:1004762981616:web:e889f1cc1f4ce373d48e35"
-};
+      <button onclick="guardarRegistro()">Guardar Registro</button>
+      <button class="btn-amarillo" onclick="limpiarFormulario()">Nuevo / Limpiar</button>
+    </section>
 
-firebase.initializeApp(firebaseConfig);
+    <section>
+      <h2>💾 Respaldo de Información</h2>
+      <button onclick="exportarDatos()">Exportar Respaldo JSON</button>
+      <input type="file" id="importarArchivo" accept=".json" onchange="importarDatos()" style="margin-top:10px;">
+    </section>
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+    <section id="tabla">
+      <h2>📋 Últimos Registros</h2>
 
-let editId = null;
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Número</th>
+              <th>Solicitante</th>
+              <th>Vinculación</th>
+              <th>Observación</th>
+              <th>Fecha</th>
+              <th>Archivos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
 
-// LOGIN
-function login(){
-auth.signInWithEmailAndPassword(email.value,password.value)
-.then(()=>{
-loginBox.style.display="none";
-app.style.display="block";
-load();
-})
-.catch(e=>alert(e.message));
-}
+          <tbody id="tablaRegistros">
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-// REGISTER
-function register(){
-auth.createUserWithEmailAndPassword(email.value,password.value)
-.then(()=>alert("Cuenta creada"))
-.catch(e=>alert(e.message));
-}
+  </main>
 
-// AUTH STATE
-auth.onAuthStateChanged(user=>{
-if(user){
-loginBox.style.display="none";
-app.style.display="block";
-load();
-}
-});
+  <footer>
+    DIVINCRI LA LIBERTAD - TRUJILLO | Sistema interno de consulta y registro
+  </footer>
 
-// GUARDAR
-function guardar(){
+  <script>
+    let registros = JSON.parse(localStorage.getItem("registrosDivincri")) || [];
+    let consultas = Number(localStorage.getItem("consultasDivincri")) || 0;
+    let modoEdicion = null;
 
-let file=document.getElementById("archivo").files[0];
+    document.getElementById("fecha").valueAsDate = new Date();
 
-let data={
-numero:numero.value,
-solicitante:solicitante.value,
-observacion:observacion.value,
-vinculados:vinculados.value,
-fecha:new Date().toLocaleDateString(),
-archivo:""
-};
+    function irA(id){
+      document.getElementById(id).scrollIntoView({
+        behavior:"smooth"
+      });
+    }
 
-function save(url){
-data.archivo=url;
+    function guardarLocal(){
+      localStorage.setItem("registrosDivincri", JSON.stringify(registros));
+      localStorage.setItem("consultasDivincri", consultas);
+    }
 
-if(editId){
-db.collection("registros").doc(editId).set(data);
-editId=null;
-}else{
-db.collection("registros").add(data);
-}
+    function actualizarEstadisticas(){
+      document.getElementById("totalNumeros").textContent = registros.length;
+      document.getElementById("totalConsultas").textContent = consultas;
 
-clear();
-load();
-}
+      const solicitantesUnicos = new Set(
+        registros
+          .map(r => r.solicitante.trim().toLowerCase())
+          .filter(s => s !== "")
+      );
 
-if(file){
-let ref=storage.ref("archivos/"+file.name);
-ref.put(file).then(s=>{
-s.ref.getDownloadURL().then(url=>save(url));
-});
-}else{
-save("");
-}
+      let cantidadArchivos = 0;
+      registros.forEach(r => {
+        cantidadArchivos += r.archivos.length;
+      });
 
-}
+      document.getElementById("totalSolicitantes").textContent = solicitantesUnicos.size;
+      document.getElementById("totalArchivos").textContent = cantidadArchivos;
+    }
 
-// CARGAR
-function load(){
+    function previsualizarArchivos(){
+      const input = document.getElementById("archivos");
+      const preview = document.getElementById("previewArchivos");
 
-db.collection("registros").onSnapshot(snap=>{
+      if(input.files.length === 0){
+        preview.style.display = "none";
+        preview.innerHTML = "";
+        return;
+      }
 
-let t=document.getElementById("tabla");
-t.innerHTML="";
+      preview.style.display = "block";
+      preview.innerHTML = "<strong>Archivos seleccionados:</strong><br>";
 
-snap.forEach(doc=>{
-let d=doc.data();
+      Array.from(input.files).forEach((file, index) => {
+        preview.innerHTML += `${index + 1}. ${file.name} - ${(file.size / 1024).toFixed(2)} KB<br>`;
+      });
+    }
 
-t.innerHTML+=`
-<tr>
-<td>${d.numero}</td>
-<td>${d.solicitante}</td>
-<td>${d.observacion}</td>
-<td>${d.vinculados}</td>
-<td>${d.archivo?`<a href="${d.archivo}" target="_blank">Descargar</a>`:"-"}</td>
-<td>
-<button onclick="edit('${doc.id}',\`${d.numero}\`,\`${d.solicitante}\`,\`${d.observacion}\`,\`${d.vinculados}\`)">Editar</button>
-<button onclick="del('${doc.id}')">Eliminar</button>
-</td>
-</tr>
-`;
-});
+    function convertirArchivosABase64(files){
+      return Promise.all(
+        Array.from(files).map(file => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
-});
+            reader.onload = () => {
+              resolve({
+                nombre:file.name,
+                tipo:file.type,
+                contenido:reader.result
+              });
+            };
 
-}
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+    }
 
-// EDITAR
-function edit(id,n,s,o,v){
-numero.value=n;
-solicitante.value=s;
-observacion.value=o;
-vinculados.value=v;
-editId=id;
-}
+    async function guardarRegistro(){
+      const numero = document.getElementById("numero").value.trim();
+      const solicitante = document.getElementById("solicitante").value.trim();
+      const vinculacion = document.getElementById("vinculacion").value.trim();
+      const observacion = document.getElementById("observacion").value.trim();
+      const fecha = document.getElementById("fecha").value;
+      const archivosInput = document.getElementById("archivos");
 
-// ELIMINAR
-function del(id){
-db.collection("registros").doc(id).delete();
-}
+      if(numero === ""){
+        alert("Ingrese el número telefónico.");
+        return;
+      }
 
-// LIMPIAR
-function clear(){
-numero.value="";
-solicitante.value="";
-observacion.value="";
-vinculados.value="";
-archivo.value="";
-}
+      if(solicitante === ""){
+        alert("Ingrese el solicitante.");
+        return;
+      }
 
-</script>
+      if(vinculacion === ""){
+        alert("Seleccione la vinculación.");
+        return;
+      }
+
+      let archivosConvertidos = [];
+
+      if(archivosInput.files.length > 0){
+        archivosConvertidos = await convertirArchivosABase64(archivosInput.files);
+      }
+
+      if(modoEdicion === null){
+        const nuevoRegistro = {
+          id:Date.now(),
+          numero,
+          solicitante,
+          vinculacion,
+          observacion,
+          fecha,
+          archivos:archivosConvertidos
+        };
+
+        registros.unshift(nuevoRegistro);
+      }else{
+        registros[modoEdicion].numero = numero;
+        registros[modoEdicion].solicitante = solicitante;
+        registros[modoEdicion].vinculacion = vinculacion;
+        registros[modoEdicion].observacion = observacion;
+        registros[modoEdicion].fecha = fecha;
+
+        if(archivosConvertidos.length > 0){
+          registros[modoEdicion].archivos = registros[modoEdicion].archivos.concat(archivosConvertidos);
+        }
+
+        modoEdicion = null;
+      }
+
+      guardarLocal();
+      mostrarRegistros();
+      limpiarFormulario();
+      alert("Registro guardado correctamente.");
+    }
+
+    function mostrarRegistros(lista = registros){
+      const tbody = document.getElementById("tablaRegistros");
+      tbody.innerHTML = "";
+
+      if(lista.length === 0){
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">No hay registros para mostrar.</td>
+          </tr>
+        `;
+        actualizarEstadisticas();
+        return;
+      }
+
+      lista.forEach((registro, index) => {
+        const archivosHTML = registro.archivos.length > 0
+          ? registro.archivos.map((archivo, i) => `
+              <div class="archivo-item">
+                <a href="${archivo.contenido}" download="${archivo.nombre}" target="_blank">
+                  ${escapeHTML(archivo.nombre)}
+                </a>
+                <br>
+                <button class="btn-rojo" onclick="eliminarArchivo(${registro.id}, ${i})">Eliminar archivo</button>
+              </div>
+            `).join("")
+          : "Sin archivos";
+
+        const fila = document.createElement("tr");
+
+        fila.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${escapeHTML(registro.numero)}</td>
+          <td>${escapeHTML(registro.solicitante)}</td>
+          <td>${escapeHTML(registro.vinculacion)}</td>
+          <td>${escapeHTML(registro.observacion)}</td>
+          <td>${escapeHTML(registro.fecha)}</td>
+          <td>${archivosHTML}</td>
+          <td>
+            <div class="acciones">
+              <button class="btn-amarillo" onclick="editarRegistro(${registro.id})">Editar</button>
+              <button class="btn-rojo" onclick="eliminarRegistro(${registro.id})">Eliminar</button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(fila);
+      });
+
+      actualizarEstadisticas();
+    }
+
+    function buscarRegistro(){
+      const texto = document.getElementById("buscarTexto").value.trim().toLowerCase();
+
+      if(texto === ""){
+        alert("Ingrese un dato para buscar.");
+        return;
+      }
+
+      consultas++;
+      guardarLocal();
+
+      const resultado = registros.filter(r =>
+        r.numero.toLowerCase().includes(texto) ||
+        r.solicitante.toLowerCase().includes(texto) ||
+        r.vinculacion.toLowerCase().includes(texto) ||
+        r.observacion.toLowerCase().includes(texto) ||
+        r.fecha.toLowerCase().includes(texto)
+      );
+
+      mostrarRegistros(resultado);
+
+      if(resultado.length === 0){
+        alert("No se encontraron coincidencias.");
+      }
+    }
+
+    function limpiarBusqueda(){
+      document.getElementById("buscarTexto").value = "";
+      mostrarRegistros();
+    }
+
+    function editarRegistro(id){
+      const index = registros.findIndex(r => r.id === id);
+
+      if(index === -1){
+        alert("Registro no encontrado.");
+        return;
+      }
+
+      const r = registros[index];
+
+      document.getElementById("numero").value = r.numero;
+      document.getElementById("solicitante").value = r.solicitante;
+      document.getElementById("vinculacion").value = r.vinculacion;
+      document.getElementById("observacion").value = r.observacion;
+      document.getElementById("fecha").value = r.fecha;
+
+      modoEdicion = index;
+
+      irA("registro");
+      alert("Modo edición activado. Puede modificar el registro y guardar.");
+    }
+
+    function eliminarRegistro(id){
+      const confirmar = confirm("¿Está seguro de eliminar este registro?");
+
+      if(!confirmar){
+        return;
+      }
+
+      registros = registros.filter(r => r.id !== id);
+      guardarLocal();
+      mostrarRegistros();
+    }
+
+    function eliminarArchivo(idRegistro, indexArchivo){
+      const confirmar = confirm("¿Desea eliminar este archivo del registro?");
+
+      if(!confirmar){
+        return;
+      }
+
+      const registro = registros.find(r => r.id === idRegistro);
+
+      if(!registro){
+        alert("Registro no encontrado.");
+        return;
+      }
+
+      registro.archivos.splice(indexArchivo, 1);
+      guardarLocal();
+      mostrarRegistros();
+    }
+
+    function limpiarFormulario(){
+      document.getElementById("numero").value = "";
+      document.getElementById("solicitante").value = "";
+      document.getElementById("vinculacion").value = "";
+      document.getElementById("observacion").value = "";
+      document.getElementById("fecha").valueAsDate = new Date();
+      document.getElementById("archivos").value = "";
+      document.getElementById("previewArchivos").style.display = "none";
+      document.getElementById("previewArchivos").innerHTML = "";
+      modoEdicion = null;
+    }
+
+    function exportarDatos(){
+      const datos = {
+        registros,
+        consultas,
+        fechaExportacion:new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {
+        type:"application/json"
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = "respaldo_divincri_la_libertad.json";
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    function importarDatos(){
+      const archivo = document.getElementById("importarArchivo").files[0];
+
+      if(!archivo){
+        return;
+      }
+
+      const confirmar = confirm("Esto reemplazará la información actual. ¿Desea continuar?");
+
+      if(!confirmar){
+        document.getElementById("importarArchivo").value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(e){
+        try{
+          const datos = JSON.parse(e.target.result);
+
+          registros = datos.registros || [];
+          consultas = datos.consultas || 0;
+
+          guardarLocal();
+          mostrarRegistros();
+
+          alert("Respaldo importado correctamente.");
+        }catch(error){
+          alert("El archivo seleccionado no es válido.");
+        }
+      };
+
+      reader.readAsText(archivo);
+    }
+
+    function escapeHTML(texto){
+      if(!texto){
+        return "";
+      }
+
+      return texto
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    mostrarRegistros();
+  </script>
 
 </body>
 </html>
