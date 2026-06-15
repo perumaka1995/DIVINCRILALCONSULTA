@@ -2,691 +2,1528 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DIVINCRI La Libertad - Trujillo</title>
 
   <style>
     :root{
-      --verde-oscuro:#005323;
-      --verde:#006b2b;
-      --verde-claro:#eaf3ea;
-      --amarillo:#ffc400;
-      --naranja:#ff6b00;
-      --blanco:#ffffff;
-      --gris:#f5f5f5;
-      --texto:#003d1b;
-      --borde:#d9d9d9;
-      --rojo:#c62828;
+      --bg:#eef3ee;
+      --surface:#ffffff;
+      --surface-2:#f8faf8;
+      --green-950:#062714;
+      --green-900:#09381d;
+      --green-800:#0e4a27;
+      --green-700:#146033;
+      --green-600:#1b7a43;
+      --gold:#d7a928;
+      --gold-2:#f2cf66;
+      --red:#b42318;
+      --blue:#155eef;
+      --orange:#b75e09;
+      --gray-50:#f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-500:#667085;
+      --gray-700:#344054;
+      --text:#101828;
+      --muted:#667085;
+      --shadow:0 16px 40px rgba(16,24,40,.10);
+      --shadow-soft:0 8px 20px rgba(16,24,40,.07);
+      --radius:18px;
     }
 
     *{
       box-sizing:border-box;
       margin:0;
       padding:0;
-      font-family:Arial, Helvetica, sans-serif;
+      font-family:Inter, Segoe UI, Arial, Helvetica, sans-serif;
     }
 
     body{
-      background:var(--verde-claro);
-      color:var(--texto);
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top left, rgba(215,169,40,.20), transparent 28%),
+        linear-gradient(135deg, #f6f8f6 0%, var(--bg) 45%, #e7efe8 100%);
+      color:var(--text);
     }
 
-    header{
-      background:linear-gradient(90deg,#004d20,#3a8150);
-      color:white;
-      padding:15px 20px;
-      text-align:center;
-    }
-
-    .header-content{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    .logo{
-      width:140px;
-      height:125px;
-      object-fit:contain;
-      border:2px solid var(--amarillo);
-      border-radius:6px;
-      background:#06491f;
-      padding:5px;
-    }
-
-    .titulo h2{
-      color:var(--amarillo);
-      font-size:22px;
-      letter-spacing:2px;
-      text-align:left;
-    }
-
-    .titulo h1{
-      font-size:42px;
-      letter-spacing:3px;
-      border-top:1px solid var(--amarillo);
-      border-bottom:1px solid var(--amarillo);
-      padding:5px 0;
-      text-align:left;
-    }
-
-    .titulo h3{
-      color:var(--amarillo);
-      font-size:16px;
-      text-align:left;
-      margin-top:5px;
-    }
-
-    .titulo p{
-      font-size:12px;
-      text-align:left;
-      margin-top:4px;
-    }
-
-    nav{
-      text-align:center;
-      margin-top:12px;
-    }
-
-    nav button{
-      border:none;
-      background:var(--verde-oscuro);
-      color:white;
-      padding:10px 18px;
-      border-radius:5px;
-      margin:4px;
-      cursor:pointer;
-      font-weight:bold;
-      box-shadow:0 3px 6px rgba(0,0,0,.25);
-    }
-
-    nav button:hover{
-      background:var(--amarillo);
-      color:#003d1b;
-    }
-
-    .container{
-      max-width:1050px;
-      margin:25px auto;
-      padding:0 15px;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:15px;
-      margin-bottom:20px;
-    }
-
-    .card{
-      background:white;
-      border-top:3px solid var(--verde);
-      border-radius:8px;
-      padding:20px;
-      text-align:center;
-      box-shadow:0 1px 5px rgba(0,0,0,.08);
-    }
-
-    .card .icon{
-      font-size:30px;
-      margin-bottom:6px;
-    }
-
-    .card h2{
-      font-size:30px;
-      color:#000;
-    }
-
-    .card p{
-      font-size:12px;
-      font-weight:bold;
-    }
-
-    section{
-      background:white;
-      border-radius:8px;
-      margin-bottom:18px;
-      padding:18px;
-      border-left:4px solid var(--verde);
-      box-shadow:0 1px 4px rgba(0,0,0,.08);
-    }
-
-    section h2{
-      font-size:20px;
-      margin-bottom:12px;
-      color:var(--verde-oscuro);
-    }
-
-    .busqueda{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    input, textarea, select{
-      width:100%;
-      padding:11px;
-      border:1px solid var(--borde);
-      border-radius:3px;
-      outline:none;
-      font-size:14px;
-      margin-bottom:10px;
-    }
-
-    textarea{
-      resize:vertical;
-      min-height:70px;
-    }
-
-    .busqueda input{
-      flex:1;
-      margin-bottom:0;
+    button,
+    input,
+    textarea,
+    select{
+      font:inherit;
     }
 
     button{
       border:none;
-      padding:11px 16px;
-      background:var(--verde-oscuro);
-      color:white;
-      border-radius:4px;
       cursor:pointer;
-      font-weight:bold;
     }
 
-    button:hover{
-      opacity:.9;
+    a{
+      color:inherit;
     }
 
-    .btn-amarillo{
-      background:var(--amarillo);
-      color:#003d1b;
+    .app{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      min-height:100vh;
     }
 
-    .btn-rojo{
-      background:var(--rojo);
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      background:
+        linear-gradient(180deg, rgba(6,39,20,.97), rgba(9,56,29,.98)),
+        url('PORTADA.PNG');
+      background-size:cover;
+      background-position:center;
+      color:white;
+      padding:22px 18px;
+      box-shadow:12px 0 30px rgba(16,24,40,.18);
+      overflow:auto;
+      z-index:10;
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding-bottom:18px;
+      border-bottom:1px solid rgba(255,255,255,.16);
+      margin-bottom:18px;
+    }
+
+    .brand-logo{
+      width:72px;
+      height:72px;
+      border-radius:16px;
+      object-fit:contain;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(242,207,102,.7);
+      padding:4px;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .brand-title small{
+      display:block;
+      color:var(--gold-2);
+      font-weight:800;
+      letter-spacing:.16em;
+      font-size:11px;
+      margin-bottom:2px;
+    }
+
+    .brand-title h1{
+      font-size:26px;
+      letter-spacing:.08em;
+      line-height:1;
+      margin-bottom:4px;
+    }
+
+    .brand-title p{
+      font-size:11px;
+      color:rgba(255,255,255,.78);
+      line-height:1.35;
+    }
+
+    .nav-label{
+      margin:16px 10px 8px;
+      font-size:11px;
+      color:rgba(255,255,255,.55);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-weight:800;
+    }
+
+    .nav-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      border-radius:12px;
+      color:rgba(255,255,255,.88);
+      background:transparent;
+      text-align:left;
+      margin:5px 0;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active{
+      color:white;
+      background:rgba(255,255,255,.12);
+      box-shadow:inset 3px 0 0 var(--gold);
+    }
+
+    .sidebar-note{
+      margin-top:18px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color:rgba(255,255,255,.80);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .main{
+      min-width:0;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:9;
+      background:rgba(255,255,255,.84);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(229,231,235,.9);
+      padding:18px 28px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+    }
+
+    .topbar h2{
+      color:var(--green-950);
+      font-size:22px;
+      margin-bottom:2px;
+      letter-spacing:-.02em;
+    }
+
+    .topbar p{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .user-chip{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:white;
+      border:1px solid var(--gray-200);
+      border-radius:999px;
+      padding:8px 12px;
+      box-shadow:var(--shadow-soft);
+      white-space:nowrap;
+      font-size:13px;
+      color:var(--gray-700);
+      font-weight:700;
+    }
+
+    .user-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#12b76a;
+      box-shadow:0 0 0 4px rgba(18,183,106,.15);
+    }
+
+    .content{
+      padding:26px 28px 38px;
+      max-width:1280px;
+      margin:0 auto;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      padding:26px;
+      color:white;
+      background:
+        linear-gradient(110deg, rgba(6,39,20,.96), rgba(14,74,39,.88)),
+        url('PORTADA.PNG');
+      background-size:cover;
+      background-position:center;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-90px;
+      top:-90px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:rgba(215,169,40,.18);
+    }
+
+    .hero-content{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .hero h3{
+      font-size:13px;
+      color:var(--gold-2);
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .hero h1{
+      font-size:34px;
+      line-height:1.08;
+      margin-bottom:8px;
+      letter-spacing:-.03em;
+    }
+
+    .hero p{
+      max-width:780px;
+      color:rgba(255,255,255,.82);
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .btn{
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:12px;
+      font-weight:800;
+      font-size:13px;
+      transition:.15s ease;
+      box-shadow:0 8px 18px rgba(16,24,40,.10);
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      opacity:.95;
+    }
+
+    .btn-primary{
+      color:white;
+      background:var(--green-700);
+    }
+
+    .btn-gold{
+      color:var(--green-950);
+      background:linear-gradient(180deg, var(--gold-2), var(--gold));
+    }
+
+    .btn-light{
+      background:white;
+      color:var(--green-950);
+    }
+
+    .btn-danger{
+      background:var(--red);
       color:white;
     }
 
-    .btn-naranja{
-      background:var(--naranja);
+    .btn-blue{
+      background:var(--blue);
       color:white;
+    }
+
+    .btn-gray{
+      background:#475467;
+      color:white;
+    }
+
+    .btn-orange{
+      background:var(--orange);
+      color:white;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:15px;
+      margin-bottom:22px;
+    }
+
+    .stat-card{
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(229,231,235,.95);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat-card::before{
+      content:"";
+      position:absolute;
+      inset:0 0 auto 0;
+      height:4px;
+      background:linear-gradient(90deg, var(--green-700), var(--gold));
+    }
+
+    .stat-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#ecfdf3;
+      color:var(--green-700);
+      font-size:22px;
+      margin-bottom:12px;
+    }
+
+    .stat-card h2{
+      font-size:30px;
+      color:var(--green-950);
+      letter-spacing:-.03em;
+    }
+
+    .stat-card p{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.95);
+      border:1px solid rgba(229,231,235,.95);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-soft);
+      margin-bottom:18px;
+      overflow:hidden;
+    }
+
+    .panel-header{
+      padding:18px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      border-bottom:1px solid var(--gray-200);
+      background:linear-gradient(180deg,#fff,#fbfdfb);
+    }
+
+    .panel-header h2{
+      font-size:18px;
+      color:var(--green-950);
+      margin-bottom:3px;
+      letter-spacing:-.01em;
+    }
+
+    .panel-header p{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .panel-body{
+      padding:20px;
+    }
+
+    .notice{
+      display:flex;
+      gap:10px;
+      background:#fffaeb;
+      color:#7a4b00;
+      border:1px solid #fedf89;
+      padding:12px;
+      border-radius:14px;
+      font-size:12px;
+      line-height:1.45;
+      margin-bottom:16px;
     }
 
     .form-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:repeat(3,1fr);
+      gap:13px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .field.full{
+      grid-column:1/-1;
+    }
+
+    .field.two{
+      grid-column:span 2;
+    }
+
+    label{
+      font-size:12px;
+      color:var(--gray-700);
+      font-weight:800;
+    }
+
+    input,
+    select,
+    textarea{
+      width:100%;
+      border:1px solid var(--gray-300);
+      background:white;
+      color:var(--text);
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+      transition:.15s ease;
+      font-size:14px;
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:90px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--green-600);
+      box-shadow:0 0 0 4px rgba(27,122,67,.12);
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:9px;
+      margin-top:16px;
+      align-items:center;
+    }
+
+    .search-grid{
+      display:grid;
+      grid-template-columns:1.5fr 1fr 1fr;
       gap:12px;
     }
 
-    .full{
-      grid-column:1/3;
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--gray-200);
+      border-radius:16px;
+      background:white;
     }
 
     table{
       width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:1050px;
       font-size:13px;
     }
 
-    th{
-      background:var(--verde-oscuro);
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:1;
+      background:var(--green-950);
       color:white;
-      padding:11px;
-      border:1px solid white;
-      text-align:center;
+      text-align:left;
+      padding:12px;
+      font-size:12px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      border-bottom:1px solid rgba(255,255,255,.12);
     }
 
-    td{
-      border:1px solid var(--borde);
-      padding:9px;
-      text-align:center;
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid var(--gray-200);
+      color:#1d2939;
       vertical-align:top;
+      line-height:1.35;
     }
 
-    tr:nth-child(even){
-      background:#fafafa;
+    tbody tr:hover{
+      background:#f8fbf8;
     }
 
-    .acciones{
+    .num-cell{
+      font-weight:900;
+      color:var(--green-900);
+      white-space:nowrap;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:5px 9px;
+      font-size:11px;
+      font-weight:900;
+      border:1px solid transparent;
+      white-space:nowrap;
+    }
+
+    .badge.Pendiente{
+      background:#fffaeb;
+      color:#93370d;
+      border-color:#fedf89;
+    }
+
+    .badge.Verificado{
+      background:#ecfdf3;
+      color:#027a48;
+      border-color:#abefc6;
+    }
+
+    .badge.Observado{
+      background:#fff1f3;
+      color:#c01048;
+      border-color:#fecdd6;
+    }
+
+    .badge.Archivado{
+      background:#f2f4f7;
+      color:#344054;
+      border-color:#d0d5dd;
+    }
+
+    .small-actions{
       display:flex;
-      gap:5px;
-      justify-content:center;
+      gap:6px;
       flex-wrap:wrap;
     }
 
-    .archivo-item{
-      background:#eef7ef;
-      border:1px solid #cfe3d2;
-      padding:6px;
-      border-radius:4px;
-      margin:3px 0;
+    .small-btn{
+      padding:7px 9px;
+      border-radius:9px;
       font-size:12px;
+      font-weight:900;
+      color:white;
     }
 
-    .archivo-item a{
-      color:var(--verde-oscuro);
-      font-weight:bold;
+    .file-list{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .file-item{
+      border:1px solid #d7eadc;
+      background:#f0f9f3;
+      border-radius:12px;
+      padding:8px;
+      font-size:12px;
+      color:var(--green-900);
+    }
+
+    .file-item a{
+      font-weight:900;
       text-decoration:none;
+      word-break:break-word;
+    }
+
+    .file-remove{
+      margin-top:6px;
+      padding:5px 8px;
+      border-radius:8px;
+      background:var(--red);
+      color:white;
+      font-size:11px;
+      font-weight:900;
     }
 
     .preview-box{
-      border:1px dashed var(--verde);
-      padding:10px;
-      border-radius:5px;
-      background:#f9fff9;
-      margin-bottom:10px;
-      font-size:13px;
       display:none;
-    }
-
-    footer{
-      text-align:center;
-      background:var(--verde-oscuro);
-      color:white;
-      padding:14px;
-      margin-top:30px;
+      margin-top:8px;
+      border:1px dashed var(--green-600);
+      background:#f6fef9;
+      padding:12px;
+      border-radius:14px;
+      color:var(--green-900);
       font-size:12px;
+      line-height:1.5;
     }
 
-    .alerta{
-      background:#fff8d8;
-      border-left:4px solid var(--amarillo);
+    .report-preview{
+      display:none;
+      background:white;
+      border:1px solid var(--gray-200);
+      border-radius:18px;
+      padding:20px;
+      margin-top:16px;
+    }
+
+    .report-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding-bottom:14px;
+      margin-bottom:14px;
+      border-bottom:3px solid var(--green-950);
+    }
+
+    .report-logo{
+      width:92px;
+      height:82px;
+      object-fit:contain;
+    }
+
+    .report-title{
+      flex:1;
+      text-align:center;
+    }
+
+    .report-title h2{
+      color:var(--green-950);
+      font-size:18px;
+      margin-bottom:4px;
+    }
+
+    .report-title p{
+      font-size:12px;
+      color:var(--gray-700);
+      margin:2px 0;
+    }
+
+    .report-metrics{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin:14px 0;
+    }
+
+    .report-metric{
+      background:var(--gray-50);
+      border:1px solid var(--gray-200);
+      border-radius:14px;
       padding:10px;
-      font-size:13px;
-      margin-bottom:12px;
-      color:#4b3a00;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
     }
 
-    @media(max-width:800px){
+    .report-metric strong{
+      display:block;
+      font-size:20px;
+      color:var(--green-950);
+      margin-bottom:2px;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(6,39,20,.62);
+      z-index:50;
+      padding:18px;
+    }
+
+    .modal.open{
+      display:flex;
+    }
+
+    .modal-card{
+      width:min(860px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:white;
+      border-radius:22px;
+      box-shadow:0 24px 70px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.6);
+    }
+
+    .modal-head{
+      padding:18px 20px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      background:linear-gradient(90deg, var(--green-950), var(--green-800));
+      color:white;
+    }
+
+    .modal-head h3{
+      font-size:18px;
+    }
+
+    .modal-body{
+      padding:20px;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+
+    .detail-item{
+      border:1px solid var(--gray-200);
+      background:var(--gray-50);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .detail-item.full{
+      grid-column:1/-1;
+    }
+
+    .detail-item span{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .detail-item p{
+      color:var(--text);
+      line-height:1.45;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .mobile-menu{
+      display:none;
+      background:var(--green-950);
+      color:white;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:900;
+    }
+
+    @media(max-width:1120px){
+      .app{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:fixed;
+        left:-300px;
+        width:280px;
+        transition:.2s ease;
+      }
+
+      .sidebar.open{
+        left:0;
+      }
+
+      .mobile-menu{
+        display:inline-flex;
+      }
+
       .stats{
         grid-template-columns:repeat(2,1fr);
       }
 
-      .form-grid{
+      .grid-2{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:760px){
+      .topbar{
+        padding:14px;
+      }
+
+      .user-chip{
+        display:none;
+      }
+
+      .content{
+        padding:18px 14px 30px;
+      }
+
+      .hero{
+        padding:20px;
+      }
+
+      .hero-content{
+        display:block;
+      }
+
+      .hero h1{
+        font-size:25px;
+      }
+
+      .stats{
         grid-template-columns:1fr;
       }
 
-      .full{
-        grid-column:1/2;
+      .form-grid,
+      .search-grid,
+      .detail-grid,
+      .report-metrics{
+        grid-template-columns:1fr;
       }
 
-      .titulo h1{
-        font-size:30px;
-        text-align:center;
+      .field.two{
+        grid-column:1/-1;
       }
 
-      .titulo h2,
-      .titulo h3,
-      .titulo p{
-        text-align:center;
+      .panel-header{
+        flex-direction:column;
+      }
+
+      .toolbar .btn{
+        width:100%;
+      }
+    }
+
+    @media print{
+      body{
+        background:white;
+      }
+
+      .sidebar,
+      .topbar,
+      .hero,
+      .stats,
+      #consulta,
+      #registro,
+      #respaldo,
+      #tabla,
+      .no-print,
+      .modal{
+        display:none !important;
+      }
+
+      .app{
+        display:block;
+      }
+
+      .content{
+        padding:0;
+        max-width:none;
+      }
+
+      #reportes{
+        display:block !important;
+        border:none;
+        box-shadow:none;
+        margin:0;
+      }
+
+      #reportes .panel-header,
+      #reportes > .panel-body > p,
+      #reportes > .panel-body > .toolbar{
+        display:none !important;
+      }
+
+      #vistaReporte{
+        display:block !important;
+        border:none;
+        margin:0;
+        padding:0;
       }
 
       table{
-        font-size:11px;
+        font-size:10px;
+        min-width:0;
       }
 
-      th,td{
-        padding:6px;
+      thead th{
+        background:#062714 !important;
+        color:white !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+
+      tbody td{
+        padding:7px;
       }
     }
   </style>
 </head>
-
 <body>
-
-  <header>
-    <div class="header-content">
-      <img src="portada.png" alt="DIVINCRI La Libertad" class="logo">
-
-      <div class="titulo">
-        <h2>LA LIBERTAD</h2>
-        <h1>DIVINCRI</h1>
-        <h3>REGIÓN POLICIAL LA LIBERTAD - TRUJILLO</h3>
-        <p>Sistema de Consulta, Registro, Archivos, Solicitantes y Vinculaciones</p>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="PORTADA.PNG" alt="DIVINCRI La Libertad" class="brand-logo" />
+        <div class="brand-title">
+          <small>LA LIBERTAD</small>
+          <h1>DIVINCRI</h1>
+          <p>Región Policial La Libertad - Trujillo</p>
+        </div>
       </div>
+
+      <div class="nav-label">Menú principal</div>
+      <button class="nav-btn active" onclick="goTo('inicio')">🏠 Panel de inicio</button>
+      <button class="nav-btn" onclick="goTo('consulta')">🔍 Consulta avanzada</button>
+      <button class="nav-btn" onclick="goTo('registro')">➕ Nuevo registro</button>
+      <button class="nav-btn" onclick="goTo('tabla')">📋 Base de registros</button>
+      <button class="nav-btn" onclick="goTo('reportes')">📄 Reportes</button>
+      <button class="nav-btn" onclick="goTo('respaldo')">💾 Respaldo</button>
+
+      <div class="nav-label">Estado del sistema</div>
+      <div class="sidebar-note">
+        <strong>Modo local:</strong><br />
+        La información se guarda en este navegador. Para uso institucional real, conectar a Firebase o servidor seguro con usuarios, roles y auditoría.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <button class="mobile-menu" onclick="toggleSidebar()">☰ Menú</button>
+          <h2>Sistema de Consulta y Registro</h2>
+          <p>Archivos, solicitantes, vinculaciones/resultados y reportes operativos.</p>
+        </div>
+        <div class="user-chip">
+          <span class="user-dot"></span>
+          Usuario local activo
+        </div>
+      </header>
+
+      <div class="content" id="inicio">
+        <section class="hero">
+          <div class="hero-content">
+            <div>
+              <h3>DIVINCRI La Libertad - Trujillo</h3>
+              <h1>Panel institucional de registros telefónicos</h1>
+              <p>
+                Plataforma de apoyo para registrar números, solicitantes, unidades, vinculaciones o resultados,
+                documentos adjuntos y reportes exportables en Excel o PDF.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-gold" onclick="goTo('registro')">➕ Registrar información</button>
+                <button class="btn btn-light" onclick="goTo('consulta')">🔍 Consultar registros</button>
+                <button class="btn btn-primary" onclick="goTo('reportes')">📄 Generar reporte</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats">
+          <article class="stat-card">
+            <div class="stat-icon">📞</div>
+            <h2 id="totalRegistros">0</h2>
+            <p>Total registros</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon">🔍</div>
+            <h2 id="totalConsultas">0</h2>
+            <p>Consultas realizadas</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon">👥</div>
+            <h2 id="totalSolicitantes">0</h2>
+            <p>Solicitantes únicos</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon">📎</div>
+            <h2 id="totalArchivos">0</h2>
+            <p>Archivos adjuntos</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon">✅</div>
+            <h2 id="totalVerificados">0</h2>
+            <p>Verificados</p>
+          </article>
+        </section>
+
+        <div class="grid-2">
+          <section class="panel" id="consulta">
+            <div class="panel-header">
+              <div>
+                <h2>🔍 Consulta avanzada</h2>
+                <p>Filtra por número, solicitante, unidad, resultados, referencia, estado o fecha.</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="search-grid">
+                <div class="field">
+                  <label>Búsqueda general</label>
+                  <input id="buscarTexto" type="text" placeholder="Ej. número, solicitante, vinculación, resultado..." />
+                </div>
+                <div class="field">
+                  <label>Estado</label>
+                  <select id="filtroEstado">
+                    <option value="">Todos</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Verificado">Verificado</option>
+                    <option value="Observado">Observado</option>
+                    <option value="Archivado">Archivado</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Fecha</label>
+                  <input id="filtroFecha" type="date" />
+                </div>
+              </div>
+              <div class="toolbar">
+                <button class="btn btn-primary" onclick="buscarRegistro()">Buscar</button>
+                <button class="btn btn-gold" onclick="limpiarBusqueda()">Limpiar filtros</button>
+                <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Vista previa con resultados</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="resumenRapido">
+            <div class="panel-header">
+              <div>
+                <h2>📌 Actividad reciente</h2>
+                <p>Últimos registros ingresados en el sistema local.</p>
+              </div>
+            </div>
+            <div class="panel-body" id="actividadReciente">
+              <p class="muted">Aún no hay registros recientes.</p>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel" id="registro">
+          <div class="panel-header">
+            <div>
+              <h2>➕ Registrar información</h2>
+              <p>Los campos de vinculaciones/resultados quedan libres para que agregues la información obtenida.</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="notice">
+              <span>⚠️</span>
+              <div>
+                <strong>Recomendación:</strong> Esta versión es funcional para prueba o demostración. Para uso real, no debe guardar datos sensibles solo en localStorage. Se recomienda Firebase/Auth, base de datos, permisos por usuario y auditoría.
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label>Número telefónico *</label>
+                <input id="numero" type="text" placeholder="Ingrese número telefónico" />
+              </div>
+
+              <div class="field">
+                <label>Solicitante *</label>
+                <input id="solicitante" type="text" placeholder="Nombre del solicitante" />
+              </div>
+
+              <div class="field">
+                <label>Unidad solicitante</label>
+                <input id="unidad" type="text" placeholder="Unidad / área solicitante" />
+              </div>
+
+              <div class="field two">
+                <label>Vinculaciones / resultados</label>
+                <input id="vinculacion" type="text" placeholder="Campo libre para agregar resultados o vinculaciones" />
+              </div>
+
+              <div class="field">
+                <label>Referencia general</label>
+                <input id="tipoCaso" type="text" placeholder="Referencia general / tipo de consulta" />
+              </div>
+
+              <div class="field">
+                <label>Estado</label>
+                <select id="estado">
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Verificado">Verificado</option>
+                  <option value="Observado">Observado</option>
+                  <option value="Archivado">Archivado</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Fecha</label>
+                <input id="fecha" type="date" />
+              </div>
+
+              <div class="field">
+                <label>Código / referencia</label>
+                <input id="codigoReferencia" type="text" placeholder="Código, oficio, expediente u otro" />
+              </div>
+
+              <div class="field full">
+                <label>Observación</label>
+                <textarea id="observacion" placeholder="Detalle, comentario o anotación relevante"></textarea>
+              </div>
+
+              <div class="field full">
+                <label>Archivos adjuntos</label>
+                <input id="archivos" type="file" multiple onchange="previsualizarArchivos()" />
+                <div id="previewArchivos" class="preview-box"></div>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <button class="btn btn-primary" onclick="guardarRegistro()">Guardar registro</button>
+              <button class="btn btn-gold" onclick="limpiarFormulario()">Nuevo / limpiar</button>
+              <button class="btn btn-gray" onclick="goTo('tabla')">Ver registros</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="respaldo">
+          <div class="panel-header">
+            <div>
+              <h2>💾 Respaldo de información</h2>
+              <p>Exporta o importa una copia local en formato JSON.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <button class="btn btn-gray" onclick="exportarDatos()">Exportar respaldo JSON</button>
+              <label class="btn btn-light" style="border:1px solid var(--gray-200);cursor:pointer;">
+                Importar JSON
+                <input id="importarArchivo" type="file" accept=".json" onchange="importarDatos()" style="display:none;" />
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="tabla">
+          <div class="panel-header">
+            <div>
+              <h2>📋 Base de registros</h2>
+              <p>Listado general de registros guardados en este navegador.</p>
+            </div>
+            <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Generar reporte</button>
+          </div>
+
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>Número</th>
+                    <th>Solicitante</th>
+                    <th>Unidad</th>
+                    <th>Vinculaciones / resultados</th>
+                    <th>Referencia general</th>
+                    <th>Estado</th>
+                    <th>Código</th>
+                    <th>Observación</th>
+                    <th>Fecha</th>
+                    <th>Archivos</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaRegistros"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="reportes">
+          <div class="panel-header">
+            <div>
+              <h2>📄 Reportes operativos</h2>
+              <p>Genera una vista previa y exporta los registros filtrados o completos.</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <p class="muted">
+              El reporte se genera con la tabla actualmente visible. Si primero realizas una búsqueda, el reporte saldrá solo con esos resultados.
+            </p>
+
+            <div class="toolbar no-print">
+              <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Vista previa</button>
+              <button class="btn btn-gold" onclick="exportarExcel()">Exportar a Excel</button>
+              <button class="btn btn-danger" onclick="exportarPDF()">Exportar a PDF</button>
+              <button class="btn btn-gray" onclick="cerrarVistaReporte()">Cerrar vista previa</button>
+            </div>
+
+            <div id="vistaReporte" class="report-preview"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="modalFicha">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Ficha de registro</h3>
+        <button class="btn btn-light" onclick="cerrarFicha()">Cerrar</button>
+      </div>
+      <div class="modal-body" id="contenidoFicha"></div>
     </div>
-
-    <nav>
-      <button onclick="irA('inicio')">Inicio</button>
-      <button onclick="irA('consulta')">Consulta</button>
-      <button onclick="irA('registro')">Registrar</button>
-      <button onclick="irA('tabla')">Registros</button>
-    </nav>
-  </header>
-
-  <main class="container" id="inicio">
-
-    <div class="stats">
-      <div class="card">
-        <div class="icon">📞</div>
-        <h2 id="totalNumeros">0</h2>
-        <p>Números Registrados</p>
-      </div>
-
-      <div class="card">
-        <div class="icon">🔍</div>
-        <h2 id="totalConsultas">0</h2>
-        <p>Consultas Realizadas</p>
-      </div>
-
-      <div class="card">
-        <div class="icon">👥</div>
-        <h2 id="totalSolicitantes">0</h2>
-        <p>Solicitantes Registrados</p>
-      </div>
-
-      <div class="card">
-        <div class="icon">📎</div>
-        <h2 id="totalArchivos">0</h2>
-        <p>Archivos Subidos</p>
-      </div>
-    </div>
-
-    <section id="consulta">
-      <h2>🔍 Consultar Números Masivos</h2>
-
-      <div class="busqueda">
-        <input type="text" id="buscarTexto" placeholder="Ingrese número, solicitante, vinculación u observación">
-        <button onclick="buscarRegistro()">Buscar</button>
-        <button class="btn-amarillo" onclick="limpiarBusqueda()">Limpiar</button>
-      </div>
-    </section>
-
-    <section id="registro">
-      <h2>➕ Registrar Número</h2>
-
-      <div class="alerta">
-        Esta versión guarda la información en el navegador mediante almacenamiento local. Para uso institucional real debe implementarse con base de datos, usuario, contraseña, permisos y respaldo seguro.
-      </div>
-
-      <div class="form-grid">
-        <div>
-          <input type="text" id="numero" placeholder="Número telefónico">
-        </div>
-
-        <div>
-          <input type="text" id="solicitante" placeholder="Solicitante">
-        </div>
-
-        <div>
-          <select id="vinculacion">
-            <option value="">Seleccione vinculación</option>
-            <option value="Investigado">Investigado</option>
-            <option value="Denunciante">Denunciante</option>
-            <option value="Agraviado">Agraviado</option>
-            <option value="Testigo">Testigo</option>
-            <option value="Familiar">Familiar</option>
-            <option value="Contacto frecuente">Contacto frecuente</option>
-            <option value="Sospechoso">Sospechoso</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-
-        <div>
-          <input type="date" id="fecha">
-        </div>
-
-        <div class="full">
-          <textarea id="observacion" placeholder="Observación"></textarea>
-        </div>
-
-        <div class="full">
-          <input type="file" id="archivos" multiple onchange="previsualizarArchivos()">
-          <div id="previewArchivos" class="preview-box"></div>
-        </div>
-      </div>
-
-      <button onclick="guardarRegistro()">Guardar Registro</button>
-      <button class="btn-amarillo" onclick="limpiarFormulario()">Nuevo / Limpiar</button>
-    </section>
-
-    <section>
-      <h2>💾 Respaldo de Información</h2>
-      <button onclick="exportarDatos()">Exportar Respaldo JSON</button>
-      <input type="file" id="importarArchivo" accept=".json" onchange="importarDatos()" style="margin-top:10px;">
-    </section>
-
-    <section id="tabla">
-      <h2>📋 Últimos Registros</h2>
-
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>N°</th>
-              <th>Número</th>
-              <th>Solicitante</th>
-              <th>Vinculación</th>
-              <th>Observación</th>
-              <th>Fecha</th>
-              <th>Archivos</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-
-          <tbody id="tablaRegistros">
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-
-  <footer>
-    DIVINCRI LA LIBERTAD - TRUJILLO | Sistema interno de consulta y registro
-  </footer>
+  </div>
 
   <script>
-    let registros = JSON.parse(localStorage.getItem("registrosDivincri")) || [];
-    let consultas = Number(localStorage.getItem("consultasDivincri")) || 0;
-    let modoEdicion = null;
+    const KEY_REGISTROS = "divincri_registros_profesional";
+    const KEY_CONSULTAS = "divincri_consultas_profesional";
 
-    document.getElementById("fecha").valueAsDate = new Date();
+    let registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
+    let consultas = Number(localStorage.getItem(KEY_CONSULTAS)) || 0;
+    let registroEditandoId = null;
+    let listaActual = registros;
 
-    function irA(id){
-      document.getElementById(id).scrollIntoView({
-        behavior:"smooth"
-      });
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("fecha").valueAsDate = new Date();
+      mostrarRegistros(registros);
+      actualizarEstadisticas();
+      actualizarActividadReciente();
+    });
+
+    function toggleSidebar(){
+      document.getElementById("sidebar").classList.toggle("open");
+    }
+
+    function goTo(id){
+      const el = document.getElementById(id);
+      if(el){
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+      }
+      document.getElementById("sidebar").classList.remove("open");
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
     }
 
     function guardarLocal(){
-      localStorage.setItem("registrosDivincri", JSON.stringify(registros));
-      localStorage.setItem("consultasDivincri", consultas);
+      localStorage.setItem(KEY_REGISTROS, JSON.stringify(registros));
+      localStorage.setItem(KEY_CONSULTAS, String(consultas));
     }
 
     function actualizarEstadisticas(){
-      document.getElementById("totalNumeros").textContent = registros.length;
-      document.getElementById("totalConsultas").textContent = consultas;
-
-      const solicitantesUnicos = new Set(
-        registros
-          .map(r => r.solicitante.trim().toLowerCase())
-          .filter(s => s !== "")
+      const solicitantes = new Set(
+        registros.map(r => (r.solicitante || "").trim().toLowerCase()).filter(Boolean)
       );
+      const archivos = registros.reduce((acc, r) => acc + ((r.archivos || []).length), 0);
+      const verificados = registros.filter(r => r.estado === "Verificado").length;
 
-      let cantidadArchivos = 0;
-      registros.forEach(r => {
-        cantidadArchivos += r.archivos.length;
-      });
+      document.getElementById("totalRegistros").textContent = registros.length;
+      document.getElementById("totalConsultas").textContent = consultas;
+      document.getElementById("totalSolicitantes").textContent = solicitantes.size;
+      document.getElementById("totalArchivos").textContent = archivos;
+      document.getElementById("totalVerificados").textContent = verificados;
+    }
 
-      document.getElementById("totalSolicitantes").textContent = solicitantesUnicos.size;
-      document.getElementById("totalArchivos").textContent = cantidadArchivos;
+    function actualizarActividadReciente(){
+      const box = document.getElementById("actividadReciente");
+      const recientes = registros.slice(0, 5);
+
+      if(recientes.length === 0){
+        box.innerHTML = `<p class="muted">Aún no hay registros recientes.</p>`;
+        return;
+      }
+
+      box.innerHTML = recientes.map(r => `
+        <div style="padding:11px 0;border-bottom:1px solid var(--gray-200);">
+          <strong class="num-cell">${escapeHTML(r.numero || "")}</strong>
+          <p class="muted">${escapeHTML(r.solicitante || "Sin solicitante")} · ${formatearFecha(r.fecha || "")}</p>
+          <span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span>
+        </div>
+      `).join("");
     }
 
     function previsualizarArchivos(){
       const input = document.getElementById("archivos");
       const preview = document.getElementById("previewArchivos");
 
-      if(input.files.length === 0){
+      if(!input.files || input.files.length === 0){
         preview.style.display = "none";
         preview.innerHTML = "";
         return;
       }
 
       preview.style.display = "block";
-      preview.innerHTML = "<strong>Archivos seleccionados:</strong><br>";
-
-      Array.from(input.files).forEach((file, index) => {
-        preview.innerHTML += `${index + 1}. ${file.name} - ${(file.size / 1024).toFixed(2)} KB<br>`;
-      });
+      preview.innerHTML = `<strong>Archivos seleccionados:</strong><br>` +
+        Array.from(input.files).map((file, index) =>
+          `${index + 1}. ${escapeHTML(file.name)} - ${(file.size / 1024).toFixed(2)} KB`
+        ).join("<br>");
     }
 
     function convertirArchivosABase64(files){
-      return Promise.all(
-        Array.from(files).map(file => {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = () => {
-              resolve({
-                nombre:file.name,
-                tipo:file.type,
-                contenido:reader.result
-              });
-            };
-
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-        })
-      );
+      return Promise.all(Array.from(files).map(file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({
+          nombre:file.name,
+          tipo:file.type,
+          tamano:file.size,
+          contenido:reader.result,
+          fechaSubida:new Date().toISOString()
+        });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
     }
 
     async function guardarRegistro(){
       const numero = document.getElementById("numero").value.trim();
       const solicitante = document.getElementById("solicitante").value.trim();
+      const unidad = document.getElementById("unidad").value.trim();
       const vinculacion = document.getElementById("vinculacion").value.trim();
-      const observacion = document.getElementById("observacion").value.trim();
+      const tipoCaso = document.getElementById("tipoCaso").value.trim();
+      const estado = document.getElementById("estado").value;
       const fecha = document.getElementById("fecha").value;
+      const codigoReferencia = document.getElementById("codigoReferencia").value.trim();
+      const observacion = document.getElementById("observacion").value.trim();
       const archivosInput = document.getElementById("archivos");
 
-      if(numero === ""){
+      if(!numero){
         alert("Ingrese el número telefónico.");
         return;
       }
 
-      if(solicitante === ""){
+      if(!solicitante){
         alert("Ingrese el solicitante.");
         return;
       }
 
-      if(vinculacion === ""){
-        alert("Seleccione la vinculación.");
-        return;
+      let nuevosArchivos = [];
+      if(archivosInput.files && archivosInput.files.length > 0){
+        nuevosArchivos = await convertirArchivosABase64(archivosInput.files);
       }
 
-      let archivosConvertidos = [];
-
-      if(archivosInput.files.length > 0){
-        archivosConvertidos = await convertirArchivosABase64(archivosInput.files);
-      }
-
-      if(modoEdicion === null){
-        const nuevoRegistro = {
+      if(registroEditandoId === null){
+        registros.unshift({
           id:Date.now(),
           numero,
           solicitante,
+          unidad,
           vinculacion,
-          observacion,
+          tipoCaso,
+          estado,
           fecha,
-          archivos:archivosConvertidos
-        };
-
-        registros.unshift(nuevoRegistro);
+          codigoReferencia,
+          observacion,
+          archivos:nuevosArchivos,
+          creadoEn:new Date().toISOString(),
+          actualizadoEn:new Date().toISOString()
+        });
       }else{
-        registros[modoEdicion].numero = numero;
-        registros[modoEdicion].solicitante = solicitante;
-        registros[modoEdicion].vinculacion = vinculacion;
-        registros[modoEdicion].observacion = observacion;
-        registros[modoEdicion].fecha = fecha;
-
-        if(archivosConvertidos.length > 0){
-          registros[modoEdicion].archivos = registros[modoEdicion].archivos.concat(archivosConvertidos);
+        const index = registros.findIndex(r => r.id === registroEditandoId);
+        if(index === -1){
+          alert("No se encontró el registro para editar.");
+          registroEditandoId = null;
+          return;
         }
 
-        modoEdicion = null;
+        registros[index] = {
+          ...registros[index],
+          numero,
+          solicitante,
+          unidad,
+          vinculacion,
+          tipoCaso,
+          estado,
+          fecha,
+          codigoReferencia,
+          observacion,
+          archivos:[...(registros[index].archivos || []), ...nuevosArchivos],
+          actualizadoEn:new Date().toISOString()
+        };
+        registroEditandoId = null;
       }
 
+      listaActual = registros;
       guardarLocal();
-      mostrarRegistros();
+      mostrarRegistros(registros);
+      actualizarEstadisticas();
+      actualizarActividadReciente();
       limpiarFormulario();
       alert("Registro guardado correctamente.");
     }
 
     function mostrarRegistros(lista = registros){
+      listaActual = lista;
       const tbody = document.getElementById("tablaRegistros");
-      tbody.innerHTML = "";
 
       if(lista.length === 0){
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="8">No hay registros para mostrar.</td>
-          </tr>
-        `;
+        tbody.innerHTML = `<tr><td colspan="12" class="muted">No hay registros para mostrar.</td></tr>`;
         actualizarEstadisticas();
         return;
       }
 
-      lista.forEach((registro, index) => {
-        const archivosHTML = registro.archivos.length > 0
-          ? registro.archivos.map((archivo, i) => `
-              <div class="archivo-item">
-                <a href="${archivo.contenido}" download="${archivo.nombre}" target="_blank">
-                  ${escapeHTML(archivo.nombre)}
-                </a>
-                <br>
-                <button class="btn-rojo" onclick="eliminarArchivo(${registro.id}, ${i})">Eliminar archivo</button>
+      tbody.innerHTML = lista.map((r, index) => {
+        const archivosHTML = (r.archivos || []).length
+          ? `<div class="file-list">${(r.archivos || []).map((a, i) => `
+              <div class="file-item">
+                <a href="${a.contenido}" download="${escapeAttr(a.nombre)}" target="_blank">📎 ${escapeHTML(a.nombre)}</a>
+                <button class="file-remove" onclick="eliminarArchivo(${r.id}, ${i})">Eliminar</button>
               </div>
-            `).join("")
-          : "Sin archivos";
+            `).join("")}</div>`
+          : `<span class="muted">Sin archivos</span>`;
 
-        const fila = document.createElement("tr");
-
-        fila.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${escapeHTML(registro.numero)}</td>
-          <td>${escapeHTML(registro.solicitante)}</td>
-          <td>${escapeHTML(registro.vinculacion)}</td>
-          <td>${escapeHTML(registro.observacion)}</td>
-          <td>${escapeHTML(registro.fecha)}</td>
-          <td>${archivosHTML}</td>
-          <td>
-            <div class="acciones">
-              <button class="btn-amarillo" onclick="editarRegistro(${registro.id})">Editar</button>
-              <button class="btn-rojo" onclick="eliminarRegistro(${registro.id})">Eliminar</button>
-            </div>
-          </td>
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td><span class="num-cell">${escapeHTML(r.numero || "")}</span></td>
+            <td>${escapeHTML(r.solicitante || "")}</td>
+            <td>${escapeHTML(r.unidad || "")}</td>
+            <td>${escapeHTML(r.vinculacion || "")}</td>
+            <td>${escapeHTML(r.tipoCaso || "")}</td>
+            <td><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></td>
+            <td>${escapeHTML(r.codigoReferencia || "")}</td>
+            <td>${escapeHTML(r.observacion || "")}</td>
+            <td>${formatearFecha(r.fecha || "")}</td>
+            <td>${archivosHTML}</td>
+            <td>
+              <div class="small-actions">
+                <button class="small-btn btn-blue" onclick="verFicha(${r.id})">Ver</button>
+                <button class="small-btn btn-orange" onclick="editarRegistro(${r.id})">Editar</button>
+                <button class="small-btn btn-danger" onclick="eliminarRegistro(${r.id})">Eliminar</button>
+              </div>
+            </td>
+          </tr>
         `;
-
-        tbody.appendChild(fila);
-      });
+      }).join("");
 
       actualizarEstadisticas();
     }
 
     function buscarRegistro(){
       const texto = document.getElementById("buscarTexto").value.trim().toLowerCase();
-
-      if(texto === ""){
-        alert("Ingrese un dato para buscar.");
-        return;
-      }
+      const estado = document.getElementById("filtroEstado").value;
+      const fecha = document.getElementById("filtroFecha").value;
 
       consultas++;
       guardarLocal();
 
-      const resultado = registros.filter(r =>
-        r.numero.toLowerCase().includes(texto) ||
-        r.solicitante.toLowerCase().includes(texto) ||
-        r.vinculacion.toLowerCase().includes(texto) ||
-        r.observacion.toLowerCase().includes(texto) ||
-        r.fecha.toLowerCase().includes(texto)
-      );
+      const resultado = registros.filter(r => {
+        const coincideTexto = !texto || [
+          r.numero,
+          r.solicitante,
+          r.unidad,
+          r.vinculacion,
+          r.tipoCaso,
+          r.estado,
+          r.codigoReferencia,
+          r.observacion,
+          r.fecha
+        ].some(v => String(v || "").toLowerCase().includes(texto));
+
+        const coincideEstado = !estado || r.estado === estado;
+        const coincideFecha = !fecha || r.fecha === fecha;
+
+        return coincideTexto && coincideEstado && coincideFecha;
+      });
 
       mostrarRegistros(resultado);
+      actualizarEstadisticas();
+      goTo("tabla");
 
       if(resultado.length === 0){
         alert("No se encontraron coincidencias.");
@@ -695,136 +1532,275 @@
 
     function limpiarBusqueda(){
       document.getElementById("buscarTexto").value = "";
-      mostrarRegistros();
+      document.getElementById("filtroEstado").value = "";
+      document.getElementById("filtroFecha").value = "";
+      mostrarRegistros(registros);
     }
 
     function editarRegistro(id){
-      const index = registros.findIndex(r => r.id === id);
-
-      if(index === -1){
+      const r = registros.find(x => x.id === id);
+      if(!r){
         alert("Registro no encontrado.");
         return;
       }
 
-      const r = registros[index];
+      document.getElementById("numero").value = r.numero || "";
+      document.getElementById("solicitante").value = r.solicitante || "";
+      document.getElementById("unidad").value = r.unidad || "";
+      document.getElementById("vinculacion").value = r.vinculacion || "";
+      document.getElementById("tipoCaso").value = r.tipoCaso || "";
+      document.getElementById("estado").value = r.estado || "Pendiente";
+      document.getElementById("fecha").value = r.fecha || "";
+      document.getElementById("codigoReferencia").value = r.codigoReferencia || "";
+      document.getElementById("observacion").value = r.observacion || "";
 
-      document.getElementById("numero").value = r.numero;
-      document.getElementById("solicitante").value = r.solicitante;
-      document.getElementById("vinculacion").value = r.vinculacion;
-      document.getElementById("observacion").value = r.observacion;
-      document.getElementById("fecha").value = r.fecha;
-
-      modoEdicion = index;
-
-      irA("registro");
-      alert("Modo edición activado. Puede modificar el registro y guardar.");
+      registroEditandoId = id;
+      goTo("registro");
     }
 
     function eliminarRegistro(id){
-      const confirmar = confirm("¿Está seguro de eliminar este registro?");
-
-      if(!confirmar){
-        return;
-      }
-
+      if(!confirm("¿Está seguro de eliminar este registro?")) return;
       registros = registros.filter(r => r.id !== id);
+      listaActual = registros;
       guardarLocal();
-      mostrarRegistros();
+      mostrarRegistros(registros);
+      actualizarActividadReciente();
     }
 
     function eliminarArchivo(idRegistro, indexArchivo){
-      const confirmar = confirm("¿Desea eliminar este archivo del registro?");
-
-      if(!confirmar){
-        return;
-      }
-
-      const registro = registros.find(r => r.id === idRegistro);
-
-      if(!registro){
-        alert("Registro no encontrado.");
-        return;
-      }
-
-      registro.archivos.splice(indexArchivo, 1);
+      if(!confirm("¿Desea eliminar este archivo adjunto?")) return;
+      const r = registros.find(x => x.id === idRegistro);
+      if(!r) return;
+      r.archivos.splice(indexArchivo, 1);
+      r.actualizadoEn = new Date().toISOString();
       guardarLocal();
-      mostrarRegistros();
+      mostrarRegistros(listaActual);
+      actualizarEstadisticas();
     }
 
     function limpiarFormulario(){
       document.getElementById("numero").value = "";
       document.getElementById("solicitante").value = "";
+      document.getElementById("unidad").value = "";
       document.getElementById("vinculacion").value = "";
-      document.getElementById("observacion").value = "";
+      document.getElementById("tipoCaso").value = "";
+      document.getElementById("estado").value = "Pendiente";
       document.getElementById("fecha").valueAsDate = new Date();
+      document.getElementById("codigoReferencia").value = "";
+      document.getElementById("observacion").value = "";
       document.getElementById("archivos").value = "";
       document.getElementById("previewArchivos").style.display = "none";
       document.getElementById("previewArchivos").innerHTML = "";
-      modoEdicion = null;
+      registroEditandoId = null;
+    }
+
+    function verFicha(id){
+      const r = registros.find(x => x.id === id);
+      if(!r){
+        alert("Registro no encontrado.");
+        return;
+      }
+
+      const archivos = (r.archivos || []).length
+        ? (r.archivos || []).map(a => `<p>📎 <a href="${a.contenido}" download="${escapeAttr(a.nombre)}">${escapeHTML(a.nombre)}</a></p>`).join("")
+        : `<p>Sin archivos adjuntos</p>`;
+
+      document.getElementById("contenidoFicha").innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item"><span>Número</span><p>${escapeHTML(r.numero || "")}</p></div>
+          <div class="detail-item"><span>Solicitante</span><p>${escapeHTML(r.solicitante || "")}</p></div>
+          <div class="detail-item"><span>Unidad</span><p>${escapeHTML(r.unidad || "")}</p></div>
+          <div class="detail-item"><span>Estado</span><p><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></p></div>
+          <div class="detail-item full"><span>Vinculaciones / resultados</span><p>${escapeHTML(r.vinculacion || "")}</p></div>
+          <div class="detail-item"><span>Referencia general</span><p>${escapeHTML(r.tipoCaso || "")}</p></div>
+          <div class="detail-item"><span>Código / referencia</span><p>${escapeHTML(r.codigoReferencia || "")}</p></div>
+          <div class="detail-item"><span>Fecha</span><p>${formatearFecha(r.fecha || "")}</p></div>
+          <div class="detail-item"><span>Última actualización</span><p>${formatearFechaHora(r.actualizadoEn || "")}</p></div>
+          <div class="detail-item full"><span>Observación</span><p>${escapeHTML(r.observacion || "")}</p></div>
+          <div class="detail-item full"><span>Archivos adjuntos</span>${archivos}</div>
+        </div>
+      `;
+      document.getElementById("modalFicha").classList.add("open");
+    }
+
+    function cerrarFicha(){
+      document.getElementById("modalFicha").classList.remove("open");
     }
 
     function exportarDatos(){
       const datos = {
+        sistema:"DIVINCRI La Libertad - Trujillo",
         registros,
         consultas,
         fechaExportacion:new Date().toISOString()
       };
-
-      const blob = new Blob([JSON.stringify(datos, null, 2)], {
-        type:"application/json"
-      });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-
-      a.href = url;
-      a.download = "respaldo_divincri_la_libertad.json";
-      a.click();
-
-      URL.revokeObjectURL(url);
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {type:"application/json"});
+      descargarBlob(blob, "respaldo_divincri_la_libertad.json");
     }
 
     function importarDatos(){
       const archivo = document.getElementById("importarArchivo").files[0];
-
-      if(!archivo){
-        return;
-      }
-
-      const confirmar = confirm("Esto reemplazará la información actual. ¿Desea continuar?");
-
-      if(!confirmar){
-        document.getElementById("importarArchivo").value = "";
-        return;
-      }
+      if(!archivo) return;
+      if(!confirm("Esto reemplazará la información actual. ¿Desea continuar?")) return;
 
       const reader = new FileReader();
-
-      reader.onload = function(e){
+      reader.onload = e => {
         try{
-          const datos = JSON.parse(e.target.result);
-
-          registros = datos.registros || [];
-          consultas = datos.consultas || 0;
-
+          const data = JSON.parse(e.target.result);
+          registros = data.registros || [];
+          consultas = Number(data.consultas || 0);
+          listaActual = registros;
           guardarLocal();
-          mostrarRegistros();
-
+          mostrarRegistros(registros);
+          actualizarEstadisticas();
+          actualizarActividadReciente();
           alert("Respaldo importado correctamente.");
-        }catch(error){
-          alert("El archivo seleccionado no es válido.");
+        }catch(err){
+          alert("Archivo JSON no válido.");
         }
       };
-
       reader.readAsText(archivo);
     }
 
-    function escapeHTML(texto){
-      if(!texto){
-        return "";
-      }
+    function generarVistaPreviaReporte(){
+      const data = listaActual || registros;
+      const totalArchivos = data.reduce((acc, r) => acc + ((r.archivos || []).length), 0);
+      const verificados = data.filter(r => r.estado === "Verificado").length;
+      const pendientes = data.filter(r => r.estado === "Pendiente").length;
+      const fechaGeneracion = new Date().toLocaleString("es-PE");
+      const contenedor = document.getElementById("vistaReporte");
 
-      return texto
+      const filas = data.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${escapeHTML(r.numero || "")}</td>
+          <td>${escapeHTML(r.solicitante || "")}</td>
+          <td>${escapeHTML(r.unidad || "")}</td>
+          <td>${escapeHTML(r.vinculacion || "")}</td>
+          <td>${escapeHTML(r.tipoCaso || "")}</td>
+          <td>${escapeHTML(r.estado || "Pendiente")}</td>
+          <td>${escapeHTML(r.codigoReferencia || "")}</td>
+          <td>${escapeHTML(r.observacion || "")}</td>
+          <td>${formatearFecha(r.fecha || "")}</td>
+          <td>${(r.archivos || []).length}</td>
+        </tr>
+      `).join("");
+
+      contenedor.innerHTML = `
+        <div class="report-head">
+          <img src="PORTADA.PNG" alt="DIVINCRI" class="report-logo">
+          <div class="report-title">
+            <h2>REPORTE DE REGISTROS TELEFÓNICOS</h2>
+            <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
+            <p>Sistema de consulta, registro, vinculaciones/resultados y archivos adjuntos</p>
+            <p>Fecha de generación: ${escapeHTML(fechaGeneracion)}</p>
+          </div>
+          <div style="width:92px;"></div>
+        </div>
+
+        <div class="report-metrics">
+          <div class="report-metric"><strong>${data.length}</strong>Total registros</div>
+          <div class="report-metric"><strong>${verificados}</strong>Verificados</div>
+          <div class="report-metric"><strong>${pendientes}</strong>Pendientes</div>
+          <div class="report-metric"><strong>${totalArchivos}</strong>Archivos</div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="tablaReporte">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Número</th>
+                <th>Solicitante</th>
+                <th>Unidad</th>
+                <th>Vinculaciones / resultados</th>
+                <th>Referencia general</th>
+                <th>Estado</th>
+                <th>Código</th>
+                <th>Observación</th>
+                <th>Fecha</th>
+                <th>Archivos</th>
+              </tr>
+            </thead>
+            <tbody>${filas || `<tr><td colspan="11">No hay registros para mostrar.</td></tr>`}</tbody>
+          </table>
+        </div>
+
+        <p class="muted" style="margin-top:12px;">
+          Documento generado automáticamente desde el sistema local DIVINCRI La Libertad - Trujillo.
+        </p>
+      `;
+
+      contenedor.style.display = "block";
+      goTo("reportes");
+    }
+
+    function cerrarVistaReporte(){
+      const contenedor = document.getElementById("vistaReporte");
+      contenedor.innerHTML = "";
+      contenedor.style.display = "none";
+    }
+
+    function exportarExcel(){
+      generarVistaPreviaReporte();
+      const tabla = document.getElementById("tablaReporte");
+      if(!tabla){
+        alert("Primero genere la vista previa.");
+        return;
+      }
+      const fecha = new Date().toISOString().slice(0,10);
+      const html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="UTF-8"></head>
+        <body>
+          <h2>DIVINCRI LA LIBERTAD - TRUJILLO</h2>
+          <h3>Reporte de registros telefónicos</h3>
+          <p>Fecha de generación: ${new Date().toLocaleString("es-PE")}</p>
+          ${tabla.outerHTML}
+        </body>
+        </html>
+      `;
+      const blob = new Blob([html], {type:"application/vnd.ms-excel;charset=utf-8;"});
+      descargarBlob(blob, `reporte_divincri_${fecha}.xls`);
+    }
+
+    function exportarPDF(){
+      generarVistaPreviaReporte();
+      setTimeout(() => window.print(), 350);
+    }
+
+    function descargarBlob(blob, nombre){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nombre;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function formatearFecha(fecha){
+      if(!fecha) return "";
+      const partes = String(fecha).split("-");
+      if(partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      return fecha;
+    }
+
+    function formatearFechaHora(valor){
+      if(!valor) return "";
+      try{
+        return new Date(valor).toLocaleString("es-PE");
+      }catch(e){
+        return valor;
+      }
+    }
+
+    function escapeHTML(texto){
+      if(texto === null || texto === undefined) return "";
+      return String(texto)
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
@@ -832,8 +1808,9 @@
         .replaceAll("'","&#039;");
     }
 
-    mostrarRegistros();
+    function escapeAttr(texto){
+      return escapeHTML(texto).replaceAll("`", "&#096;");
+    }
   </script>
-
 </body>
 </html>
