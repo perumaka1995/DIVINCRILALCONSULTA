@@ -1310,9 +1310,9 @@
 
     // CLOUDINARY: archivos adjuntos gratis sin Firebase Storage
     // Cloud name visto en tu panel de Cloudinary: dicurso0i
-    // Preajuste creado en modo No firmado: divincri_sin_firmar
+    // Preajuste creado en modo No firmado: divincri_unsigned
     const CLOUDINARY_CLOUD_NAME = "dicurso0i";
-    const CLOUDINARY_UPLOAD_PRESET = "divincri_sin_firmar";
+    const CLOUDINARY_UPLOAD_PRESET = "divincri_unsigned";
 
     const KEY_REGISTROS = "divincri_registros_profesional";
     const KEY_CONSULTAS = "divincri_consultas_profesional";
@@ -1378,7 +1378,7 @@
         nota.innerHTML = `
           <strong>Modo nube:</strong><br />
           Los registros se guardan en Firebase Firestore y los archivos adjuntos en Cloudinary.
-          Esta versión no usa autenticación.
+          Sistema conectado a nube con respaldo en línea.
         `;
       }
     }
