@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DIVINCRI La Libertad - Trujillo</title>
+  <!-- VERSION_FINAL_CLOUDINARY_DEBUG_V2: image/upload para imágenes y raw/upload para PDF/Word/Excel -->
 
   <style>
     :root{
@@ -1309,9 +1310,9 @@
     const COLECCION_REGISTROS = "registros";
 
     // CLOUDINARY: archivos adjuntos gratis sin Firebase Storage
-    // Cloud name visto en tu panel de Cloudinary: dicurso0i
+    // Cloud name visto en tu panel de Cloudinary: dicours0i
     // Preajuste creado en modo No firmado: divincri_unsigned
-    const CLOUDINARY_CLOUD_NAME = "dicurso0i";
+    const CLOUDINARY_CLOUD_NAME = "dicours0i";
     const CLOUDINARY_UPLOAD_PRESET = "divincri_unsigned";
 
     const KEY_REGISTROS = "divincri_registros_profesional";
@@ -1460,13 +1461,22 @@
     }
 
     async function subirArchivoCloudinary(file, idRegistro){
-      const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+      // VERSIÓN FINAL: imágenes van por image/upload; PDF, Word, Excel y otros van por raw/upload.
+      // Esto evita fallas con auto/upload en algunos presets unsigned.
+      const resourceType = String(file.type || "").startsWith("image/") ? "image" : "raw";
+      const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-      // IMPORTANTE: no enviamos "folder" aquí.
-      // En cargas unsigned Cloudinary solo permite pocos parámetros desde el navegador.
-      // La carpeta debe configurarse dentro del upload preset, no en el fetch.
+
+      console.log("Subiendo archivo a Cloudinary:", {
+        cloud:CLOUDINARY_CLOUD_NAME,
+        preset:CLOUDINARY_UPLOAD_PRESET,
+        endpoint,
+        nombre:file.name,
+        tipo:file.type,
+        tamano:file.size
+      });
 
       const response = await fetch(endpoint, {
         method:"POST",
@@ -1476,8 +1486,9 @@
       const data = await response.json().catch(() => ({}));
 
       if(!response.ok){
-        const detalle = data?.error?.message || "No se pudo subir el archivo a Cloudinary.";
-        throw new Error(detalle);
+        console.error("Respuesta Cloudinary:", data);
+        const detalle = data?.error?.message || JSON.stringify(data) || "No se pudo subir el archivo a Cloudinary.";
+        throw new Error("Cloudinary: " + detalle);
       }
 
       return {
@@ -1488,8 +1499,8 @@
         url:data.secure_url,
         ruta:data.public_id,
         publicId:data.public_id,
-        resourceType:data.resource_type,
-        formato:data.format,
+        resourceType:data.resource_type || resourceType,
+        formato:data.format || "",
         fechaSubida:new Date().toISOString(),
         nube:"cloudinary"
       };
