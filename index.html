@@ -1464,7 +1464,9 @@
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-      formData.append("folder", `registros_divincri/${idRegistro}`);
+      // IMPORTANTE: no enviamos "folder" aquí.
+      // En cargas unsigned Cloudinary solo permite pocos parámetros desde el navegador.
+      // La carpeta debe configurarse dentro del upload preset, no en el fetch.
 
       const response = await fetch(endpoint, {
         method:"POST",
@@ -1675,7 +1677,7 @@
         alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
       }catch(error){
         console.error("Error guardando registro:", error);
-        alert("No se pudo guardar el registro. Revisa la consola, las reglas de Firestore y el preajuste de Cloudinary.");
+        alert("No se pudo guardar el registro. Detalle: " + (error.message || error));
       }
     }
 
