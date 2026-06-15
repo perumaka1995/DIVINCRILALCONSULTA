@@ -339,7 +339,7 @@
 
   <header>
     <div class="header-content">
-      <img src="PORTADA.PNG" alt="DIVINCRI La Libertad" class="logo">
+      <img src="portada.png" alt="DIVINCRI La Libertad" class="logo">
 
       <div class="titulo">
         <h2>LA LIBERTAD</h2>
