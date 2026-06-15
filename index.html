@@ -1286,21 +1286,15 @@
       query,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL,
-      deleteObject
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
     /*
       CONFIGURACIÓN FIREBASE
       1) Crea tu proyecto en Firebase.
       2) Agrega una app Web.
       3) Copia aquí tu firebaseConfig real.
-      4) Activa Firestore Database y Storage.
-      5) Si NO usarás autenticación, coloca reglas públicas SOLO para prueba.
+      4) Activa Firestore Database.
+      5) Los archivos adjuntos se suben a Cloudinary con un preajuste sin firmar.
+      6) Si NO usarás autenticación, coloca reglas públicas SOLO para prueba.
     */
     const firebaseConfig = {
       apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
@@ -1313,6 +1307,13 @@
     };
 
     const COLECCION_REGISTROS = "registros";
+
+    // CLOUDINARY: archivos adjuntos gratis sin Firebase Storage
+    // Cloud name visto en tu panel de Cloudinary: dicurso0i
+    // Preajuste creado en modo No firmado: divincri_sin_firmar
+    const CLOUDINARY_CLOUD_NAME = "dicurso0i";
+    const CLOUDINARY_UPLOAD_PRESET = "divincri_sin_firmar";
+
     const KEY_REGISTROS = "divincri_registros_profesional";
     const KEY_CONSULTAS = "divincri_consultas_profesional";
 
@@ -1324,9 +1325,14 @@
       firebaseConfig.appId &&
       !firebaseConfig.appId.includes("PEGA_AQUI");
 
+    const CLOUDINARY_CONFIGURADO =
+      CLOUDINARY_CLOUD_NAME &&
+      CLOUDINARY_UPLOAD_PRESET &&
+      !CLOUDINARY_CLOUD_NAME.includes("PEGA_AQUI") &&
+      !CLOUDINARY_UPLOAD_PRESET.includes("PEGA_AQUI");
+
     let appFirebase = null;
     let db = null;
-    let storage = null;
     let firebaseActivo = false;
 
     let registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
@@ -1344,9 +1350,8 @@
         try{
           appFirebase = initializeApp(firebaseConfig);
           db = getFirestore(appFirebase);
-          storage = getStorage(appFirebase);
           firebaseActivo = true;
-          actualizarEstadoNube("Nube Firebase activa", true);
+          actualizarEstadoNube(CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa", true);
           escucharRegistrosEnNube();
           return;
         }catch(error){
@@ -1372,7 +1377,7 @@
       if(nota && activo){
         nota.innerHTML = `
           <strong>Modo nube:</strong><br />
-          Los registros se guardan en Firebase Firestore y los archivos adjuntos en Firebase Storage.
+          Los registros se guardan en Firebase Firestore y los archivos adjuntos en Cloudinary.
           Esta versión no usa autenticación.
         `;
       }
@@ -1395,7 +1400,7 @@
       }, (error) => {
         console.error("Error leyendo registros en Firebase:", error);
         actualizarEstadoNube("Error de nube: modo local", false);
-        alert("No se pudo leer Firebase. Revisa tu configuración y reglas de Firestore/Storage.");
+        alert("No se pudo leer Firebase. Revisa tu configuración, las reglas de Firestore y el preajuste unsigned de Cloudinary.");
         mostrarRegistros(registros);
         actualizarEstadisticas();
         actualizarActividadReciente();
@@ -1454,31 +1459,46 @@
         .slice(0, 120);
     }
 
+    async function subirArchivoCloudinary(file, idRegistro){
+      const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      formData.append("folder", `registros_divincri/${idRegistro}`);
+
+      const response = await fetch(endpoint, {
+        method:"POST",
+        body:formData
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if(!response.ok){
+        const detalle = data?.error?.message || "No se pudo subir el archivo a Cloudinary.";
+        throw new Error(detalle);
+      }
+
+      return {
+        nombre:file.name,
+        tipo:file.type || data.resource_type || "archivo",
+        tamano:file.size,
+        contenido:data.secure_url,
+        url:data.secure_url,
+        ruta:data.public_id,
+        publicId:data.public_id,
+        resourceType:data.resource_type,
+        formato:data.format,
+        fechaSubida:new Date().toISOString(),
+        nube:"cloudinary"
+      };
+    }
+
     async function subirArchivos(files, idRegistro){
       if(!files || files.length === 0) return [];
 
-      if(firebaseActivo && storage){
+      if(firebaseActivo && CLOUDINARY_CONFIGURADO){
         const lista = Array.from(files);
-        return Promise.all(lista.map(async (file) => {
-          const nombreSeguro = limpiarNombreArchivo(file.name);
-          const ruta = `registros/${idRegistro}/${Date.now()}_${nombreSeguro}`;
-          const archivoRef = ref(storage, ruta);
-          const snapshot = await uploadBytes(archivoRef, file, {
-            contentType:file.type || "application/octet-stream"
-          });
-          const url = await getDownloadURL(snapshot.ref);
-
-          return {
-            nombre:file.name,
-            tipo:file.type,
-            tamano:file.size,
-            contenido:url,
-            url,
-            ruta,
-            fechaSubida:new Date().toISOString(),
-            nube:"firebase-storage"
-          };
-        }));
+        return Promise.all(lista.map(file => subirArchivoCloudinary(file, idRegistro)));
       }
 
       return convertirArchivosABase64(files);
@@ -1490,18 +1510,9 @@
     }
 
     async function eliminarRegistroEnNube(registro){
-      const archivos = registro.archivos || [];
-
-      for(const archivo of archivos){
-        if(archivo.ruta){
-          try{
-            await deleteObject(ref(storage, archivo.ruta));
-          }catch(error){
-            console.warn("No se pudo eliminar archivo de Storage:", archivo.ruta, error);
-          }
-        }
-      }
-
+      // Se elimina el registro de Firestore.
+      // En Cloudinary, por seguridad, los archivos subidos con preajuste sin firmar
+      // no se eliminan desde el navegador; solo se elimina la referencia del sistema.
       await deleteDoc(doc(db, COLECCION_REGISTROS, String(registro.id)));
     }
 
@@ -1664,7 +1675,7 @@
         alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
       }catch(error){
         console.error("Error guardando registro:", error);
-        alert("No se pudo guardar el registro. Revisa la consola y las reglas de Firebase.");
+        alert("No se pudo guardar el registro. Revisa la consola, las reglas de Firestore y el preajuste de Cloudinary.");
       }
     }
 
@@ -1802,21 +1813,13 @@
     }
 
     async function eliminarArchivo(idRegistro, indexArchivo){
-      if(!confirm("¿Desea eliminar este archivo adjunto?")) return;
+      if(!confirm("¿Desea quitar este archivo adjunto del registro?")) return;
       const r = registros.find(x => String(x.id) === String(idRegistro));
       if(!r) return;
 
-      const archivo = r.archivos[indexArchivo];
-
       try{
-        if(firebaseActivo && archivo && archivo.ruta){
-          try{
-            await deleteObject(ref(storage, archivo.ruta));
-          }catch(error){
-            console.warn("No se pudo eliminar el archivo de Storage:", error);
-          }
-        }
-
+        // Esta acción quita el archivo de la ficha y de Firestore.
+        // El archivo en Cloudinary queda almacenado y puede borrarse manualmente desde Cloudinary si fuera necesario.
         r.archivos.splice(indexArchivo, 1);
         r.actualizadoEn = new Date().toISOString();
 
@@ -1828,8 +1831,8 @@
           actualizarEstadisticas();
         }
       }catch(error){
-        console.error("Error eliminando archivo:", error);
-        alert("No se pudo eliminar el archivo.");
+        console.error("Error quitando archivo:", error);
+        alert("No se pudo quitar el archivo del registro.");
       }
     }
 
@@ -1885,7 +1888,7 @@
     function exportarDatos(){
       const datos = {
         sistema:"DIVINCRI La Libertad - Trujillo",
-        modo:firebaseActivo ? "Firebase Firestore + Storage" : "LocalStorage",
+        modo:firebaseActivo ? "Firebase Firestore + Cloudinary" : "LocalStorage",
         registros,
         consultas,
         fechaExportacion:new Date().toISOString()
@@ -1970,7 +1973,7 @@
             <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
             <p>Sistema de consulta, registro, vinculaciones/resultados y archivos adjuntos</p>
             <p>Fecha de generación: ${escapeHTML(fechaGeneracion)}</p>
-            <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Storage" : "LocalStorage"}</p>
+            <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
           </div>
           <div style="width:92px;"></div>
         </div>
@@ -2035,7 +2038,7 @@
           <h2>DIVINCRI LA LIBERTAD - TRUJILLO</h2>
           <h3>Reporte de registros telefónicos</h3>
           <p>Fecha de generación: ${new Date().toLocaleString("es-PE")}</p>
-          <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Storage" : "LocalStorage"}</p>
+          <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
           ${tabla.outerHTML}
         </body>
         </html>
