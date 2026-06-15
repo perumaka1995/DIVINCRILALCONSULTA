@@ -1274,9 +1274,60 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL,
+      deleteObject
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+    /*
+      CONFIGURACIÓN FIREBASE
+      1) Crea tu proyecto en Firebase.
+      2) Agrega una app Web.
+      3) Copia aquí tu firebaseConfig real.
+      4) Activa Firestore Database y Storage.
+      5) Si NO usarás autenticación, coloca reglas públicas SOLO para prueba.
+    */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
+      authDomain: "divincri-la-libertad.firebaseapp.com",
+      projectId: "divincri-la-libertad",
+      storageBucket: "divincri-la-libertad.firebasestorage.app",
+      messagingSenderId: "1004762981616",
+      appId: "1:1004762981616:web:e889f1cc1f4ce373d48e35",
+      measurementId: "G-4L4FS8NZHW"
+    };
+
+    const COLECCION_REGISTROS = "registros";
     const KEY_REGISTROS = "divincri_registros_profesional";
     const KEY_CONSULTAS = "divincri_consultas_profesional";
+
+    const FIREBASE_CONFIGURADO =
+      firebaseConfig.apiKey &&
+      !firebaseConfig.apiKey.includes("PEGA_AQUI") &&
+      firebaseConfig.projectId &&
+      !firebaseConfig.projectId.includes("TU-PROYECTO") &&
+      firebaseConfig.appId &&
+      !firebaseConfig.appId.includes("PEGA_AQUI");
+
+    let appFirebase = null;
+    let db = null;
+    let storage = null;
+    let firebaseActivo = false;
 
     let registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
     let consultas = Number(localStorage.getItem(KEY_CONSULTAS)) || 0;
@@ -1285,10 +1336,89 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("fecha").valueAsDate = new Date();
+      iniciarSistema();
+    });
+
+    async function iniciarSistema(){
+      if(FIREBASE_CONFIGURADO){
+        try{
+          appFirebase = initializeApp(firebaseConfig);
+          db = getFirestore(appFirebase);
+          storage = getStorage(appFirebase);
+          firebaseActivo = true;
+          actualizarEstadoNube("Nube Firebase activa", true);
+          escucharRegistrosEnNube();
+          return;
+        }catch(error){
+          console.error("Error inicializando Firebase:", error);
+          actualizarEstadoNube("Error Firebase: modo local", false);
+        }
+      }else{
+        actualizarEstadoNube("Modo local activo", false);
+      }
+
       mostrarRegistros(registros);
       actualizarEstadisticas();
       actualizarActividadReciente();
-    });
+    }
+
+    function actualizarEstadoNube(texto, activo){
+      const chip = document.querySelector(".user-chip");
+      if(chip){
+        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(texto)}`;
+      }
+
+      const nota = document.querySelector(".sidebar-note");
+      if(nota && activo){
+        nota.innerHTML = `
+          <strong>Modo nube:</strong><br />
+          Los registros se guardan en Firebase Firestore y los archivos adjuntos en Firebase Storage.
+          Esta versión no usa autenticación.
+        `;
+      }
+    }
+
+    function escucharRegistrosEnNube(){
+      const q = query(collection(db, COLECCION_REGISTROS), orderBy("creadoEn", "desc"));
+
+      onSnapshot(q, (snapshot) => {
+        registros = snapshot.docs.map(documento => normalizarRegistro({
+          id: documento.id,
+          ...documento.data()
+        }));
+
+        listaActual = registros;
+        guardarLocal();
+        mostrarRegistros(registros);
+        actualizarEstadisticas();
+        actualizarActividadReciente();
+      }, (error) => {
+        console.error("Error leyendo registros en Firebase:", error);
+        actualizarEstadoNube("Error de nube: modo local", false);
+        alert("No se pudo leer Firebase. Revisa tu configuración y reglas de Firestore/Storage.");
+        mostrarRegistros(registros);
+        actualizarEstadisticas();
+        actualizarActividadReciente();
+      });
+    }
+
+    function normalizarRegistro(r){
+      return {
+        id:String(r.id || ""),
+        numero:r.numero || "",
+        solicitante:r.solicitante || "",
+        unidad:r.unidad || "",
+        vinculacion:r.vinculacion || "",
+        tipoCaso:r.tipoCaso || "",
+        estado:r.estado || "Pendiente",
+        fecha:r.fecha || "",
+        codigoReferencia:r.codigoReferencia || "",
+        observacion:r.observacion || "",
+        archivos:Array.isArray(r.archivos) ? r.archivos : [],
+        creadoEn:r.creadoEn || "",
+        actualizadoEn:r.actualizadoEn || ""
+      };
+    }
 
     function toggleSidebar(){
       document.getElementById("sidebar").classList.toggle("open");
@@ -1306,6 +1436,73 @@
     function guardarLocal(){
       localStorage.setItem(KEY_REGISTROS, JSON.stringify(registros));
       localStorage.setItem(KEY_CONSULTAS, String(consultas));
+    }
+
+    function crearIdRegistro(){
+      return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function limpiarParaFirebase(obj){
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function limpiarNombreArchivo(nombre){
+      return String(nombre || "archivo")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .slice(0, 120);
+    }
+
+    async function subirArchivos(files, idRegistro){
+      if(!files || files.length === 0) return [];
+
+      if(firebaseActivo && storage){
+        const lista = Array.from(files);
+        return Promise.all(lista.map(async (file) => {
+          const nombreSeguro = limpiarNombreArchivo(file.name);
+          const ruta = `registros/${idRegistro}/${Date.now()}_${nombreSeguro}`;
+          const archivoRef = ref(storage, ruta);
+          const snapshot = await uploadBytes(archivoRef, file, {
+            contentType:file.type || "application/octet-stream"
+          });
+          const url = await getDownloadURL(snapshot.ref);
+
+          return {
+            nombre:file.name,
+            tipo:file.type,
+            tamano:file.size,
+            contenido:url,
+            url,
+            ruta,
+            fechaSubida:new Date().toISOString(),
+            nube:"firebase-storage"
+          };
+        }));
+      }
+
+      return convertirArchivosABase64(files);
+    }
+
+    async function guardarRegistroEnNube(registro){
+      const id = String(registro.id);
+      await setDoc(doc(db, COLECCION_REGISTROS, id), limpiarParaFirebase(registro));
+    }
+
+    async function eliminarRegistroEnNube(registro){
+      const archivos = registro.archivos || [];
+
+      for(const archivo of archivos){
+        if(archivo.ruta){
+          try{
+            await deleteObject(ref(storage, archivo.ruta));
+          }catch(error){
+            console.warn("No se pudo eliminar archivo de Storage:", archivo.ruta, error);
+          }
+        }
+      }
+
+      await deleteDoc(doc(db, COLECCION_REGISTROS, String(registro.id)));
     }
 
     function actualizarEstadisticas(){
@@ -1365,7 +1562,8 @@
           tipo:file.type,
           tamano:file.size,
           contenido:reader.result,
-          fechaSubida:new Date().toISOString()
+          fechaSubida:new Date().toISOString(),
+          nube:"local-base64"
         });
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -1394,59 +1592,80 @@
         return;
       }
 
-      let nuevosArchivos = [];
-      if(archivosInput.files && archivosInput.files.length > 0){
-        nuevosArchivos = await convertirArchivosABase64(archivosInput.files);
-      }
+      try{
+        const ahora = new Date().toISOString();
+        const id = registroEditandoId === null ? crearIdRegistro() : String(registroEditandoId);
+        const nuevosArchivos = await subirArchivos(archivosInput.files, id);
 
-      if(registroEditandoId === null){
-        registros.unshift({
-          id:Date.now(),
-          numero,
-          solicitante,
-          unidad,
-          vinculacion,
-          tipoCaso,
-          estado,
-          fecha,
-          codigoReferencia,
-          observacion,
-          archivos:nuevosArchivos,
-          creadoEn:new Date().toISOString(),
-          actualizadoEn:new Date().toISOString()
-        });
-      }else{
-        const index = registros.findIndex(r => r.id === registroEditandoId);
-        if(index === -1){
-          alert("No se encontró el registro para editar.");
+        if(registroEditandoId === null){
+          const nuevoRegistro = {
+            id,
+            numero,
+            solicitante,
+            unidad,
+            vinculacion,
+            tipoCaso,
+            estado,
+            fecha,
+            codigoReferencia,
+            observacion,
+            archivos:nuevosArchivos,
+            creadoEn:ahora,
+            actualizadoEn:ahora
+          };
+
+          if(firebaseActivo){
+            await guardarRegistroEnNube(nuevoRegistro);
+          }else{
+            registros.unshift(nuevoRegistro);
+          }
+        }else{
+          const index = registros.findIndex(r => String(r.id) === String(registroEditandoId));
+          if(index === -1){
+            alert("No se encontró el registro para editar.");
+            registroEditandoId = null;
+            return;
+          }
+
+          const actualizado = {
+            ...registros[index],
+            id,
+            numero,
+            solicitante,
+            unidad,
+            vinculacion,
+            tipoCaso,
+            estado,
+            fecha,
+            codigoReferencia,
+            observacion,
+            archivos:[...(registros[index].archivos || []), ...nuevosArchivos],
+            actualizadoEn:ahora
+          };
+
+          if(firebaseActivo){
+            await guardarRegistroEnNube(actualizado);
+          }else{
+            registros[index] = actualizado;
+          }
+
           registroEditandoId = null;
-          return;
         }
 
-        registros[index] = {
-          ...registros[index],
-          numero,
-          solicitante,
-          unidad,
-          vinculacion,
-          tipoCaso,
-          estado,
-          fecha,
-          codigoReferencia,
-          observacion,
-          archivos:[...(registros[index].archivos || []), ...nuevosArchivos],
-          actualizadoEn:new Date().toISOString()
-        };
-        registroEditandoId = null;
-      }
+        if(!firebaseActivo){
+          listaActual = registros;
+          guardarLocal();
+          mostrarRegistros(registros);
+          actualizarEstadisticas();
+          actualizarActividadReciente();
+        }
 
-      listaActual = registros;
-      guardarLocal();
-      mostrarRegistros(registros);
-      actualizarEstadisticas();
-      actualizarActividadReciente();
-      limpiarFormulario();
-      alert("Registro guardado correctamente.");
+        limpiarFormulario();
+        alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
+      }catch(error){
+        console.error("Error guardando registro:", error);
+        alert("No se pudo guardar el registro. Revisa la consola y las reglas de Firebase.");
+      }
     }
 
     function mostrarRegistros(lista = registros){
@@ -1460,11 +1679,12 @@
       }
 
       tbody.innerHTML = lista.map((r, index) => {
+        const idSeguro = escapeJS(String(r.id || ""));
         const archivosHTML = (r.archivos || []).length
           ? `<div class="file-list">${(r.archivos || []).map((a, i) => `
               <div class="file-item">
-                <a href="${a.contenido}" download="${escapeAttr(a.nombre)}" target="_blank">📎 ${escapeHTML(a.nombre)}</a>
-                <button class="file-remove" onclick="eliminarArchivo(${r.id}, ${i})">Eliminar</button>
+                <a href="${escapeAttr(a.contenido || a.url || "#")}" download="${escapeAttr(a.nombre)}" target="_blank">📎 ${escapeHTML(a.nombre)}</a>
+                <button class="file-remove" onclick="eliminarArchivo('${idSeguro}', ${i})">Eliminar</button>
               </div>
             `).join("")}</div>`
           : `<span class="muted">Sin archivos</span>`;
@@ -1484,9 +1704,9 @@
             <td>${archivosHTML}</td>
             <td>
               <div class="small-actions">
-                <button class="small-btn btn-blue" onclick="verFicha(${r.id})">Ver</button>
-                <button class="small-btn btn-orange" onclick="editarRegistro(${r.id})">Editar</button>
-                <button class="small-btn btn-danger" onclick="eliminarRegistro(${r.id})">Eliminar</button>
+                <button class="small-btn btn-blue" onclick="verFicha('${idSeguro}')">Ver</button>
+                <button class="small-btn btn-orange" onclick="editarRegistro('${idSeguro}')">Editar</button>
+                <button class="small-btn btn-danger" onclick="eliminarRegistro('${idSeguro}')">Eliminar</button>
               </div>
             </td>
           </tr>
@@ -1540,7 +1760,7 @@
     }
 
     function editarRegistro(id){
-      const r = registros.find(x => x.id === id);
+      const r = registros.find(x => String(x.id) === String(id));
       if(!r){
         alert("Registro no encontrado.");
         return;
@@ -1556,28 +1776,61 @@
       document.getElementById("codigoReferencia").value = r.codigoReferencia || "";
       document.getElementById("observacion").value = r.observacion || "";
 
-      registroEditandoId = id;
+      registroEditandoId = String(id);
       goTo("registro");
     }
 
-    function eliminarRegistro(id){
+    async function eliminarRegistro(id){
       if(!confirm("¿Está seguro de eliminar este registro?")) return;
-      registros = registros.filter(r => r.id !== id);
-      listaActual = registros;
-      guardarLocal();
-      mostrarRegistros(registros);
-      actualizarActividadReciente();
+      const r = registros.find(x => String(x.id) === String(id));
+      if(!r) return;
+
+      try{
+        if(firebaseActivo){
+          await eliminarRegistroEnNube(r);
+        }else{
+          registros = registros.filter(x => String(x.id) !== String(id));
+          listaActual = registros;
+          guardarLocal();
+          mostrarRegistros(registros);
+          actualizarActividadReciente();
+        }
+      }catch(error){
+        console.error("Error eliminando registro:", error);
+        alert("No se pudo eliminar el registro en Firebase.");
+      }
     }
 
-    function eliminarArchivo(idRegistro, indexArchivo){
+    async function eliminarArchivo(idRegistro, indexArchivo){
       if(!confirm("¿Desea eliminar este archivo adjunto?")) return;
-      const r = registros.find(x => x.id === idRegistro);
+      const r = registros.find(x => String(x.id) === String(idRegistro));
       if(!r) return;
-      r.archivos.splice(indexArchivo, 1);
-      r.actualizadoEn = new Date().toISOString();
-      guardarLocal();
-      mostrarRegistros(listaActual);
-      actualizarEstadisticas();
+
+      const archivo = r.archivos[indexArchivo];
+
+      try{
+        if(firebaseActivo && archivo && archivo.ruta){
+          try{
+            await deleteObject(ref(storage, archivo.ruta));
+          }catch(error){
+            console.warn("No se pudo eliminar el archivo de Storage:", error);
+          }
+        }
+
+        r.archivos.splice(indexArchivo, 1);
+        r.actualizadoEn = new Date().toISOString();
+
+        if(firebaseActivo){
+          await guardarRegistroEnNube(r);
+        }else{
+          guardarLocal();
+          mostrarRegistros(listaActual);
+          actualizarEstadisticas();
+        }
+      }catch(error){
+        console.error("Error eliminando archivo:", error);
+        alert("No se pudo eliminar el archivo.");
+      }
     }
 
     function limpiarFormulario(){
@@ -1597,14 +1850,14 @@
     }
 
     function verFicha(id){
-      const r = registros.find(x => x.id === id);
+      const r = registros.find(x => String(x.id) === String(id));
       if(!r){
         alert("Registro no encontrado.");
         return;
       }
 
       const archivos = (r.archivos || []).length
-        ? (r.archivos || []).map(a => `<p>📎 <a href="${a.contenido}" download="${escapeAttr(a.nombre)}">${escapeHTML(a.nombre)}</a></p>`).join("")
+        ? (r.archivos || []).map(a => `<p>📎 <a href="${escapeAttr(a.contenido || a.url || "#")}" download="${escapeAttr(a.nombre)}" target="_blank">${escapeHTML(a.nombre)}</a></p>`).join("")
         : `<p>Sin archivos adjuntos</p>`;
 
       document.getElementById("contenidoFicha").innerHTML = `
@@ -1632,6 +1885,7 @@
     function exportarDatos(){
       const datos = {
         sistema:"DIVINCRI La Libertad - Trujillo",
+        modo:firebaseActivo ? "Firebase Firestore + Storage" : "LocalStorage",
         registros,
         consultas,
         fechaExportacion:new Date().toISOString()
@@ -1643,22 +1897,42 @@
     function importarDatos(){
       const archivo = document.getElementById("importarArchivo").files[0];
       if(!archivo) return;
-      if(!confirm("Esto reemplazará la información actual. ¿Desea continuar?")) return;
+
+      const mensaje = firebaseActivo
+        ? "Esto importará los registros del JSON a Firebase. Si un ID ya existe, se actualizará. ¿Desea continuar?"
+        : "Esto reemplazará la información local actual. ¿Desea continuar?";
+
+      if(!confirm(mensaje)) return;
 
       const reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = async e => {
         try{
           const data = JSON.parse(e.target.result);
-          registros = data.registros || [];
-          consultas = Number(data.consultas || 0);
-          listaActual = registros;
-          guardarLocal();
-          mostrarRegistros(registros);
-          actualizarEstadisticas();
-          actualizarActividadReciente();
-          alert("Respaldo importado correctamente.");
+          const importados = Array.isArray(data.registros) ? data.registros : [];
+
+          if(firebaseActivo){
+            for(const r of importados){
+              const registro = normalizarRegistro({
+                ...r,
+                id:String(r.id || crearIdRegistro()),
+                actualizadoEn:new Date().toISOString()
+              });
+              await guardarRegistroEnNube(registro);
+            }
+            alert("Respaldo importado correctamente a Firebase.");
+          }else{
+            registros = importados.map(r => normalizarRegistro(r));
+            consultas = Number(data.consultas || 0);
+            listaActual = registros;
+            guardarLocal();
+            mostrarRegistros(registros);
+            actualizarEstadisticas();
+            actualizarActividadReciente();
+            alert("Respaldo importado correctamente.");
+          }
         }catch(err){
-          alert("Archivo JSON no válido.");
+          console.error(err);
+          alert("Archivo JSON no válido o error importando datos.");
         }
       };
       reader.readAsText(archivo);
@@ -1696,6 +1970,7 @@
             <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
             <p>Sistema de consulta, registro, vinculaciones/resultados y archivos adjuntos</p>
             <p>Fecha de generación: ${escapeHTML(fechaGeneracion)}</p>
+            <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Storage" : "LocalStorage"}</p>
           </div>
           <div style="width:92px;"></div>
         </div>
@@ -1729,7 +2004,7 @@
         </div>
 
         <p class="muted" style="margin-top:12px;">
-          Documento generado automáticamente desde el sistema local DIVINCRI La Libertad - Trujillo.
+          Documento generado automáticamente desde el sistema DIVINCRI La Libertad - Trujillo.
         </p>
       `;
 
@@ -1760,6 +2035,7 @@
           <h2>DIVINCRI LA LIBERTAD - TRUJILLO</h2>
           <h3>Reporte de registros telefónicos</h3>
           <p>Fecha de generación: ${new Date().toLocaleString("es-PE")}</p>
+          <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Storage" : "LocalStorage"}</p>
           ${tabla.outerHTML}
         </body>
         </html>
@@ -1813,6 +2089,36 @@
     function escapeAttr(texto){
       return escapeHTML(texto).replaceAll("`", "&#096;");
     }
+
+    function escapeJS(texto){
+      return String(texto || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r");
+    }
+
+    Object.assign(window, {
+      toggleSidebar,
+      goTo,
+      guardarRegistro,
+      mostrarRegistros,
+      buscarRegistro,
+      limpiarBusqueda,
+      editarRegistro,
+      eliminarRegistro,
+      eliminarArchivo,
+      limpiarFormulario,
+      verFicha,
+      cerrarFicha,
+      exportarDatos,
+      importarDatos,
+      generarVistaPreviaReporte,
+      cerrarVistaReporte,
+      exportarExcel,
+      exportarPDF,
+      previsualizarArchivos
+    });
   </script>
 </body>
 </html>
