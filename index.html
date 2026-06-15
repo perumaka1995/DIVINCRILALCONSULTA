@@ -76,7 +76,7 @@
       height:100vh;
       background:
         linear-gradient(180deg, rgba(6,39,20,.97), rgba(9,56,29,.98)),
-        url('PORTADA.PNG');
+        url('portada.png');
       background-size:cover;
       background-position:center;
       color:white;
