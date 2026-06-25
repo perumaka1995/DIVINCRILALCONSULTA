@@ -1332,6 +1332,13 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
     /*
       CONFIGURACIÓN FIREBASE
       1) Crea tu proyecto en Firebase.
@@ -1339,7 +1346,8 @@
       3) Copia aquí tu firebaseConfig real.
       4) Activa Firestore Database.
       5) Los archivos adjuntos se suben a Cloudinary con un preajuste sin firmar.
-      6) Si NO usarás autenticación, coloca reglas públicas SOLO para prueba.
+      6) Seguridad: Firebase Authentication + reglas de Firestore.
+         Usuario público: solo crea pedidos. Administrador: lee, edita y elimina.
     */
     const firebaseConfig = {
       apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
@@ -1361,15 +1369,10 @@
 
     const KEY_REGISTROS = "divincri_registros_profesional";
     const KEY_CONSULTAS = "divincri_consultas_profesional";
-    const KEY_ADMIN_SESSION = "divincri_admin_activo";
 
-    /*
-      CLAVE DE ACCESO RÁPIDA PARA EL PANEL ADMIN.
-      CAMBIA ESTA CLAVE ANTES DE PUBLICAR.
-      IMPORTANTE: al estar en HTML público, esta clave solo oculta la vista.
-      Para seguridad real usa Firebase Authentication + reglas de Firestore.
-    */
-    const ADMIN_PASSWORD = "DIVINCRI2026";
+    // UID autorizado del administrador en Firebase Authentication.
+    // Este UID no es una contraseña; la seguridad real se aplica con Firebase Auth + reglas de Firestore.
+    const ADMIN_UID = "BVIZc8y2XifksQgCGVynf7iK0u93";
 
     const FIREBASE_CONFIGURADO =
       firebaseConfig.apiKey &&
@@ -1387,11 +1390,13 @@
 
     let appFirebase = null;
     let db = null;
+    let auth = null;
     let firebaseActivo = false;
     let unsubscribeRegistros = null;
+    let usuarioActual = null;
+    let esAdministrador = false;
 
-    let esAdministrador = sessionStorage.getItem(KEY_ADMIN_SESSION) === "1";
-    let registros = esAdministrador ? (JSON.parse(localStorage.getItem(KEY_REGISTROS)) || []) : [];
+    let registros = [];
     let consultas = Number(localStorage.getItem(KEY_CONSULTAS)) || 0;
     let registroEditandoId = null;
     let listaActual = registros;
@@ -1408,32 +1413,52 @@
         try{
           appFirebase = initializeApp(firebaseConfig);
           db = getFirestore(appFirebase);
+          auth = getAuth(appFirebase);
           firebaseActivo = true;
           actualizarEstadoNube(CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa", true);
 
-          if(esAdministrador){
-            escucharRegistrosEnNube();
-          }else{
-            prepararVistaPublica();
-          }
+          onAuthStateChanged(auth, async (user) => {
+            usuarioActual = user;
+            esAdministrador = !!(user && user.uid === ADMIN_UID);
+
+            if(user && !esAdministrador){
+              if(unsubscribeRegistros){
+                unsubscribeRegistros();
+                unsubscribeRegistros = null;
+              }
+              await signOut(auth);
+              usuarioActual = null;
+              esAdministrador = false;
+              configurarVistaPorRol();
+              prepararVistaPublica();
+              alert("Este usuario no está autorizado como administrador.");
+              return;
+            }
+
+            configurarVistaPorRol();
+
+            if(esAdministrador){
+              escucharRegistrosEnNube();
+            }else{
+              if(unsubscribeRegistros){
+                unsubscribeRegistros();
+                unsubscribeRegistros = null;
+              }
+              prepararVistaPublica();
+            }
+          });
+
           return;
         }catch(error){
           console.error("Error inicializando Firebase:", error);
           actualizarEstadoNube("Error Firebase: modo local", false);
         }
       }else{
-        actualizarEstadoNube("Modo local activo", false);
+        actualizarEstadoNube("Firebase no configurado", false);
       }
 
-      if(esAdministrador){
-        registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
-        listaActual = registros;
-        mostrarRegistros(registros);
-        actualizarEstadisticas();
-        actualizarActividadReciente();
-      }else{
-        prepararVistaPublica();
-      }
+      // Sin Firebase Auth no se habilita el panel administrador.
+      prepararVistaPublica();
     }
 
     function prepararVistaPublica(){
@@ -1476,45 +1501,59 @@
 
     function validarAdmin(){
       if(esAdministrador) return true;
-      alert("Acceso restringido. Solo el administrador puede ver registros, reportes, editar o eliminar información.");
+      alert("Acceso restringido. Solo el administrador autenticado puede ver registros, reportes, editar o eliminar información.");
       return false;
     }
 
-    function loginAdmin(){
-      const clave = prompt("Ingrese la clave de administrador:");
-      if(clave === null) return;
-
-      if(clave !== ADMIN_PASSWORD){
-        alert("Clave incorrecta.");
+    async function loginAdmin(){
+      if(!firebaseActivo || !auth){
+        alert("Firebase Authentication no está activo. Revisa la configuración de Firebase antes de ingresar como administrador.");
         return;
       }
 
-      esAdministrador = true;
-      sessionStorage.setItem(KEY_ADMIN_SESSION, "1");
-      registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
-      listaActual = registros;
-      configurarVistaPorRol();
+      const email = prompt("Ingrese el correo del administrador:");
+      if(email === null) return;
 
-      if(firebaseActivo){
+      const password = prompt("Ingrese la contraseña del administrador:");
+      if(password === null) return;
+
+      try{
+        const credencial = await signInWithEmailAndPassword(auth, email.trim(), password);
+
+        if(!credencial.user || credencial.user.uid !== ADMIN_UID){
+          await signOut(auth);
+          alert("Usuario autenticado, pero no autorizado como administrador.");
+          return;
+        }
+
+        usuarioActual = credencial.user;
+        esAdministrador = true;
+        configurarVistaPorRol();
         escucharRegistrosEnNube();
-      }else{
-        mostrarRegistros(registros);
-        actualizarEstadisticas();
-        actualizarActividadReciente();
+        alert("Administrador conectado correctamente.");
+        goTo("tabla");
+      }catch(error){
+        console.error("Error de acceso administrador:", error);
+        alert("Acceso denegado. Verifique correo y contraseña del administrador.");
       }
-
-      alert("Modo administrador activado.");
-      goTo("tabla");
     }
 
-    function logoutAdmin(){
+    async function logoutAdmin(){
       if(unsubscribeRegistros){
         unsubscribeRegistros();
         unsubscribeRegistros = null;
       }
 
+      try{
+        if(auth){
+          await signOut(auth);
+        }
+      }catch(error){
+        console.error("Error cerrando sesión:", error);
+      }
+
+      usuarioActual = null;
       esAdministrador = false;
-      sessionStorage.removeItem(KEY_ADMIN_SESSION);
       registros = [];
       listaActual = [];
       configurarVistaPorRol();
@@ -1528,7 +1567,8 @@
       const chip = document.querySelector(".user-chip");
       if(chip){
         const rol = esAdministrador ? "Administrador" : "Usuario solicitante";
-        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(rol)} · ${escapeHTML(texto)}`;
+        const correo = esAdministrador && usuarioActual?.email ? ` · ${usuarioActual.email}` : "";
+        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(rol)}${escapeHTML(correo)} · ${escapeHTML(texto)}`;
       }
 
       const nota = document.querySelector(".sidebar-note");
