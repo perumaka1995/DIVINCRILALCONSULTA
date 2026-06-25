@@ -820,6 +820,37 @@
       font-weight:900;
     }
 
+    .admin-only,
+    .public-only{
+      transition:.15s ease;
+    }
+
+    .access-note{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      background:#eef4ff;
+      color:#1849a9;
+      border:1px solid #b2ccff;
+      padding:12px;
+      border-radius:14px;
+      font-size:12px;
+      line-height:1.45;
+      margin-bottom:16px;
+    }
+
+    .success-box{
+      display:none;
+      margin-top:14px;
+      padding:13px;
+      border-radius:14px;
+      background:#ecfdf3;
+      border:1px solid #abefc6;
+      color:#027a48;
+      font-size:13px;
+      font-weight:800;
+    }
+
     @media(max-width:1120px){
       .app{
         grid-template-columns:1fr;
@@ -977,16 +1008,18 @@
 
       <div class="nav-label">Menú principal</div>
       <button class="nav-btn active" onclick="goTo('inicio')">🏠 Panel de inicio</button>
-      <button class="nav-btn" onclick="goTo('consulta')">🔍 Consulta avanzada</button>
-      <button class="nav-btn" onclick="goTo('registro')">➕ Nuevo registro</button>
-      <button class="nav-btn" onclick="goTo('tabla')">📋 Base de registros</button>
-      <button class="nav-btn" onclick="goTo('reportes')">📄 Reportes</button>
-      <button class="nav-btn" onclick="goTo('respaldo')">💾 Respaldo</button>
+      <button class="nav-btn" onclick="goTo('registro')">📝 Realizar pedido / subir oficio</button>
+      <button class="nav-btn admin-only" onclick="goTo('consulta')">🔍 Consulta avanzada</button>
+      <button class="nav-btn admin-only" onclick="goTo('tabla')">📋 Base de registros</button>
+      <button class="nav-btn admin-only" onclick="goTo('reportes')">📄 Reportes</button>
+      <button class="nav-btn admin-only" onclick="goTo('respaldo')">💾 Respaldo</button>
+      <button class="nav-btn public-only" onclick="loginAdmin()">🔐 Ingresar como administrador</button>
+      <button class="nav-btn admin-only" onclick="logoutAdmin()">🚪 Salir de administrador</button>
 
       <div class="nav-label">Estado del sistema</div>
       <div class="sidebar-note">
-        <strong>Modo local:</strong><br />
-        La información se guarda en este navegador. Para uso institucional real, conectar a Firebase o servidor seguro con usuarios, roles y auditoría.
+        <strong>Acceso público:</strong><br />
+        El usuario solicitante solo puede enviar su pedido u oficio. La base de registros, reportes y archivos quedan disponibles únicamente para el administrador.
       </div>
     </aside>
 
@@ -997,9 +1030,13 @@
           <h2>Sistema de Consulta y Registro</h2>
           <p>Archivos, solicitantes, vinculaciones/resultados y reportes operativos.</p>
         </div>
-        <div class="user-chip">
-          <span class="user-dot"></span>
-          Usuario local activo
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-primary public-only" onclick="loginAdmin()">🔐 Administrador</button>
+          <button class="btn btn-gray admin-only" onclick="logoutAdmin()">🚪 Salir</button>
+          <div class="user-chip">
+            <span class="user-dot"></span>
+            Usuario solicitante
+          </div>
         </div>
       </header>
 
@@ -1008,21 +1045,21 @@
           <div class="hero-content">
             <div>
               <h3>DIVINCRI La Libertad - Trujillo</h3>
-              <h1>Panel institucional de registros telefónicos</h1>
+              <h1>Registro de pedidos y oficios</h1>
               <p>
-                Plataforma de apoyo para registrar números, solicitantes, unidades, vinculaciones o resultados,
-                documentos adjuntos y reportes exportables en Excel o PDF.
+                Plataforma para que el usuario envíe pedidos, consultas u oficios adjuntos.
+                La información enviada solo será visible para el administrador autorizado.
               </p>
               <div class="hero-actions">
-                <button class="btn btn-gold" onclick="goTo('registro')">➕ Registrar información</button>
-                <button class="btn btn-light" onclick="goTo('consulta')">🔍 Consultar registros</button>
-                <button class="btn btn-primary" onclick="goTo('reportes')">📄 Generar reporte</button>
+                <button class="btn btn-gold" onclick="goTo('registro')">📝 Realizar pedido / subir oficio</button>
+                <button class="btn btn-light admin-only" onclick="goTo('consulta')">🔍 Consultar registros</button>
+                <button class="btn btn-primary admin-only" onclick="goTo('reportes')">📄 Generar reporte</button>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="stats">
+        <section class="stats admin-only">
           <article class="stat-card">
             <div class="stat-icon">📞</div>
             <h2 id="totalRegistros">0</h2>
@@ -1054,7 +1091,7 @@
           </article>
         </section>
 
-        <div class="grid-2">
+        <div class="grid-2 admin-only">
           <section class="panel" id="consulta">
             <div class="panel-header">
               <div>
@@ -1107,8 +1144,8 @@
         <section class="panel" id="registro">
           <div class="panel-header">
             <div>
-              <h2>➕ Registrar información</h2>
-              <p>Los campos de vinculaciones/resultados quedan libres para que agregues la información obtenida.</p>
+              <h2>📝 Realizar pedido o subir oficio</h2>
+              <p>Complete los datos de la solicitud. El usuario no podrá ver la base de registros; solo el administrador tendrá acceso.</p>
             </div>
           </div>
 
@@ -1116,38 +1153,43 @@
             <div class="notice">
               <span>⚠️</span>
               <div>
-                <strong>Recomendación:</strong> Esta versión es funcional para prueba o demostración. Para uso real, no debe guardar datos sensibles solo en localStorage. Se recomienda Firebase/Auth, base de datos, permisos por usuario y auditoría.
+                <strong>Importante:</strong> El solicitante solo enviará su pedido u oficio. La consulta de registros, reportes, edición, eliminación y descarga de archivos queda reservada para el administrador.
               </div>
             </div>
 
             <div class="form-grid">
               <div class="field">
-                <label>Número telefónico *</label>
-                <input id="numero" type="text" placeholder="Ingrese número telefónico" />
+                <label>Número telefónico a consultar</label>
+                <input id="numero" type="text" placeholder="Ingrese número telefónico, si corresponde" />
               </div>
 
               <div class="field">
                 <label>Solicitante *</label>
-                <input id="solicitante" type="text" placeholder="Nombre del solicitante" />
+                <input id="solicitante" type="text" placeholder="Nombre completo del solicitante" />
               </div>
 
               <div class="field">
-                <label>Unidad solicitante</label>
-                <input id="unidad" type="text" placeholder="Unidad / área solicitante" />
+                <label>Unidad / entidad solicitante</label>
+                <input id="unidad" type="text" placeholder="Unidad, área o dependencia" />
               </div>
 
-              <div class="field two">
-                <label>Vinculaciones / resultados</label>
-                <input id="vinculacion" type="text" placeholder="Campo libre para agregar resultados o vinculaciones" />
-              </div>
-
-              <div class="field">
-                <label>Referencia general</label>
-                <input id="tipoCaso" type="text" placeholder="Referencia general / tipo de consulta" />
+              <div class="field two admin-only">
+                <label>Vinculaciones / resultados internos</label>
+                <input id="vinculacion" type="text" placeholder="Solo administrador: resultados, vinculaciones o atención realizada" />
               </div>
 
               <div class="field">
-                <label>Estado</label>
+                <label>Tipo de solicitud *</label>
+                <select id="tipoCaso">
+                  <option value="Pedido">Realizar pedido</option>
+                  <option value="Oficio">Subir oficio</option>
+                  <option value="Consulta telefónica">Consulta telefónica</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div class="field admin-only">
+                <label>Estado interno</label>
                 <select id="estado">
                   <option value="Pendiente">Pendiente</option>
                   <option value="Verificado">Verificado</option>
@@ -1162,31 +1204,33 @@
               </div>
 
               <div class="field">
-                <label>Código / referencia</label>
-                <input id="codigoReferencia" type="text" placeholder="Código, oficio, expediente u otro" />
+                <label>Código / N° de oficio / expediente</label>
+                <input id="codigoReferencia" type="text" placeholder="Ej. N° de oficio, expediente, referencia u otro" />
               </div>
 
               <div class="field full">
-                <label>Observación</label>
-                <textarea id="observacion" placeholder="Detalle, comentario o anotación relevante"></textarea>
+                <label>Detalle del pedido u oficio *</label>
+                <textarea id="observacion" placeholder="Describa el pedido, consulta o motivo del oficio"></textarea>
               </div>
 
               <div class="field full">
-                <label>Archivos adjuntos</label>
-                <input id="archivos" type="file" multiple onchange="previsualizarArchivos()" />
+                <label>Subir oficio o archivo adjunto</label>
+                <input id="archivos" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" onchange="previsualizarArchivos()" />
                 <div id="previewArchivos" class="preview-box"></div>
+                <p class="muted" style="margin-top:6px;">Puede adjuntar PDF, Word, Excel o imagen del oficio/documento.</p>
               </div>
             </div>
 
             <div class="toolbar">
-              <button class="btn btn-primary" onclick="guardarRegistro()">Guardar registro</button>
+              <button class="btn btn-primary" onclick="guardarRegistro()">Enviar pedido / oficio</button>
               <button class="btn btn-gold" onclick="limpiarFormulario()">Nuevo / limpiar</button>
-              <button class="btn btn-gray" onclick="goTo('tabla')">Ver registros</button>
+              <button class="btn btn-gray admin-only" onclick="goTo('tabla')">Ver registros</button>
             </div>
+            <div id="mensajeEnvio" class="success-box">✅ Su pedido/oficio fue enviado correctamente. Será revisado por el administrador.</div>
           </div>
         </section>
 
-        <section class="panel" id="respaldo">
+        <section class="panel admin-only" id="respaldo">
           <div class="panel-header">
             <div>
               <h2>💾 Respaldo de información</h2>
@@ -1204,7 +1248,7 @@
           </div>
         </section>
 
-        <section class="panel" id="tabla">
+        <section class="panel admin-only" id="tabla">
           <div class="panel-header">
             <div>
               <h2>📋 Base de registros</h2>
@@ -1223,7 +1267,7 @@
                     <th>Solicitante</th>
                     <th>Unidad</th>
                     <th>Vinculaciones / resultados</th>
-                    <th>Referencia general</th>
+                    <th>Tipo de solicitud</th>
                     <th>Estado</th>
                     <th>Código</th>
                     <th>Observación</th>
@@ -1238,7 +1282,7 @@
           </div>
         </section>
 
-        <section class="panel" id="reportes">
+        <section class="panel admin-only" id="reportes">
           <div class="panel-header">
             <div>
               <h2>📄 Reportes operativos</h2>
@@ -1317,6 +1361,15 @@
 
     const KEY_REGISTROS = "divincri_registros_profesional";
     const KEY_CONSULTAS = "divincri_consultas_profesional";
+    const KEY_ADMIN_SESSION = "divincri_admin_activo";
+
+    /*
+      CLAVE DE ACCESO RÁPIDA PARA EL PANEL ADMIN.
+      CAMBIA ESTA CLAVE ANTES DE PUBLICAR.
+      IMPORTANTE: al estar en HTML público, esta clave solo oculta la vista.
+      Para seguridad real usa Firebase Authentication + reglas de Firestore.
+    */
+    const ADMIN_PASSWORD = "DIVINCRI2026";
 
     const FIREBASE_CONFIGURADO =
       firebaseConfig.apiKey &&
@@ -1335,8 +1388,10 @@
     let appFirebase = null;
     let db = null;
     let firebaseActivo = false;
+    let unsubscribeRegistros = null;
 
-    let registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
+    let esAdministrador = sessionStorage.getItem(KEY_ADMIN_SESSION) === "1";
+    let registros = esAdministrador ? (JSON.parse(localStorage.getItem(KEY_REGISTROS)) || []) : [];
     let consultas = Number(localStorage.getItem(KEY_CONSULTAS)) || 0;
     let registroEditandoId = null;
     let listaActual = registros;
@@ -1347,13 +1402,20 @@
     });
 
     async function iniciarSistema(){
+      configurarVistaPorRol();
+
       if(FIREBASE_CONFIGURADO){
         try{
           appFirebase = initializeApp(firebaseConfig);
           db = getFirestore(appFirebase);
           firebaseActivo = true;
           actualizarEstadoNube(CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa", true);
-          escucharRegistrosEnNube();
+
+          if(esAdministrador){
+            escucharRegistrosEnNube();
+          }else{
+            prepararVistaPublica();
+          }
           return;
         }catch(error){
           console.error("Error inicializando Firebase:", error);
@@ -1363,31 +1425,142 @@
         actualizarEstadoNube("Modo local activo", false);
       }
 
-      mostrarRegistros(registros);
-      actualizarEstadisticas();
-      actualizarActividadReciente();
+      if(esAdministrador){
+        registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
+        listaActual = registros;
+        mostrarRegistros(registros);
+        actualizarEstadisticas();
+        actualizarActividadReciente();
+      }else{
+        prepararVistaPublica();
+      }
+    }
+
+    function prepararVistaPublica(){
+      registros = [];
+      listaActual = [];
+      registroEditandoId = null;
+
+      const tbody = document.getElementById("tablaRegistros");
+      if(tbody){
+        tbody.innerHTML = "";
+      }
+
+      const actividad = document.getElementById("actividadReciente");
+      if(actividad){
+        actividad.innerHTML = `<p class="muted">Visible solo para administrador.</p>`;
+      }
+    }
+
+    function configurarVistaPorRol(){
+      document.querySelectorAll(".admin-only").forEach(el => {
+        el.style.display = esAdministrador ? "" : "none";
+      });
+
+      document.querySelectorAll(".public-only").forEach(el => {
+        el.style.display = esAdministrador ? "none" : "";
+      });
+
+      const estado = document.getElementById("estado");
+      if(estado && !esAdministrador){
+        estado.value = "Pendiente";
+      }
+
+      const vinculacion = document.getElementById("vinculacion");
+      if(vinculacion && !esAdministrador){
+        vinculacion.value = "";
+      }
+
+      actualizarEstadoNube(firebaseActivo ? (CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa") : "Usuario solicitante", firebaseActivo);
+    }
+
+    function validarAdmin(){
+      if(esAdministrador) return true;
+      alert("Acceso restringido. Solo el administrador puede ver registros, reportes, editar o eliminar información.");
+      return false;
+    }
+
+    function loginAdmin(){
+      const clave = prompt("Ingrese la clave de administrador:");
+      if(clave === null) return;
+
+      if(clave !== ADMIN_PASSWORD){
+        alert("Clave incorrecta.");
+        return;
+      }
+
+      esAdministrador = true;
+      sessionStorage.setItem(KEY_ADMIN_SESSION, "1");
+      registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
+      listaActual = registros;
+      configurarVistaPorRol();
+
+      if(firebaseActivo){
+        escucharRegistrosEnNube();
+      }else{
+        mostrarRegistros(registros);
+        actualizarEstadisticas();
+        actualizarActividadReciente();
+      }
+
+      alert("Modo administrador activado.");
+      goTo("tabla");
+    }
+
+    function logoutAdmin(){
+      if(unsubscribeRegistros){
+        unsubscribeRegistros();
+        unsubscribeRegistros = null;
+      }
+
+      esAdministrador = false;
+      sessionStorage.removeItem(KEY_ADMIN_SESSION);
+      registros = [];
+      listaActual = [];
+      configurarVistaPorRol();
+      prepararVistaPublica();
+      limpiarFormulario();
+      alert("Sesión de administrador cerrada.");
+      goTo("registro");
     }
 
     function actualizarEstadoNube(texto, activo){
       const chip = document.querySelector(".user-chip");
       if(chip){
-        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(texto)}`;
+        const rol = esAdministrador ? "Administrador" : "Usuario solicitante";
+        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(rol)} · ${escapeHTML(texto)}`;
       }
 
       const nota = document.querySelector(".sidebar-note");
-      if(nota && activo){
-        nota.innerHTML = `
-          <strong>Modo nube:</strong><br />
-          Los registros se guardan en Firebase Firestore y los archivos adjuntos en Cloudinary.
-          Sistema conectado a nube con respaldo en línea.
-        `;
+      if(nota){
+        if(esAdministrador && activo){
+          nota.innerHTML = `
+            <strong>Modo administrador:</strong><br />
+            Puede consultar registros, revisar oficios adjuntos, generar reportes, editar, archivar o eliminar pedidos.
+          `;
+        }else{
+          nota.innerHTML = `
+            <strong>Acceso público:</strong><br />
+            El usuario solo puede enviar su pedido u oficio. No se carga ni se muestra la base de registros.
+          `;
+        }
       }
     }
 
     function escucharRegistrosEnNube(){
+      if(!esAdministrador) return;
+      if(!db) return;
+
+      if(unsubscribeRegistros){
+        unsubscribeRegistros();
+        unsubscribeRegistros = null;
+      }
+
       const q = query(collection(db, COLECCION_REGISTROS), orderBy("creadoEn", "desc"));
 
-      onSnapshot(q, (snapshot) => {
+      unsubscribeRegistros = onSnapshot(q, (snapshot) => {
+        if(!esAdministrador) return;
+
         registros = snapshot.docs.map(documento => normalizarRegistro({
           id: documento.id,
           ...documento.data()
@@ -1401,10 +1574,15 @@
       }, (error) => {
         console.error("Error leyendo registros en Firebase:", error);
         actualizarEstadoNube("Error de nube: modo local", false);
-        alert("No se pudo leer Firebase. Revisa tu configuración, las reglas de Firestore y el preajuste unsigned de Cloudinary.");
-        mostrarRegistros(registros);
-        actualizarEstadisticas();
-        actualizarActividadReciente();
+
+        if(esAdministrador){
+          alert("No se pudo leer Firebase. Revisa tu configuración, las reglas de Firestore y el preajuste unsigned de Cloudinary.");
+          registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
+          listaActual = registros;
+          mostrarRegistros(registros);
+          actualizarEstadisticas();
+          actualizarActividadReciente();
+        }
       });
     }
 
@@ -1431,6 +1609,11 @@
     }
 
     function goTo(id){
+      const seccionesAdmin = ["consulta", "tabla", "reportes", "respaldo"];
+      if(seccionesAdmin.includes(id) && !validarAdmin()){
+        return;
+      }
+
       const el = document.getElementById(id);
       if(el){
         el.scrollIntoView({behavior:"smooth", block:"start"});
@@ -1598,21 +1781,26 @@
       const numero = document.getElementById("numero").value.trim();
       const solicitante = document.getElementById("solicitante").value.trim();
       const unidad = document.getElementById("unidad").value.trim();
-      const vinculacion = document.getElementById("vinculacion").value.trim();
+      const vinculacion = esAdministrador ? document.getElementById("vinculacion").value.trim() : "";
       const tipoCaso = document.getElementById("tipoCaso").value.trim();
-      const estado = document.getElementById("estado").value;
+      const estado = esAdministrador ? document.getElementById("estado").value : "Pendiente";
       const fecha = document.getElementById("fecha").value;
       const codigoReferencia = document.getElementById("codigoReferencia").value.trim();
       const observacion = document.getElementById("observacion").value.trim();
       const archivosInput = document.getElementById("archivos");
 
-      if(!numero){
-        alert("Ingrese el número telefónico.");
+      if(!solicitante){
+        alert("Ingrese el nombre del solicitante.");
         return;
       }
 
-      if(!solicitante){
-        alert("Ingrese el solicitante.");
+      if(!tipoCaso){
+        alert("Seleccione el tipo de solicitud.");
+        return;
+      }
+
+      if(!observacion){
+        alert("Ingrese el detalle del pedido u oficio.");
         return;
       }
 
@@ -1644,6 +1832,8 @@
             registros.unshift(nuevoRegistro);
           }
         }else{
+          if(!validarAdmin()) return;
+
           const index = registros.findIndex(r => String(r.id) === String(registroEditandoId));
           if(index === -1){
             alert("No se encontró el registro para editar.");
@@ -1676,23 +1866,42 @@
           registroEditandoId = null;
         }
 
-        if(!firebaseActivo){
-          listaActual = registros;
-          guardarLocal();
-          mostrarRegistros(registros);
-          actualizarEstadisticas();
-          actualizarActividadReciente();
+        if(esAdministrador){
+          if(!firebaseActivo){
+            listaActual = registros;
+            guardarLocal();
+            mostrarRegistros(registros);
+            actualizarEstadisticas();
+            actualizarActividadReciente();
+          }
+          limpiarFormulario();
+          alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
+        }else{
+          if(!firebaseActivo){
+            guardarLocal();
+          }
+          limpiarFormulario();
+          const mensaje = document.getElementById("mensajeEnvio");
+          if(mensaje){
+            mensaje.style.display = "block";
+            setTimeout(() => { mensaje.style.display = "none"; }, 7000);
+          }
+          alert(firebaseActivo ? "Pedido/oficio enviado correctamente. Será revisado por el administrador." : "Pedido guardado en modo local. Para que llegue al administrador debes usar Firebase activo.");
         }
-
-        limpiarFormulario();
-        alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
       }catch(error){
         console.error("Error guardando registro:", error);
-        alert("No se pudo guardar el registro. Detalle: " + (error.message || error));
+        alert("No se pudo enviar/guardar el pedido. Detalle: " + (error.message || error));
       }
     }
 
     function mostrarRegistros(lista = registros){
+      if(!esAdministrador){
+        listaActual = [];
+        const tbodyPublico = document.getElementById("tablaRegistros");
+        if(tbodyPublico) tbodyPublico.innerHTML = "";
+        return;
+      }
+
       listaActual = lista;
       const tbody = document.getElementById("tablaRegistros");
 
@@ -1741,6 +1950,7 @@
     }
 
     function buscarRegistro(){
+      if(!validarAdmin()) return;
       const texto = document.getElementById("buscarTexto").value.trim().toLowerCase();
       const estado = document.getElementById("filtroEstado").value;
       const fecha = document.getElementById("filtroFecha").value;
@@ -1777,6 +1987,7 @@
     }
 
     function limpiarBusqueda(){
+      if(!validarAdmin()) return;
       document.getElementById("buscarTexto").value = "";
       document.getElementById("filtroEstado").value = "";
       document.getElementById("filtroFecha").value = "";
@@ -1784,6 +1995,7 @@
     }
 
     function editarRegistro(id){
+      if(!validarAdmin()) return;
       const r = registros.find(x => String(x.id) === String(id));
       if(!r){
         alert("Registro no encontrado.");
@@ -1805,6 +2017,7 @@
     }
 
     async function eliminarRegistro(id){
+      if(!validarAdmin()) return;
       if(!confirm("¿Está seguro de eliminar este registro?")) return;
       const r = registros.find(x => String(x.id) === String(id));
       if(!r) return;
@@ -1826,6 +2039,7 @@
     }
 
     async function eliminarArchivo(idRegistro, indexArchivo){
+      if(!validarAdmin()) return;
       if(!confirm("¿Desea quitar este archivo adjunto del registro?")) return;
       const r = registros.find(x => String(x.id) === String(idRegistro));
       if(!r) return;
@@ -1854,7 +2068,7 @@
       document.getElementById("solicitante").value = "";
       document.getElementById("unidad").value = "";
       document.getElementById("vinculacion").value = "";
-      document.getElementById("tipoCaso").value = "";
+      document.getElementById("tipoCaso").value = "Pedido";
       document.getElementById("estado").value = "Pendiente";
       document.getElementById("fecha").valueAsDate = new Date();
       document.getElementById("codigoReferencia").value = "";
@@ -1866,6 +2080,7 @@
     }
 
     function verFicha(id){
+      if(!validarAdmin()) return;
       const r = registros.find(x => String(x.id) === String(id));
       if(!r){
         alert("Registro no encontrado.");
@@ -1883,7 +2098,7 @@
           <div class="detail-item"><span>Unidad</span><p>${escapeHTML(r.unidad || "")}</p></div>
           <div class="detail-item"><span>Estado</span><p><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></p></div>
           <div class="detail-item full"><span>Vinculaciones / resultados</span><p>${escapeHTML(r.vinculacion || "")}</p></div>
-          <div class="detail-item"><span>Referencia general</span><p>${escapeHTML(r.tipoCaso || "")}</p></div>
+          <div class="detail-item"><span>Tipo de solicitud</span><p>${escapeHTML(r.tipoCaso || "")}</p></div>
           <div class="detail-item"><span>Código / referencia</span><p>${escapeHTML(r.codigoReferencia || "")}</p></div>
           <div class="detail-item"><span>Fecha</span><p>${formatearFecha(r.fecha || "")}</p></div>
           <div class="detail-item"><span>Última actualización</span><p>${formatearFechaHora(r.actualizadoEn || "")}</p></div>
@@ -1899,6 +2114,7 @@
     }
 
     function exportarDatos(){
+      if(!validarAdmin()) return;
       const datos = {
         sistema:"DIVINCRI La Libertad - Trujillo",
         modo:firebaseActivo ? "Firebase Firestore + Cloudinary" : "LocalStorage",
@@ -1911,6 +2127,7 @@
     }
 
     function importarDatos(){
+      if(!validarAdmin()) return;
       const archivo = document.getElementById("importarArchivo").files[0];
       if(!archivo) return;
 
@@ -1955,6 +2172,7 @@
     }
 
     function generarVistaPreviaReporte(){
+      if(!validarAdmin()) return;
       const data = listaActual || registros;
       const totalArchivos = data.reduce((acc, r) => acc + ((r.archivos || []).length), 0);
       const verificados = data.filter(r => r.estado === "Verificado").length;
@@ -1982,9 +2200,9 @@
         <div class="report-head">
           <img src="./portada.png" alt="DIVINCRI" class="report-logo" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/perumaka1995/DIVINCRILALCONSULTA/main/portada.png';">
           <div class="report-title">
-            <h2>REPORTE DE REGISTROS TELEFÓNICOS</h2>
+            <h2>REPORTE DE PEDIDOS Y OFICIOS</h2>
             <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
-            <p>Sistema de consulta, registro, vinculaciones/resultados y archivos adjuntos</p>
+            <p>Sistema de pedidos, oficios, resultados internos y archivos adjuntos</p>
             <p>Fecha de generación: ${escapeHTML(fechaGeneracion)}</p>
             <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
           </div>
@@ -2007,7 +2225,7 @@
                 <th>Solicitante</th>
                 <th>Unidad</th>
                 <th>Vinculaciones / resultados</th>
-                <th>Referencia general</th>
+                <th>Tipo de solicitud</th>
                 <th>Estado</th>
                 <th>Código</th>
                 <th>Observación</th>
@@ -2029,12 +2247,14 @@
     }
 
     function cerrarVistaReporte(){
+      if(!validarAdmin()) return;
       const contenedor = document.getElementById("vistaReporte");
       contenedor.innerHTML = "";
       contenedor.style.display = "none";
     }
 
     function exportarExcel(){
+      if(!validarAdmin()) return;
       generarVistaPreviaReporte();
       const tabla = document.getElementById("tablaReporte");
       if(!tabla){
@@ -2049,7 +2269,7 @@
         <head><meta charset="UTF-8"></head>
         <body>
           <h2>DIVINCRI LA LIBERTAD - TRUJILLO</h2>
-          <h3>Reporte de registros telefónicos</h3>
+          <h3>Reporte de pedidos y oficios</h3>
           <p>Fecha de generación: ${new Date().toLocaleString("es-PE")}</p>
           <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
           ${tabla.outerHTML}
@@ -2061,6 +2281,7 @@
     }
 
     function exportarPDF(){
+      if(!validarAdmin()) return;
       generarVistaPreviaReporte();
       setTimeout(() => window.print(), 350);
     }
@@ -2117,6 +2338,8 @@
     Object.assign(window, {
       toggleSidebar,
       goTo,
+      loginAdmin,
+      logoutAdmin,
       guardarRegistro,
       mostrarRegistros,
       buscarRegistro,
