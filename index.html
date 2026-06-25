@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DIVINCRI La Libertad - Trujillo</title>
-  <!-- VERSION_FINAL_CLOUDINARY_DEBUG_V2: image/upload para imágenes y raw/upload para PDF/Word/Excel -->
+  <!-- VERSION_META_OTROS_PLATAFORMA: tipo de solicitud Meta u Otros; plataforma solo para Meta -->
 
   <style>
     :root{
@@ -533,7 +533,7 @@
       width:100%;
       border-collapse:separate;
       border-spacing:0;
-      min-width:1050px;
+      min-width:1500px;
       font-size:13px;
     }
 
@@ -1145,7 +1145,7 @@
           <div class="panel-header">
             <div>
               <h2>📝 Realizar pedido o subir oficio</h2>
-              <p>Complete los datos de la solicitud. El usuario no podrá ver la base de registros; solo el administrador tendrá acceso.</p>
+              <p>Complete los datos de la solicitud. La hora se registra automáticamente y solo será visible para el administrador.</p>
             </div>
           </div>
 
@@ -1159,33 +1159,116 @@
 
             <div class="form-grid">
               <div class="field">
-                <label>Número telefónico a consultar</label>
-                <input id="numero" type="text" placeholder="Ingrese número telefónico, si corresponde" />
-              </div>
-
-              <div class="field">
                 <label>Solicitante *</label>
                 <input id="solicitante" type="text" placeholder="Nombre completo del solicitante" />
               </div>
 
               <div class="field">
-                <label>Unidad / entidad solicitante</label>
-                <input id="unidad" type="text" placeholder="Unidad, área o dependencia" />
+                <label>WhatsApp del solicitante</label>
+                <input id="whatsappSolicitante" type="text" placeholder="Número de WhatsApp para contacto" />
+              </div>
+
+              <div class="field">
+                <label>Grado PNP *</label>
+                <select id="grado">
+                  <option value="">Seleccione grado</option>
+                  <option value="S3 PNP">S3 PNP - Suboficial de Tercera</option>
+                  <option value="S2 PNP">S2 PNP - Suboficial de Segunda</option>
+                  <option value="S1 PNP">S1 PNP - Suboficial de Primera</option>
+                  <option value="ST3 PNP">ST3 PNP - Suboficial Técnico de Tercera</option>
+                  <option value="ST2 PNP">ST2 PNP - Suboficial Técnico de Segunda</option>
+                  <option value="ST1 PNP">ST1 PNP - Suboficial Técnico de Primera</option>
+                  <option value="SB PNP">SB PNP - Suboficial Brigadier</option>
+                  <option value="SS PNP">SS PNP - Suboficial Superior</option>
+                  <option value="ALFZ PNP">ALFZ PNP - Alférez</option>
+                  <option value="TNTE PNP">TNTE PNP - Teniente</option>
+                  <option value="CAP PNP">CAP PNP - Capitán</option>
+                  <option value="MAY PNP">MAY PNP - Mayor</option>
+                  <option value="CMDTE PNP">CMDTE PNP - Comandante</option>
+                  <option value="CRNL PNP">CRNL PNP - Coronel</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Tipo de solicitud *</label>
+                <select id="tipoCaso" onchange="mostrarCamposPorPlataforma()">
+                  <option value="Meta">Meta</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+
+              <div class="field" id="campoPlataforma">
+                <label>Medio / plataforma *</label>
+                <select id="redSocial" onchange="mostrarCamposPorPlataforma()">
+                  <option value="">Seleccione plataforma</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="TikTok">TikTok</option>
+                </select>
+              </div>
+
+              <div class="field whatsapp-field" id="campoNumeroWhatsApp">
+                <label>Número a solicitar información *</label>
+                <input id="numero" type="text" placeholder="Ingrese número telefónico de WhatsApp" />
+              </div>
+
+              <div class="field whatsapp-field" id="campoUnidadSolicitante">
+                <label>Unidad solicitante *</label>
+                <input id="unidad" type="text" placeholder="Unidad, área o dependencia solicitante" />
+              </div>
+
+              <div class="field amenaza-field" id="campoTipoAmenaza">
+                <label>Tipo de amenaza *</label>
+                <select id="tipoAmenaza">
+                  <option value="">Seleccione una opción</option>
+                  <option value="Emergencia">Emergencia</option>
+                  <option value="Acoso/Intimidación">Acoso/Intimidación</option>
+                  <option value="Seguridad infantil (riesgo potencial de daño)">Seguridad infantil (riesgo potencial de daño)</option>
+                  <option value="Fugitivo">Fugitivo</option>
+                  <option value="Persona desaparecida/secuestrada">Persona desaparecida/secuestrada</option>
+                  <option value="Menor desaparecido/secuestrado/fugitivo">Menor desaparecido/secuestrado/fugitivo</option>
+                  <option value="Agresión física">Agresión física</option>
+                  <option value="Posible falsificación">Posible falsificación</option>
+                  <option value="Suicidio">Suicidio</option>
+                  <option value="Actividad terrorista">Actividad terrorista</option>
+                  <option value="Amenazas de violencia">Amenazas de violencia</option>
+                  <option value="Amenazas">Amenazas</option>
+                  <option value="Explotación humana: amenaza inminente">Explotación humana: amenaza inminente</option>
+                  <option value="Preservación">Preservación</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div class="field whatsapp-field" id="campoDelito">
+                <label>Delito relacionado *</label>
+                <select id="delito">
+                  <option value="">Seleccione delito</option>
+                  <option value="Extorsión">Extorsión</option>
+                  <option value="Estafa">Estafa</option>
+                  <option value="Amenazas">Amenazas</option>
+                  <option value="Chantaje">Chantaje</option>
+                  <option value="Suplantación de identidad">Suplantación de identidad</option>
+                  <option value="Acoso">Acoso</option>
+                  <option value="Difusión de material íntimo">Difusión de material íntimo</option>
+                  <option value="Grooming">Grooming</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div class="field whatsapp-field" id="campoFechaSolicitud">
+                <label>Fecha *</label>
+                <input id="fecha" type="date" />
+              </div>
+
+              <div class="field whatsapp-field">
+                <label>Código / N° de oficio / expediente</label>
+                <input id="codigoReferencia" type="text" placeholder="Ej. N° de oficio, expediente, referencia u otro" />
               </div>
 
               <div class="field two admin-only">
                 <label>Vinculaciones / resultados internos</label>
                 <input id="vinculacion" type="text" placeholder="Solo administrador: resultados, vinculaciones o atención realizada" />
-              </div>
-
-              <div class="field">
-                <label>Tipo de solicitud *</label>
-                <select id="tipoCaso">
-                  <option value="Pedido">Realizar pedido</option>
-                  <option value="Oficio">Subir oficio</option>
-                  <option value="Consulta telefónica">Consulta telefónica</option>
-                  <option value="Otro">Otro</option>
-                </select>
               </div>
 
               <div class="field admin-only">
@@ -1198,26 +1281,24 @@
                 </select>
               </div>
 
-              <div class="field">
-                <label>Fecha</label>
-                <input id="fecha" type="date" />
+              <input id="horaPedido" type="hidden" />
+
+              <div class="field full social-field" id="campoUrlAmenaza">
+                <label>URL de la red social *</label>
+                <input id="urlAmenaza" type="url" placeholder="Pegue la URL de la red social" />
+                <button type="button" class="btn btn-light" style="width:max-content;border:1px solid var(--gray-200);padding:8px 12px;margin-top:4px;" onclick="copiarUrlAmenazaFormulario()">Copiar URL</button>
               </div>
 
-              <div class="field">
-                <label>Código / N° de oficio / expediente</label>
-                <input id="codigoReferencia" type="text" placeholder="Ej. N° de oficio, expediente, referencia u otro" />
+              <div class="field full" id="campoObservacion">
+                <label id="labelObservacion">Detalle del pedido / amenaza *</label>
+                <textarea id="observacion" placeholder="Describa la amenaza, pedido o motivo de la solicitud"></textarea>
               </div>
 
               <div class="field full">
-                <label>Detalle del pedido u oficio *</label>
-                <textarea id="observacion" placeholder="Describa el pedido, consulta o motivo del oficio"></textarea>
-              </div>
-
-              <div class="field full">
-                <label>Subir oficio o archivo adjunto</label>
-                <input id="archivos" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" onchange="previsualizarArchivos()" />
+                <label>Subir oficio o archivos adjuntos</label>
+                <input id="archivos" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="previsualizarArchivos()" />
                 <div id="previewArchivos" class="preview-box"></div>
-                <p class="muted" style="margin-top:6px;">Puede adjuntar PDF, Word, Excel o imagen del oficio/documento.</p>
+                <p class="muted" style="margin-top:6px;">Puede seleccionar y adjuntar varios archivos a la vez: PDF, Word, Excel o imágenes del oficio/documento.</p>
               </div>
             </div>
 
@@ -1263,15 +1344,22 @@
                 <thead>
                   <tr>
                     <th>N°</th>
-                    <th>Número</th>
+                    <th>Número a solicitar</th>
                     <th>Solicitante</th>
+                    <th>WhatsApp solicitante</th>
+                    <th>Grado</th>
                     <th>Unidad</th>
-                    <th>Vinculaciones / resultados</th>
-                    <th>Tipo de solicitud</th>
+                    <th>Resultados internos</th>
+                    <th>Tipo solicitud</th>
+                    <th>Medio</th>
+                    <th>Tipo amenaza</th>
+                    <th>Delito</th>
+                    <th>URL red social</th>
                     <th>Estado</th>
                     <th>Código</th>
                     <th>Observación</th>
                     <th>Fecha</th>
+                    <th>Hora solicitada</th>
                     <th>Archivos</th>
                     <th>Acciones</th>
                   </tr>
@@ -1403,6 +1491,9 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("fecha").valueAsDate = new Date();
+      const horaInput = document.getElementById("horaPedido");
+      if(horaInput) horaInput.value = obtenerHoraActual();
+      mostrarCamposMeta();
       iniciarSistema();
     });
 
@@ -1496,6 +1587,7 @@
         vinculacion.value = "";
       }
 
+      mostrarCamposMeta();
       actualizarEstadoNube(firebaseActivo ? (CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa") : "Usuario solicitante", firebaseActivo);
     }
 
@@ -1631,11 +1723,18 @@
         id:String(r.id || ""),
         numero:r.numero || "",
         solicitante:r.solicitante || "",
+        whatsappSolicitante:r.whatsappSolicitante || "",
+        grado:r.grado || "",
         unidad:r.unidad || "",
         vinculacion:r.vinculacion || "",
-        tipoCaso:r.tipoCaso || "",
+        tipoCaso:r.tipoCaso || "Meta",
+        redSocial:r.redSocial || "",
+        tipoAmenaza:r.tipoAmenaza || "",
+        delito:r.delito || "",
+        urlAmenaza:r.urlAmenaza || "",
         estado:r.estado || "Pendiente",
         fecha:r.fecha || "",
+        horaPedido:r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""),
         codigoReferencia:r.codigoReferencia || "",
         observacion:r.observacion || "",
         archivos:Array.isArray(r.archivos) ? r.archivos : [],
@@ -1778,7 +1877,7 @@
       box.innerHTML = recientes.map(r => `
         <div style="padding:11px 0;border-bottom:1px solid var(--gray-200);">
           <strong class="num-cell">${escapeHTML(r.numero || "")}</strong>
-          <p class="muted">${escapeHTML(r.solicitante || "Sin solicitante")} · ${formatearFecha(r.fecha || "")}</p>
+          <p class="muted">${escapeHTML(r.solicitante || "Sin solicitante")} · ${formatearFecha(r.fecha || "")} · ${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</p>
           <span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span>
         </div>
       `).join("");
@@ -1820,11 +1919,20 @@
     async function guardarRegistro(){
       const numero = document.getElementById("numero").value.trim();
       const solicitante = document.getElementById("solicitante").value.trim();
+      const whatsappSolicitante = document.getElementById("whatsappSolicitante")?.value.trim() || "";
+      const grado = document.getElementById("grado").value.trim();
       const unidad = document.getElementById("unidad").value.trim();
       const vinculacion = esAdministrador ? document.getElementById("vinculacion").value.trim() : "";
-      const tipoCaso = document.getElementById("tipoCaso").value.trim();
+      const tipoCaso = document.getElementById("tipoCaso")?.value.trim() || "Meta";
+      let redSocial = document.getElementById("redSocial")?.value.trim() || "";
+      const tipoAmenaza = document.getElementById("tipoAmenaza")?.value.trim() || "";
+      const delito = document.getElementById("delito")?.value.trim() || "";
+      const urlAmenaza = document.getElementById("urlAmenaza")?.value.trim() || "";
+      const esWhatsApp = redSocial === "WhatsApp";
+      const esRedSocialMeta = ["Facebook", "Instagram", "TikTok"].includes(redSocial);
       const estado = esAdministrador ? document.getElementById("estado").value : "Pendiente";
       const fecha = document.getElementById("fecha").value;
+      const horaPedido = registroEditandoId === null ? obtenerHoraActual() : (document.getElementById("horaPedido")?.value || obtenerHoraActual());
       const codigoReferencia = document.getElementById("codigoReferencia").value.trim();
       const observacion = document.getElementById("observacion").value.trim();
       const archivosInput = document.getElementById("archivos");
@@ -1834,13 +1942,60 @@
         return;
       }
 
+      if(!grado){
+        alert("Seleccione el grado PNP del solicitante.");
+        return;
+      }
+
       if(!tipoCaso){
         alert("Seleccione el tipo de solicitud.");
         return;
       }
 
+      if(tipoCaso === "Meta" && !redSocial){
+        alert("Seleccione la plataforma: WhatsApp, Facebook, Instagram o TikTok.");
+        return;
+      }
+
+      if(esWhatsApp){
+        if(!numero){
+          alert("Ingrese el número de WhatsApp a solicitar información.");
+          return;
+        }
+
+        if(!unidad){
+          alert("Ingrese la unidad solicitante.");
+          return;
+        }
+
+        if(!tipoAmenaza){
+          alert("Seleccione el tipo de amenaza.");
+          return;
+        }
+
+        if(!delito){
+          alert("Seleccione el delito relacionado.");
+          return;
+        }
+
+        if(!fecha){
+          alert("Seleccione la fecha de la solicitud.");
+          return;
+        }
+      }
+
+      if(esRedSocialMeta && !tipoAmenaza){
+        alert("Seleccione el tipo de amenaza para la red social.");
+        return;
+      }
+
+      if(esRedSocialMeta && !urlAmenaza){
+        alert("Pegue la URL de la red social.");
+        return;
+      }
+
       if(!observacion){
-        alert("Ingrese el detalle del pedido u oficio.");
+        alert("Ingrese el detalle de la amenaza o pedido de información.");
         return;
       }
 
@@ -1854,11 +2009,18 @@
             id,
             numero,
             solicitante,
+            whatsappSolicitante,
+            grado,
             unidad,
             vinculacion,
             tipoCaso,
+            redSocial,
+            tipoAmenaza,
+            delito,
+            urlAmenaza,
             estado,
             fecha,
+            horaPedido,
             codigoReferencia,
             observacion,
             archivos:nuevosArchivos,
@@ -1886,11 +2048,18 @@
             id,
             numero,
             solicitante,
+            whatsappSolicitante,
+            grado,
             unidad,
             vinculacion,
             tipoCaso,
+            redSocial,
+            tipoAmenaza,
+            delito,
+            urlAmenaza,
             estado,
             fecha,
+            horaPedido,
             codigoReferencia,
             observacion,
             archivos:[...(registros[index].archivos || []), ...nuevosArchivos],
@@ -1946,7 +2115,7 @@
       const tbody = document.getElementById("tablaRegistros");
 
       if(lista.length === 0){
-        tbody.innerHTML = `<tr><td colspan="12" class="muted">No hay registros para mostrar.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="19" class="muted">No hay registros para mostrar.</td></tr>`;
         actualizarEstadisticas();
         return;
       }
@@ -1962,18 +2131,29 @@
             `).join("")}</div>`
           : `<span class="muted">Sin archivos</span>`;
 
+        const urlAmenazaHTML = r.urlAmenaza
+          ? `<div class="small-actions"><a class="small-btn btn-blue" href="${escapeAttr(r.urlAmenaza)}" target="_blank" rel="noopener">Abrir</a><button class="small-btn btn-gray" onclick="copiarTexto('${escapeJS(r.urlAmenaza)}')">Copiar</button></div>`
+          : `<span class="muted">Sin URL</span>`;
+
         return `
           <tr>
             <td>${index + 1}</td>
             <td><span class="num-cell">${escapeHTML(r.numero || "")}</span></td>
             <td>${escapeHTML(r.solicitante || "")}</td>
+            <td>${escapeHTML(r.whatsappSolicitante || "")}</td>
+            <td>${escapeHTML(r.grado || "")}</td>
             <td>${escapeHTML(r.unidad || "")}</td>
             <td>${escapeHTML(r.vinculacion || "")}</td>
             <td>${escapeHTML(r.tipoCaso || "")}</td>
+            <td>${escapeHTML(r.redSocial || "")}</td>
+            <td>${escapeHTML(r.tipoAmenaza || "")}</td>
+            <td>${escapeHTML(r.delito || "")}</td>
+            <td>${urlAmenazaHTML}</td>
             <td><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></td>
             <td>${escapeHTML(r.codigoReferencia || "")}</td>
             <td>${escapeHTML(r.observacion || "")}</td>
             <td>${formatearFecha(r.fecha || "")}</td>
+            <td>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</td>
             <td>${archivosHTML}</td>
             <td>
               <div class="small-actions">
@@ -2002,13 +2182,20 @@
         const coincideTexto = !texto || [
           r.numero,
           r.solicitante,
+          r.whatsappSolicitante,
+          r.grado,
           r.unidad,
           r.vinculacion,
           r.tipoCaso,
+          r.redSocial,
+          r.tipoAmenaza,
+          r.delito,
+          r.urlAmenaza,
           r.estado,
           r.codigoReferencia,
           r.observacion,
-          r.fecha
+          r.fecha,
+          r.horaPedido
         ].some(v => String(v || "").toLowerCase().includes(texto));
 
         const coincideEstado = !estado || r.estado === estado;
@@ -2044,11 +2231,19 @@
 
       document.getElementById("numero").value = r.numero || "";
       document.getElementById("solicitante").value = r.solicitante || "";
+      document.getElementById("whatsappSolicitante").value = r.whatsappSolicitante || "";
+      document.getElementById("grado").value = r.grado || "";
       document.getElementById("unidad").value = r.unidad || "";
       document.getElementById("vinculacion").value = r.vinculacion || "";
-      document.getElementById("tipoCaso").value = r.tipoCaso || "";
+      document.getElementById("tipoCaso").value = r.tipoCaso || "Meta";
+      document.getElementById("redSocial").value = r.redSocial || "";
+      document.getElementById("tipoAmenaza").value = r.tipoAmenaza || "";
+      document.getElementById("delito").value = r.delito || "";
+      document.getElementById("urlAmenaza").value = r.urlAmenaza || "";
+      mostrarCamposPorPlataforma();
       document.getElementById("estado").value = r.estado || "Pendiente";
       document.getElementById("fecha").value = r.fecha || "";
+      document.getElementById("horaPedido").value = r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || "") || obtenerHoraActual();
       document.getElementById("codigoReferencia").value = r.codigoReferencia || "";
       document.getElementById("observacion").value = r.observacion || "";
 
@@ -2106,11 +2301,19 @@
     function limpiarFormulario(){
       document.getElementById("numero").value = "";
       document.getElementById("solicitante").value = "";
+      document.getElementById("whatsappSolicitante").value = "";
+      document.getElementById("grado").value = "";
       document.getElementById("unidad").value = "";
       document.getElementById("vinculacion").value = "";
-      document.getElementById("tipoCaso").value = "Pedido";
+      document.getElementById("tipoCaso").value = "Meta";
+      document.getElementById("redSocial").value = "";
+      document.getElementById("tipoAmenaza").value = "";
+      document.getElementById("delito").value = "";
+      document.getElementById("urlAmenaza").value = "";
+      mostrarCamposPorPlataforma();
       document.getElementById("estado").value = "Pendiente";
       document.getElementById("fecha").valueAsDate = new Date();
+      document.getElementById("horaPedido").value = obtenerHoraActual();
       document.getElementById("codigoReferencia").value = "";
       document.getElementById("observacion").value = "";
       document.getElementById("archivos").value = "";
@@ -2131,16 +2334,27 @@
         ? (r.archivos || []).map(a => `<p>📎 <a href="${escapeAttr(a.contenido || a.url || "#")}" download="${escapeAttr(a.nombre)}" target="_blank">${escapeHTML(a.nombre)}</a></p>`).join("")
         : `<p>Sin archivos adjuntos</p>`;
 
+      const urlAmenazaFicha = r.urlAmenaza
+        ? `<p><a href="${escapeAttr(r.urlAmenaza)}" target="_blank" rel="noopener">${escapeHTML(r.urlAmenaza)}</a></p><button class="btn btn-gray" style="margin-top:8px;" onclick="copiarTexto('${escapeJS(r.urlAmenaza)}')">Copiar URL</button>`
+        : `<p>Sin URL registrada</p>`;
+
       document.getElementById("contenidoFicha").innerHTML = `
         <div class="detail-grid">
-          <div class="detail-item"><span>Número</span><p>${escapeHTML(r.numero || "")}</p></div>
+          <div class="detail-item"><span>Número a solicitar</span><p>${escapeHTML(r.numero || "")}</p></div>
           <div class="detail-item"><span>Solicitante</span><p>${escapeHTML(r.solicitante || "")}</p></div>
+          <div class="detail-item"><span>WhatsApp del solicitante</span><p>${escapeHTML(r.whatsappSolicitante || "")}</p></div>
+          <div class="detail-item"><span>Grado PNP</span><p>${escapeHTML(r.grado || "")}</p></div>
           <div class="detail-item"><span>Unidad</span><p>${escapeHTML(r.unidad || "")}</p></div>
           <div class="detail-item"><span>Estado</span><p><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></p></div>
           <div class="detail-item full"><span>Vinculaciones / resultados</span><p>${escapeHTML(r.vinculacion || "")}</p></div>
           <div class="detail-item"><span>Tipo de solicitud</span><p>${escapeHTML(r.tipoCaso || "")}</p></div>
+          <div class="detail-item"><span>Medio / plataforma</span><p>${escapeHTML(r.redSocial || "")}</p></div>
+          <div class="detail-item"><span>Tipo de amenaza</span><p>${escapeHTML(r.tipoAmenaza || "")}</p></div>
+          <div class="detail-item"><span>Delito relacionado</span><p>${escapeHTML(r.delito || "")}</p></div>
+          <div class="detail-item full"><span>URL de la red social</span>${urlAmenazaFicha}</div>
           <div class="detail-item"><span>Código / referencia</span><p>${escapeHTML(r.codigoReferencia || "")}</p></div>
           <div class="detail-item"><span>Fecha</span><p>${formatearFecha(r.fecha || "")}</p></div>
+          <div class="detail-item"><span>Hora solicitada</span><p>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</p></div>
           <div class="detail-item"><span>Última actualización</span><p>${formatearFechaHora(r.actualizadoEn || "")}</p></div>
           <div class="detail-item full"><span>Observación</span><p>${escapeHTML(r.observacion || "")}</p></div>
           <div class="detail-item full"><span>Archivos adjuntos</span>${archivos}</div>
@@ -2225,13 +2439,20 @@
           <td>${i + 1}</td>
           <td>${escapeHTML(r.numero || "")}</td>
           <td>${escapeHTML(r.solicitante || "")}</td>
+          <td>${escapeHTML(r.whatsappSolicitante || "")}</td>
+          <td>${escapeHTML(r.grado || "")}</td>
           <td>${escapeHTML(r.unidad || "")}</td>
           <td>${escapeHTML(r.vinculacion || "")}</td>
           <td>${escapeHTML(r.tipoCaso || "")}</td>
+          <td>${escapeHTML(r.redSocial || "")}</td>
+          <td>${escapeHTML(r.tipoAmenaza || "")}</td>
+          <td>${escapeHTML(r.delito || "")}</td>
+          <td>${escapeHTML(r.urlAmenaza || "")}</td>
           <td>${escapeHTML(r.estado || "Pendiente")}</td>
           <td>${escapeHTML(r.codigoReferencia || "")}</td>
           <td>${escapeHTML(r.observacion || "")}</td>
           <td>${formatearFecha(r.fecha || "")}</td>
+          <td>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</td>
           <td>${(r.archivos || []).length}</td>
         </tr>
       `).join("");
@@ -2261,19 +2482,26 @@
             <thead>
               <tr>
                 <th>N°</th>
-                <th>Número</th>
+                <th>Número a solicitar</th>
                 <th>Solicitante</th>
+                <th>WhatsApp solicitante</th>
+                <th>Grado</th>
                 <th>Unidad</th>
-                <th>Vinculaciones / resultados</th>
-                <th>Tipo de solicitud</th>
+                <th>Resultados internos</th>
+                <th>Tipo solicitud</th>
+                <th>Medio</th>
+                <th>Tipo amenaza</th>
+                <th>Delito</th>
+                <th>URL red social</th>
                 <th>Estado</th>
                 <th>Código</th>
                 <th>Observación</th>
                 <th>Fecha</th>
+                <th>Hora solicitada</th>
                 <th>Archivos</th>
               </tr>
             </thead>
-            <tbody>${filas || `<tr><td colspan="11">No hay registros para mostrar.</td></tr>`}</tbody>
+            <tbody>${filas || `<tr><td colspan="18">No hay registros para mostrar.</td></tr>`}</tbody>
           </table>
         </div>
 
@@ -2337,6 +2565,34 @@
       URL.revokeObjectURL(url);
     }
 
+    function obtenerHoraActual(){
+      const ahora = new Date();
+      const horas = String(ahora.getHours()).padStart(2, "0");
+      const minutos = String(ahora.getMinutes()).padStart(2, "0");
+      return `${horas}:${minutos}`;
+    }
+
+    function obtenerHoraDesdeISO(valor){
+      if(!valor) return "";
+      try{
+        const fecha = new Date(valor);
+        if(Number.isNaN(fecha.getTime())) return "";
+        const horas = String(fecha.getHours()).padStart(2, "0");
+        const minutos = String(fecha.getMinutes()).padStart(2, "0");
+        return `${horas}:${minutos}`;
+      }catch(e){
+        return "";
+      }
+    }
+
+    function formatearHora(hora){
+      if(!hora) return "";
+      const texto = String(hora);
+      const partes = texto.split(":");
+      if(partes.length >= 2) return `${partes[0]}:${partes[1]}`;
+      return texto;
+    }
+
     function formatearFecha(fecha){
       if(!fecha) return "";
       const partes = String(fecha).split("-");
@@ -2351,6 +2607,104 @@
       }catch(e){
         return valor;
       }
+    }
+
+    function mostrarCamposPorPlataforma(){
+      const tipoCaso = document.getElementById("tipoCaso")?.value || "Meta";
+      const redSocialSelect = document.getElementById("redSocial");
+      const campoPlataforma = document.getElementById("campoPlataforma");
+      const usaMeta = tipoCaso === "Meta";
+
+      if(campoPlataforma){
+        campoPlataforma.style.display = usaMeta ? "" : "none";
+      }
+
+      if(!usaMeta && redSocialSelect){
+        redSocialSelect.value = "";
+      }
+
+      const plataforma = usaMeta ? (redSocialSelect?.value || "") : "";
+      const esWhatsApp = plataforma === "WhatsApp";
+      const esRedSocialMeta = ["Facebook", "Instagram", "TikTok"].includes(plataforma);
+
+      document.querySelectorAll(".whatsapp-field").forEach(el => {
+        el.style.display = esWhatsApp ? "" : "none";
+      });
+
+      document.querySelectorAll(".amenaza-field").forEach(el => {
+        el.style.display = (esWhatsApp || esRedSocialMeta) ? "" : "none";
+      });
+
+      document.querySelectorAll(".social-field").forEach(el => {
+        el.style.display = esRedSocialMeta ? "" : "none";
+      });
+
+      const labelObservacion = document.getElementById("labelObservacion");
+      const observacion = document.getElementById("observacion");
+
+      if(!usaMeta){
+        if(labelObservacion) labelObservacion.textContent = "Detalle de otra solicitud *";
+        if(observacion) observacion.placeholder = "Describa el pedido, oficio u otra solicitud";
+        ["numero", "unidad", "tipoAmenaza", "delito", "urlAmenaza", "codigoReferencia", "fecha"].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.value = "";
+        });
+      }else if(esWhatsApp){
+        if(labelObservacion) labelObservacion.textContent = "Detalle del pedido de información por WhatsApp *";
+        if(observacion) observacion.placeholder = "Describa la amenaza, número vinculado, hechos relevantes o motivo del pedido";
+        const url = document.getElementById("urlAmenaza");
+        if(url) url.value = "";
+      }else if(esRedSocialMeta){
+        if(labelObservacion) labelObservacion.textContent = "Detalle de la amenaza en red social *";
+        if(observacion) observacion.placeholder = "Describa la amenaza encontrada en la red social";
+        ["numero", "unidad", "delito", "codigoReferencia"].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.value = "";
+        });
+      }else{
+        if(labelObservacion) labelObservacion.textContent = "Detalle del pedido / amenaza *";
+        if(observacion) observacion.placeholder = "Seleccione WhatsApp, Facebook, Instagram o TikTok y describa el pedido";
+        ["numero", "unidad", "tipoAmenaza", "delito", "urlAmenaza", "codigoReferencia"].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.value = "";
+        });
+      }
+    }
+
+    function mostrarCamposMeta(){
+      mostrarCamposPorPlataforma();
+    }
+
+    async function copiarTexto(texto){
+      if(!texto){
+        alert("No hay texto para copiar.");
+        return;
+      }
+
+      try{
+        if(navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(texto);
+        }else{
+          const temp = document.createElement("textarea");
+          temp.value = texto;
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+        }
+        alert("URL copiada correctamente.");
+      }catch(error){
+        console.error("Error copiando texto:", error);
+        alert("No se pudo copiar automáticamente. Copie la URL manualmente.");
+      }
+    }
+
+    function copiarUrlAmenazaFormulario(){
+      const url = document.getElementById("urlAmenaza")?.value.trim() || "";
+      copiarTexto(url);
     }
 
     function escapeHTML(texto){
@@ -2396,7 +2750,11 @@
       cerrarVistaReporte,
       exportarExcel,
       exportarPDF,
-      previsualizarArchivos
+      previsualizarArchivos,
+      mostrarCamposPorPlataforma,
+      mostrarCamposMeta,
+      copiarTexto,
+      copiarUrlAmenazaFormulario
     });
   </script>
 </body>
