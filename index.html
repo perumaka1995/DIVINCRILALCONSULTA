@@ -1,2761 +1,377 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DIVINCRI La Libertad - Trujillo</title>
-  <!-- VERSION_META_OTROS_PLATAFORMA: tipo de solicitud Meta u Otros; plataforma solo para Meta -->
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Área de Análisis de Inteligencia - DIVINCRI La Libertad</title>
+  <meta name="description" content="Análisis relacional editable de números, IMEI, DNI, personas y operadoras, con fechas visibles en las vinculaciones.">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root{
-      --bg:#eef3ee;
-      --surface:#ffffff;
-      --surface-2:#f8faf8;
-      --green-950:#062714;
-      --green-900:#09381d;
-      --green-800:#0e4a27;
-      --green-700:#146033;
-      --green-600:#1b7a43;
-      --gold:#d7a928;
-      --gold-2:#f2cf66;
-      --red:#b42318;
-      --blue:#155eef;
-      --orange:#b75e09;
-      --gray-50:#f9fafb;
-      --gray-100:#f3f4f6;
-      --gray-200:#e5e7eb;
-      --gray-300:#d1d5db;
-      --gray-500:#667085;
-      --gray-700:#344054;
-      --text:#101828;
-      --muted:#667085;
-      --shadow:0 16px 40px rgba(16,24,40,.10);
-      --shadow-soft:0 8px 20px rgba(16,24,40,.07);
-      --radius:18px;
-    }
-
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-      font-family:Inter, Segoe UI, Arial, Helvetica, sans-serif;
-    }
-
-    body{
-      min-height:100vh;
-      background:
-        radial-gradient(circle at top left, rgba(215,169,40,.20), transparent 28%),
-        linear-gradient(135deg, #f6f8f6 0%, var(--bg) 45%, #e7efe8 100%);
-      color:var(--text);
-    }
-
-    button,
-    input,
-    textarea,
-    select{
-      font:inherit;
-    }
-
-    button{
-      border:none;
-      cursor:pointer;
-    }
-
-    a{
-      color:inherit;
-    }
-
-    .app{
-      display:grid;
-      grid-template-columns:280px 1fr;
-      min-height:100vh;
-    }
-
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      background:
-        linear-gradient(180deg, rgba(6,39,20,.78), rgba(9,56,29,.82)),
-        url('./portada.png'),
-        url('https://raw.githubusercontent.com/perumaka1995/DIVINCRILALCONSULTA/main/portada.png');
-      background-size:cover;
-      background-position:center;
-      color:white;
-      padding:22px 18px;
-      box-shadow:12px 0 30px rgba(16,24,40,.18);
-      overflow:auto;
-      z-index:10;
-    }
-
-    .brand{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding-bottom:18px;
-      border-bottom:1px solid rgba(255,255,255,.16);
-      margin-bottom:18px;
-    }
-
-    .brand-logo{
-      width:72px;
-      height:72px;
-      border-radius:16px;
-      object-fit:contain;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(242,207,102,.7);
-      padding:4px;
-      box-shadow:0 10px 24px rgba(0,0,0,.25);
-    }
-
-    .brand-title small{
-      display:block;
-      color:var(--gold-2);
-      font-weight:800;
-      letter-spacing:.16em;
-      font-size:11px;
-      margin-bottom:2px;
-    }
-
-    .brand-title h1{
-      font-size:26px;
-      letter-spacing:.08em;
-      line-height:1;
-      margin-bottom:4px;
-    }
-
-    .brand-title p{
-      font-size:11px;
-      color:rgba(255,255,255,.78);
-      line-height:1.35;
-    }
-
-    .nav-label{
-      margin:16px 10px 8px;
-      font-size:11px;
-      color:rgba(255,255,255,.55);
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      font-weight:800;
-    }
-
-    .nav-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 12px;
-      border-radius:12px;
-      color:rgba(255,255,255,.88);
-      background:transparent;
-      text-align:left;
-      margin:5px 0;
-      font-weight:700;
-      transition:.18s ease;
-    }
-
-    .nav-btn:hover,
-    .nav-btn.active{
-      color:white;
-      background:rgba(255,255,255,.12);
-      box-shadow:inset 3px 0 0 var(--gold);
-    }
-
-    .sidebar-note{
-      margin-top:18px;
-      padding:14px;
-      border-radius:14px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      color:rgba(255,255,255,.80);
-      font-size:12px;
-      line-height:1.45;
-    }
-
-    .main{
-      min-width:0;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:9;
-      background:rgba(255,255,255,.84);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid rgba(229,231,235,.9);
-      padding:18px 28px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-    }
-
-    .topbar h2{
-      color:var(--green-950);
-      font-size:22px;
-      margin-bottom:2px;
-      letter-spacing:-.02em;
-    }
-
-    .topbar p{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .user-chip{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      background:white;
-      border:1px solid var(--gray-200);
-      border-radius:999px;
-      padding:8px 12px;
-      box-shadow:var(--shadow-soft);
-      white-space:nowrap;
-      font-size:13px;
-      color:var(--gray-700);
-      font-weight:700;
-    }
-
-    .user-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:#12b76a;
-      box-shadow:0 0 0 4px rgba(18,183,106,.15);
-    }
-
-    .content{
-      padding:26px 28px 38px;
-      max-width:1280px;
-      margin:0 auto;
-    }
-
-    .hero{
-      position:relative;
-      overflow:hidden;
-      border-radius:24px;
-      padding:26px;
-      color:white;
-      background:
-        linear-gradient(110deg, rgba(6,39,20,.70), rgba(14,74,39,.55)),
-        url('./portada.png'),
-        url('https://raw.githubusercontent.com/perumaka1995/DIVINCRILALCONSULTA/main/portada.png');
-      background-size:cover;
-      background-position:center;
-      box-shadow:var(--shadow);
-      margin-bottom:22px;
-    }
-
-    .hero::after{
-      content:"";
-      position:absolute;
-      right:-90px;
-      top:-90px;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      background:rgba(215,169,40,.18);
-    }
-
-    .hero-content{
-      position:relative;
-      z-index:1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-    }
-
-    .hero h3{
-      font-size:13px;
-      color:var(--gold-2);
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-
-    .hero h1{
-      font-size:34px;
-      line-height:1.08;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
-    }
-
-    .hero p{
-      max-width:780px;
-      color:rgba(255,255,255,.82);
-      line-height:1.5;
-      font-size:14px;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
-
-    .btn{
-      display:inline-flex;
-      justify-content:center;
-      align-items:center;
-      gap:8px;
-      padding:11px 15px;
-      border-radius:12px;
-      font-weight:800;
-      font-size:13px;
-      transition:.15s ease;
-      box-shadow:0 8px 18px rgba(16,24,40,.10);
-    }
-
-    .btn:hover{
-      transform:translateY(-1px);
-      opacity:.95;
-    }
-
-    .btn-primary{
-      color:white;
-      background:var(--green-700);
-    }
-
-    .btn-gold{
-      color:var(--green-950);
-      background:linear-gradient(180deg, var(--gold-2), var(--gold));
-    }
-
-    .btn-light{
-      background:white;
-      color:var(--green-950);
-    }
-
-    .btn-danger{
-      background:var(--red);
-      color:white;
-    }
-
-    .btn-blue{
-      background:var(--blue);
-      color:white;
-    }
-
-    .btn-gray{
-      background:#475467;
-      color:white;
-    }
-
-    .btn-orange{
-      background:var(--orange);
-      color:white;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:15px;
-      margin-bottom:22px;
-    }
-
-    .stat-card{
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(229,231,235,.95);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow-soft);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .stat-card::before{
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:4px;
-      background:linear-gradient(90deg, var(--green-700), var(--gold));
-    }
-
-    .stat-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:#ecfdf3;
-      color:var(--green-700);
-      font-size:22px;
-      margin-bottom:12px;
-    }
-
-    .stat-card h2{
-      font-size:30px;
-      color:var(--green-950);
-      letter-spacing:-.03em;
-    }
-
-    .stat-card p{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    .grid-2{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:18px;
-      align-items:start;
-    }
-
-    .panel{
-      background:rgba(255,255,255,.95);
-      border:1px solid rgba(229,231,235,.95);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow-soft);
-      margin-bottom:18px;
-      overflow:hidden;
-    }
-
-    .panel-header{
-      padding:18px 20px;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:14px;
-      border-bottom:1px solid var(--gray-200);
-      background:linear-gradient(180deg,#fff,#fbfdfb);
-    }
-
-    .panel-header h2{
-      font-size:18px;
-      color:var(--green-950);
-      margin-bottom:3px;
-      letter-spacing:-.01em;
-    }
-
-    .panel-header p{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.4;
-    }
-
-    .panel-body{
-      padding:20px;
-    }
-
-    .notice{
-      display:flex;
-      gap:10px;
-      background:#fffaeb;
-      color:#7a4b00;
-      border:1px solid #fedf89;
-      padding:12px;
-      border-radius:14px;
-      font-size:12px;
-      line-height:1.45;
-      margin-bottom:16px;
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:13px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .field.full{
-      grid-column:1/-1;
-    }
-
-    .field.two{
-      grid-column:span 2;
-    }
-
-    label{
-      font-size:12px;
-      color:var(--gray-700);
-      font-weight:800;
-    }
-
-    input,
-    select,
-    textarea{
-      width:100%;
-      border:1px solid var(--gray-300);
-      background:white;
-      color:var(--text);
-      border-radius:12px;
-      padding:11px 12px;
-      outline:none;
-      transition:.15s ease;
-      font-size:14px;
-    }
-
-    textarea{
-      resize:vertical;
-      min-height:90px;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus{
-      border-color:var(--green-600);
-      box-shadow:0 0 0 4px rgba(27,122,67,.12);
-    }
-
-    .toolbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:9px;
-      margin-top:16px;
-      align-items:center;
-    }
-
-    .search-grid{
-      display:grid;
-      grid-template-columns:1.5fr 1fr 1fr;
-      gap:12px;
-    }
-
-    .table-wrap{
-      overflow:auto;
-      border:1px solid var(--gray-200);
-      border-radius:16px;
-      background:white;
-    }
-
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      min-width:1500px;
-      font-size:13px;
-    }
-
-    thead th{
-      position:sticky;
-      top:0;
-      z-index:1;
-      background:var(--green-950);
-      color:white;
-      text-align:left;
-      padding:12px;
-      font-size:12px;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-
-    tbody td{
-      padding:12px;
-      border-bottom:1px solid var(--gray-200);
-      color:#1d2939;
-      vertical-align:top;
-      line-height:1.35;
-    }
-
-    tbody tr:hover{
-      background:#f8fbf8;
-    }
-
-    .num-cell{
-      font-weight:900;
-      color:var(--green-900);
-      white-space:nowrap;
-    }
-
-    .muted{
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border-radius:999px;
-      padding:5px 9px;
-      font-size:11px;
-      font-weight:900;
-      border:1px solid transparent;
-      white-space:nowrap;
-    }
-
-    .badge.Pendiente{
-      background:#fffaeb;
-      color:#93370d;
-      border-color:#fedf89;
-    }
-
-    .badge.Verificado{
-      background:#ecfdf3;
-      color:#027a48;
-      border-color:#abefc6;
-    }
-
-    .badge.Observado{
-      background:#fff1f3;
-      color:#c01048;
-      border-color:#fecdd6;
-    }
-
-    .badge.Archivado{
-      background:#f2f4f7;
-      color:#344054;
-      border-color:#d0d5dd;
-    }
-
-    .small-actions{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
-
-    .small-btn{
-      padding:7px 9px;
-      border-radius:9px;
-      font-size:12px;
-      font-weight:900;
-      color:white;
-    }
-
-    .file-list{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .file-item{
-      border:1px solid #d7eadc;
-      background:#f0f9f3;
-      border-radius:12px;
-      padding:8px;
-      font-size:12px;
-      color:var(--green-900);
-    }
-
-    .file-item a{
-      font-weight:900;
-      text-decoration:none;
-      word-break:break-word;
-    }
-
-    .file-remove{
-      margin-top:6px;
-      padding:5px 8px;
-      border-radius:8px;
-      background:var(--red);
-      color:white;
-      font-size:11px;
-      font-weight:900;
-    }
-
-    .preview-box{
-      display:none;
-      margin-top:8px;
-      border:1px dashed var(--green-600);
-      background:#f6fef9;
-      padding:12px;
-      border-radius:14px;
-      color:var(--green-900);
-      font-size:12px;
-      line-height:1.5;
-    }
-
-    .report-preview{
-      display:none;
-      background:white;
-      border:1px solid var(--gray-200);
-      border-radius:18px;
-      padding:20px;
-      margin-top:16px;
-    }
-
-    .report-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding-bottom:14px;
-      margin-bottom:14px;
-      border-bottom:3px solid var(--green-950);
-    }
-
-    .report-logo{
-      width:92px;
-      height:82px;
-      object-fit:contain;
-    }
-
-    .report-title{
-      flex:1;
-      text-align:center;
-    }
-
-    .report-title h2{
-      color:var(--green-950);
-      font-size:18px;
-      margin-bottom:4px;
-    }
-
-    .report-title p{
-      font-size:12px;
-      color:var(--gray-700);
-      margin:2px 0;
-    }
-
-    .report-metrics{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-      margin:14px 0;
-    }
-
-    .report-metric{
-      background:var(--gray-50);
-      border:1px solid var(--gray-200);
-      border-radius:14px;
-      padding:10px;
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .report-metric strong{
-      display:block;
-      font-size:20px;
-      color:var(--green-950);
-      margin-bottom:2px;
-    }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background:rgba(6,39,20,.62);
-      z-index:50;
-      padding:18px;
-    }
-
-    .modal.open{
-      display:flex;
-    }
-
-    .modal-card{
-      width:min(860px,100%);
-      max-height:90vh;
-      overflow:auto;
-      background:white;
-      border-radius:22px;
-      box-shadow:0 24px 70px rgba(0,0,0,.28);
-      border:1px solid rgba(255,255,255,.6);
-    }
-
-    .modal-head{
-      padding:18px 20px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      background:linear-gradient(90deg, var(--green-950), var(--green-800));
-      color:white;
-    }
-
-    .modal-head h3{
-      font-size:18px;
-    }
-
-    .modal-body{
-      padding:20px;
-    }
-
-    .detail-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-
-    .detail-item{
-      border:1px solid var(--gray-200);
-      background:var(--gray-50);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .detail-item.full{
-      grid-column:1/-1;
-    }
-
-    .detail-item span{
-      display:block;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:900;
-      margin-bottom:4px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    .detail-item p{
-      color:var(--text);
-      line-height:1.45;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .mobile-menu{
-      display:none;
-      background:var(--green-950);
-      color:white;
-      padding:10px 12px;
-      border-radius:12px;
-      font-weight:900;
-    }
-
-    .admin-only,
-    .public-only{
-      transition:.15s ease;
-    }
-
-    .access-note{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      background:#eef4ff;
-      color:#1849a9;
-      border:1px solid #b2ccff;
-      padding:12px;
-      border-radius:14px;
-      font-size:12px;
-      line-height:1.45;
-      margin-bottom:16px;
-    }
-
-    .success-box{
-      display:none;
-      margin-top:14px;
-      padding:13px;
-      border-radius:14px;
-      background:#ecfdf3;
-      border:1px solid #abefc6;
-      color:#027a48;
-      font-size:13px;
-      font-weight:800;
-    }
-
-    @media(max-width:1120px){
-      .app{
-        grid-template-columns:1fr;
-      }
-
-      .sidebar{
-        position:fixed;
-        left:-300px;
-        width:280px;
-        transition:.2s ease;
-      }
-
-      .sidebar.open{
-        left:0;
-      }
-
-      .mobile-menu{
-        display:inline-flex;
-      }
-
-      .stats{
-        grid-template-columns:repeat(2,1fr);
-      }
-
-      .grid-2{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media(max-width:760px){
-      .topbar{
-        padding:14px;
-      }
-
-      .user-chip{
-        display:none;
-      }
-
-      .content{
-        padding:18px 14px 30px;
-      }
-
-      .hero{
-        padding:20px;
-      }
-
-      .hero-content{
-        display:block;
-      }
-
-      .hero h1{
-        font-size:25px;
-      }
-
-      .stats{
-        grid-template-columns:1fr;
-      }
-
-      .form-grid,
-      .search-grid,
-      .detail-grid,
-      .report-metrics{
-        grid-template-columns:1fr;
-      }
-
-      .field.two{
-        grid-column:1/-1;
-      }
-
-      .panel-header{
-        flex-direction:column;
-      }
-
-      .toolbar .btn{
-        width:100%;
-      }
-    }
-
-    @media print{
-      body{
-        background:white;
-      }
-
-      .sidebar,
-      .topbar,
-      .hero,
-      .stats,
-      #consulta,
-      #registro,
-      #respaldo,
-      #tabla,
-      .no-print,
-      .modal{
-        display:none !important;
-      }
-
-      .app{
-        display:block;
-      }
-
-      .content{
-        padding:0;
-        max-width:none;
-      }
-
-      #reportes{
-        display:block !important;
-        border:none;
-        box-shadow:none;
-        margin:0;
-      }
-
-      #reportes .panel-header,
-      #reportes > .panel-body > p,
-      #reportes > .panel-body > .toolbar{
-        display:none !important;
-      }
-
-      #vistaReporte{
-        display:block !important;
-        border:none;
-        margin:0;
-        padding:0;
-      }
-
-      table{
-        font-size:10px;
-        min-width:0;
-      }
-
-      thead th{
-        background:#062714 !important;
-        color:white !important;
-        -webkit-print-color-adjust:exact;
-        print-color-adjust:exact;
-      }
-
-      tbody td{
-        padding:7px;
-      }
-    }
+      --pnp-950:#032416;--pnp-900:#06351f;--pnp-800:#08472a;--pnp-700:#0b6038;
+      --pnp-600:#0f7746;--pnp-500:#16935a;--gold:#c79216;--gold-2:#edcf73;
+      --ink:#10251a;--muted:#66766d;--line:#d9e4dc;--surface:#fff;--soft:#f5f9f6;
+      --blue:#1769aa;--green:#158356;--orange:#c16a06;--purple:#7b51b8;--teal:#227989;
+      --red:#c12b39;--shadow:0 14px 40px rgba(3,36,22,.10);--shadow-sm:0 6px 18px rgba(3,36,22,.08);
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#eef5f0,#f8faf8 40%,#edf4ef)}
+    button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit}
+    .top{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:15px;min-height:74px;padding:10px 24px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);box-shadow:0 7px 25px rgba(3,36,22,.08);backdrop-filter:blur(16px)}
+    .logo{width:48px;height:48px;object-fit:contain;padding:3px;border-radius:12px;background:#fff;border:1px solid rgba(199,146,22,.45)}
+    .brand{margin-right:auto;color:var(--pnp-800);font-size:15px;font-weight:950;line-height:1.15}.brand small{display:block;margin-top:4px;color:var(--muted);font-size:10px;font-weight:700}
+    .nav{display:flex;gap:5px;flex-wrap:wrap}.nav a{padding:10px 14px;border-radius:10px;text-decoration:none;font-size:11px;font-weight:900}.nav a:hover,.nav a.active{color:#fff;background:linear-gradient(180deg,var(--pnp-600),var(--pnp-800))}
+    main{max-width:1640px;margin:auto;padding:18px 20px 34px}.notice{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:11px 14px;border:1px solid #e6cf91;border-radius:14px;background:linear-gradient(90deg,#fff9e8,#fff,#f5faf7);color:#53645a;font-size:10px;box-shadow:var(--shadow-sm)}.notice b{color:var(--pnp-800)}
+    .metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:11px;margin-bottom:14px}.metric{position:relative;overflow:hidden;display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;min-height:78px;padding:12px;border:1px solid var(--line);border-radius:15px;background:#fff;box-shadow:var(--shadow-sm)}.metric .ico{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:var(--pnp-700);background:#e9f5ed;font-size:18px;font-weight:900}.metric span{display:block;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.7px}.metric b{display:block;margin-top:2px;color:var(--pnp-900);font-size:25px;line-height:1}
+    .layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}.panel{border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:var(--shadow);overflow:hidden}.sidebar{position:sticky;top:90px;max-height:calc(100vh - 108px);overflow:auto}.panel-head{padding:13px 15px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#f7faf8)}.panel-head h2{margin:0;color:var(--pnp-800);font-size:11px;letter-spacing:.75px;text-transform:uppercase}.panel-head p{margin:4px 0 0;color:var(--muted);font-size:9px;line-height:1.4}.panel-body{padding:14px}
+    .field{margin-bottom:11px}.field label{display:block;margin-bottom:6px;color:#4c6255;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}input,textarea,select{width:100%;padding:10px 11px;border:1px solid #cbd9cf;border-radius:10px;background:#fff;color:var(--ink);outline:none;font-size:11px}textarea{min-height:96px;resize:vertical;font-family:Consolas,monospace;font-size:9px;line-height:1.5}input:focus,textarea:focus,select:focus{border-color:var(--pnp-500);box-shadow:0 0 0 3px rgba(22,147,90,.11)}input[type=file]{padding:7px;font-size:9px}
+    .btns{display:flex;gap:7px;flex-wrap:wrap}.btn{min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;border:1px solid transparent;border-radius:10px;color:#fff;background:linear-gradient(180deg,var(--pnp-600),var(--pnp-800));box-shadow:0 6px 15px rgba(3,36,22,.14);font-size:9px;font-weight:900}.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}.btn.gold{background:linear-gradient(180deg,#d4a52f,#a87109)}.btn.red{background:linear-gradient(180deg,#d44855,#a51f2c)}.btn.blue{background:linear-gradient(180deg,#3b7dbe,#1d5793)}.btn.gray{background:linear-gradient(180deg,#6b7a72,#47564e)}.btn.light{color:var(--pnp-800);background:#fff;border-color:#cbd9cf;box-shadow:none}.btn.small{min-height:30px;padding:0 9px;font-size:8px}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none;filter:none}.wide{width:100%}
+    .hint{margin-top:9px;padding:9px;border:1px dashed #bfd0c4;border-radius:10px;background:#f6faf7;color:#627168;font-size:8px;line-height:1.45}.divider{height:1px;margin:13px 0;background:var(--line)}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:9px 10px;border-bottom:1px solid var(--line);background:#f5f8f6}.tab{min-height:34px;padding:0 12px;border:1px solid #d2ded6;border-radius:9px;color:#43564b;background:#fff;box-shadow:none;font-size:9px;font-weight:900}.tab.active{color:#fff;background:linear-gradient(180deg,var(--pnp-600),var(--pnp-800));border-color:var(--pnp-700)}.view{display:none}.view.active{display:block}
+    .graph-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line);background:#fff}.graph-title b{display:block;color:var(--pnp-900);font-size:12px}.graph-title span{display:block;margin-top:3px;color:var(--muted);font-size:8px}.graph-counts{display:flex;gap:6px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;min-height:27px;padding:0 9px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#52645a;font-size:8px;font-weight:900}.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--pnp-500)}
+    .controls{display:grid;grid-template-columns:auto minmax(220px,1fr) auto;gap:10px;align-items:center;padding:9px 11px;border-bottom:1px solid var(--line);background:#f7faf8}.control-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mode-btn,.type-chip{min-height:31px;padding:0 10px;border:1px solid #d1ded5;border-radius:9px;background:#fff;color:#475a4f;box-shadow:none;font-size:8px;font-weight:900}.mode-btn.active,.type-chip.active{color:#fff;background:var(--pnp-700);border-color:var(--pnp-700)}.search-inline{display:flex;gap:6px}.search-inline input{min-width:160px}.switch{display:inline-flex;align-items:center;gap:6px;color:#52645a;font-size:8px;font-weight:900}.switch input{width:auto}
+    .editor-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 11px;border-bottom:1px solid var(--line);background:#fff}.selection-label{margin-right:auto;color:#5b6d62;font-size:8px}.selection-label b{color:var(--pnp-800)}
+    #graphWrap{position:relative;height:690px;overflow:hidden;background:radial-gradient(circle at 52% 45%,rgba(15,119,70,.08),transparent 34%),linear-gradient(rgba(8,71,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(8,71,42,.035) 1px,transparent 1px),#f8faf8;background-size:auto,30px 30px,30px 30px;cursor:grab}#graphWrap:active{cursor:grabbing}#graph{width:100%;height:100%;display:block}.graph-empty{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}.empty-card{max-width:420px;padding:24px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.94);box-shadow:var(--shadow);text-align:center}.empty-card b{display:block;color:var(--pnp-900);font-size:13px}.empty-card span{display:block;margin-top:7px;color:var(--muted);font-size:9px;line-height:1.5}.graph-help{position:absolute;left:12px;bottom:12px;z-index:10;max-width:430px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.92);color:#637269;font-size:8px;line-height:1.4;box-shadow:var(--shadow-sm);pointer-events:none}.graph-help b{color:var(--pnp-800)}
+    .legend{display:flex;gap:6px;flex-wrap:wrap;padding:9px 11px;border-top:1px solid var(--line);background:#fff}.legend span{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;color:#506157;font-size:8px;font-weight:850}.dot{width:10px;height:10px;border-radius:3px}.numero{background:var(--blue)}.imei{background:var(--green)}.dni{background:var(--orange)}.persona{background:var(--purple)}.operadora{background:var(--teal)}.custom{background:#596b60}.objective{background:var(--red)}
+    .detail-strip{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;padding:12px;background:#f7faf8;border-top:1px solid var(--line)}.detail-card{padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff}.detail-card h3{margin:0 0 7px;color:var(--pnp-800);font-size:10px}.detail-card p{margin:4px 0;color:#5b6c62;font-size:8px;line-height:1.5}.dates-list{display:flex;gap:5px;flex-wrap:wrap}.date-tag{padding:4px 7px;border-radius:999px;background:#fff4d8;color:#8b5700;font-size:8px;font-weight:900}
+    .table-wrap{max-height:760px;overflow:auto}table{width:100%;border-collapse:collapse;min-width:1050px;font-size:9px}th,td{padding:9px;border-bottom:1px solid #e3ebe5;text-align:left;vertical-align:top}th{position:sticky;top:0;z-index:2;background:#edf5ef;color:#294b37;font-size:8px;text-transform:uppercase;letter-spacing:.35px}tr:hover td{background:#f8fbf9}.cell-actions{display:flex;gap:5px;flex-wrap:wrap}.tag{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:900}.tag.n{color:#235f9a;background:#e8f2ff}.tag.i{color:#0c7543;background:#e7f7ed}.tag.d{color:#a55e00;background:#fff3d8}
+    .timeline{padding:14px}.event{display:grid;grid-template-columns:118px 1fr;gap:12px;position:relative;padding-bottom:11px}.event:before{content:"";position:absolute;left:103px;top:15px;bottom:-3px;width:1px;background:#d2ddd5}.event-date{padding-top:4px;text-align:right;color:var(--pnp-700);font-size:8px;font-weight:900}.event-box{padding:10px;border:1px solid var(--line);border-radius:11px;background:#fff}.event-box b{font-size:9px}.event-box p{margin:4px 0 0;color:var(--muted);font-size:8px}.report{padding:16px}.report pre{min-height:420px;margin:0;padding:15px;border:1px solid var(--line);border-radius:12px;background:#f9fbfa;white-space:pre-wrap;color:#30443a;font:9px/1.6 Consolas,monospace}
+    .modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,36,22,.66)}.modal.open{display:flex}.modal-card{width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:18px;background:#fff;box-shadow:0 30px 90px rgba(0,0,0,.30)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;color:#fff;background:linear-gradient(90deg,var(--pnp-950),var(--pnp-700))}.modal-head h3{margin:0;font-size:12px}.modal-body{padding:16px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.modal-grid .full{grid-column:1/-1}.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:0 16px 16px}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:300;display:none;max-width:420px;padding:12px 15px;border-radius:12px;color:#fff;background:linear-gradient(145deg,var(--pnp-700),var(--pnp-950));box-shadow:0 18px 45px rgba(0,0,0,.26);font-size:10px}.toast.show{display:block}
+    #graphView:fullscreen{width:100vw;height:100vh;overflow:auto;background:#f7faf8}#graphView:fullscreen #graphWrap{height:calc(100vh - 226px)}
+    @media(max-width:1180px){.metrics{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:280px 1fr}.controls{grid-template-columns:1fr}.sidebar{position:relative;top:auto;max-height:none}}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.detail-strip{grid-template-columns:1fr}.nav{display:none}#graphWrap{height:600px}}
+    @media(max-width:620px){main{padding:12px}.top{padding:8px 12px}.metrics{grid-template-columns:repeat(2,1fr)}.row,.modal-grid{grid-template-columns:1fr}.modal-grid .full{grid-column:auto}.graph-head{align-items:flex-start;flex-direction:column}#graphWrap{height:540px}.editor-bar .btn{flex:1}.controls{padding:8px}.search-inline{width:100%}.search-inline input{min-width:0}.detail-strip{padding:8px}}
+    @media print{.top,.notice,.metrics,.sidebar,.tabs,.controls,.editor-bar,.legend,.detail-strip,.btns,.no-print{display:none!important}body{background:#fff}main{padding:0}.layout{display:block}.panel{border:0;box-shadow:none}.view{display:none!important}#reportView{display:block!important}.report pre{border:0;font-size:10px}}
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <img src="./portada.png" alt="DIVINCRI La Libertad" class="brand-logo" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/perumaka1995/DIVINCRILALCONSULTA/main/portada.png';" />
-        <div class="brand-title">
-          <small>LA LIBERTAD</small>
-          <h1>DIVINCRI</h1>
-          <p>Región Policial La Libertad - Trujillo</p>
-        </div>
-      </div>
+  <header class="top" id="inicio">
+    <img class="logo" src="logo_divincri.png" alt="DIVINCRI" onerror="this.style.display='none'">
+    <div class="brand">Área de Análisis de Inteligencia<small>DIVINCRI La Libertad · Vinculaciones técnicas editables</small></div>
+    <nav class="nav"><a class="active" href="#inicio">Inicio</a><a href="#consulta">Consulta</a><a href="#grafo">Grafo</a><a href="#informe">Informe</a></nav>
+  </header>
 
-      <div class="nav-label">Menú principal</div>
-      <button class="nav-btn active" onclick="goTo('inicio')">🏠 Panel de inicio</button>
-      <button class="nav-btn" onclick="goTo('registro')">📝 Realizar pedido / subir oficio</button>
-      <button class="nav-btn admin-only" onclick="goTo('consulta')">🔍 Consulta avanzada</button>
-      <button class="nav-btn admin-only" onclick="goTo('tabla')">📋 Base de registros</button>
-      <button class="nav-btn admin-only" onclick="goTo('reportes')">📄 Reportes</button>
-      <button class="nav-btn admin-only" onclick="goTo('respaldo')">💾 Respaldo</button>
-      <button class="nav-btn public-only" onclick="loginAdmin()">🔐 Ingresar como administrador</button>
-      <button class="nav-btn admin-only" onclick="logoutAdmin()">🚪 Salir de administrador</button>
+  <main>
+    <div class="notice"><span>ⓘ</span><div><b>Fechas visibles en las vinculaciones:</b> cada enlace muestra la fecha registrada. Puedes seleccionar nodos, enlaces o textos para editar, ocultar o eliminar del gráfico sin perder el archivo original.</div></div>
 
-      <div class="nav-label">Estado del sistema</div>
-      <div class="sidebar-note">
-        <strong>Acceso público:</strong><br />
-        El usuario solicitante solo puede enviar su pedido u oficio. La base de registros, reportes y archivos quedan disponibles únicamente para el administrador.
-      </div>
-    </aside>
+    <section class="metrics">
+      <article class="metric"><div class="ico">≡</div><div><span>Registros</span><b id="mReg">0</b></div></article>
+      <article class="metric"><div class="ico">☎</div><div><span>Números</span><b id="mNum">0</b></div></article>
+      <article class="metric"><div class="ico">▣</div><div><span>IMEI</span><b id="mImei">0</b></div></article>
+      <article class="metric"><div class="ico">ID</div><div><span>DNI</span><b id="mDni">0</b></div></article>
+      <article class="metric"><div class="ico">●</div><div><span>Personas</span><b id="mPer">0</b></div></article>
+      <article class="metric"><div class="ico">⇄</div><div><span>Vínculos</span><b id="mLinks">0</b></div></article>
+    </section>
 
-    <main class="main">
-      <header class="topbar">
-        <div>
-          <button class="mobile-menu" onclick="toggleSidebar()">☰ Menú</button>
-          <h2>Sistema de Consulta y Registro</h2>
-          <p>Archivos, solicitantes, vinculaciones/resultados y reportes operativos.</p>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button class="btn btn-primary public-only" onclick="loginAdmin()">🔐 Administrador</button>
-          <button class="btn btn-gray admin-only" onclick="logoutAdmin()">🚪 Salir</button>
-          <div class="user-chip">
-            <span class="user-dot"></span>
-            Usuario solicitante
+    <section class="layout" id="consulta">
+      <aside class="panel sidebar">
+        <div class="panel-head"><h2>Módulo de consulta y carga</h2><p>Carga, reemplaza, busca o registra datos manualmente.</p></div>
+        <div class="panel-body">
+          <div class="field"><label>Buscar número, IMEI, DNI, persona u operadora</label><input id="mainSearch" placeholder="Ejemplo: 972638697"></div>
+          <div class="btns"><button class="btn wide" id="btnSearch">Buscar vínculo</button><button class="btn light wide" id="btnFull">Ver red completa</button></div>
+          <div class="divider"></div>
+          <div class="field"><label>Cargar PDF / Excel / CSV / TXT</label><input id="fileInput" type="file" multiple accept=".pdf,.xlsx,.xls,.csv,.txt"></div>
+          <div class="btns"><button class="btn" id="btnAddFiles">Agregar archivo</button><button class="btn gold" id="btnReplaceFiles">Reemplazar base</button></div>
+          <div class="hint">Columnas reconocidas: <b>imei, numero, fecha_hora, fecha, operadora, dni, nombre, tipo, observacion</b>. La fecha se coloca automáticamente sobre el enlace.</div>
+          <div class="divider"></div>
+          <div class="field"><label>Pegar datos desde Excel o CSV</label><textarea id="pasteData" placeholder="imei,numero,fecha_hora,operadora,dni,nombre,tipo\n353...,972...,08/04/2026 13:39,Movistar,47124459,Nombre,Vinculación"></textarea></div>
+          <div class="btns"><button class="btn" id="btnPasteAdd">Agregar</button><button class="btn gold" id="btnPasteReplace">Reemplazar</button></div>
+          <div class="divider"></div>
+          <div class="field"><label>Registro manual rápido</label><div class="row"><input id="fNumero" placeholder="Número"><input id="fImei" placeholder="IMEI"></div></div>
+          <div class="field"><div class="row"><input id="fDni" placeholder="DNI"><input id="fFecha" type="datetime-local"></div></div>
+          <div class="field"><input id="fNombre" placeholder="Nombre / titular"></div>
+          <div class="field"><div class="row"><input id="fOperadora" placeholder="Operadora"><input id="fTipo" placeholder="Vinculación"></div></div>
+          <div class="field"><input id="fObservacion" placeholder="Observación"></div>
+          <button class="btn wide" id="btnManual">Agregar registro manual</button>
+          <div class="divider"></div>
+          <div class="btns">
+            <button class="btn blue" id="btnPDF">Informe PDF</button><button class="btn light" id="btnCSV">Exportar CSV</button>
+            <button class="btn light" id="btnJSON">Exportar JSON</button><button class="btn red" id="btnClear">Limpiar base</button>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <div class="content" id="inicio">
-        <section class="hero">
-          <div class="hero-content">
-            <div>
-              <h3>DIVINCRI La Libertad - Trujillo</h3>
-              <h1>Registro de pedidos y oficios</h1>
-              <p>
-                Plataforma para que el usuario envíe pedidos, consultas u oficios adjuntos.
-                La información enviada solo será visible para el administrador autorizado.
-              </p>
-              <div class="hero-actions">
-                <button class="btn btn-gold" onclick="goTo('registro')">📝 Realizar pedido / subir oficio</button>
-                <button class="btn btn-light admin-only" onclick="goTo('consulta')">🔍 Consultar registros</button>
-                <button class="btn btn-primary admin-only" onclick="goTo('reportes')">📄 Generar reporte</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="stats admin-only">
-          <article class="stat-card">
-            <div class="stat-icon">📞</div>
-            <h2 id="totalRegistros">0</h2>
-            <p>Total registros</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-icon">🔍</div>
-            <h2 id="totalConsultas">0</h2>
-            <p>Consultas realizadas</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-icon">👥</div>
-            <h2 id="totalSolicitantes">0</h2>
-            <p>Solicitantes únicos</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-icon">📎</div>
-            <h2 id="totalArchivos">0</h2>
-            <p>Archivos adjuntos</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-icon">✅</div>
-            <h2 id="totalVerificados">0</h2>
-            <p>Verificados</p>
-          </article>
-        </section>
-
-        <div class="grid-2 admin-only">
-          <section class="panel" id="consulta">
-            <div class="panel-header">
-              <div>
-                <h2>🔍 Consulta avanzada</h2>
-                <p>Filtra por número, solicitante, unidad, resultados, referencia, estado o fecha.</p>
-              </div>
-            </div>
-            <div class="panel-body">
-              <div class="search-grid">
-                <div class="field">
-                  <label>Búsqueda general</label>
-                  <input id="buscarTexto" type="text" placeholder="Ej. número, solicitante, vinculación, resultado..." />
-                </div>
-                <div class="field">
-                  <label>Estado</label>
-                  <select id="filtroEstado">
-                    <option value="">Todos</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="Verificado">Verificado</option>
-                    <option value="Observado">Observado</option>
-                    <option value="Archivado">Archivado</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label>Fecha</label>
-                  <input id="filtroFecha" type="date" />
-                </div>
-              </div>
-              <div class="toolbar">
-                <button class="btn btn-primary" onclick="buscarRegistro()">Buscar</button>
-                <button class="btn btn-gold" onclick="limpiarBusqueda()">Limpiar filtros</button>
-                <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Vista previa con resultados</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="panel" id="resumenRapido">
-            <div class="panel-header">
-              <div>
-                <h2>📌 Actividad reciente</h2>
-                <p>Últimos registros ingresados en el sistema local.</p>
-              </div>
-            </div>
-            <div class="panel-body" id="actividadReciente">
-              <p class="muted">Aún no hay registros recientes.</p>
-            </div>
-          </section>
+      <section class="panel" id="grafo">
+        <div class="tabs">
+          <button class="tab active" data-view="graphView">Grafo relacional</button>
+          <button class="tab" data-view="tableView">Tabla</button>
+          <button class="tab" data-view="timelineView">Línea de tiempo</button>
+          <button class="tab" data-view="reportView">Informe</button>
         </div>
 
-        <section class="panel" id="registro">
-          <div class="panel-header">
-            <div>
-              <h2>📝 Realizar pedido o subir oficio</h2>
-              <p>Complete los datos de la solicitud. La hora se registra automáticamente y solo será visible para el administrador.</p>
-            </div>
+        <div class="view active" id="graphView">
+          <div class="graph-head">
+            <div class="graph-title"><b>Mapa relacional inteligente y editable</b><span>Los enlaces muestran la fecha de la vinculación y pueden editarse directamente.</span></div>
+            <div class="graph-counts"><span class="pill" id="graphNodeCount">0 nodos</span><span class="pill" id="graphEdgeCount">0 vínculos</span></div>
           </div>
-
-          <div class="panel-body">
-            <div class="notice">
-              <span>⚠️</span>
-              <div>
-                <strong>Importante:</strong> El solicitante solo enviará su pedido u oficio. La consulta de registros, reportes, edición, eliminación y descarga de archivos queda reservada para el administrador.
-              </div>
+          <div class="controls">
+            <div class="control-group" id="modeButtons">
+              <button class="mode-btn active" data-mode="all">Todo</button><button class="mode-btn" data-mode="principal">Principal</button><button class="mode-btn" data-mode="direct">Directos</button><button class="mode-btn" data-mode="linked">Más vinculados</button>
             </div>
-
-            <div class="form-grid">
-              <div class="field">
-                <label>Solicitante *</label>
-                <input id="solicitante" type="text" placeholder="Nombre completo del solicitante" />
-              </div>
-
-              <div class="field">
-                <label>WhatsApp del solicitante</label>
-                <input id="whatsappSolicitante" type="text" placeholder="Número de WhatsApp para contacto" />
-              </div>
-
-              <div class="field">
-                <label>Grado PNP *</label>
-                <select id="grado">
-                  <option value="">Seleccione grado</option>
-                  <option value="S3 PNP">S3 PNP - Suboficial de Tercera</option>
-                  <option value="S2 PNP">S2 PNP - Suboficial de Segunda</option>
-                  <option value="S1 PNP">S1 PNP - Suboficial de Primera</option>
-                  <option value="ST3 PNP">ST3 PNP - Suboficial Técnico de Tercera</option>
-                  <option value="ST2 PNP">ST2 PNP - Suboficial Técnico de Segunda</option>
-                  <option value="ST1 PNP">ST1 PNP - Suboficial Técnico de Primera</option>
-                  <option value="SB PNP">SB PNP - Suboficial Brigadier</option>
-                  <option value="SS PNP">SS PNP - Suboficial Superior</option>
-                  <option value="ALFZ PNP">ALFZ PNP - Alférez</option>
-                  <option value="TNTE PNP">TNTE PNP - Teniente</option>
-                  <option value="CAP PNP">CAP PNP - Capitán</option>
-                  <option value="MAY PNP">MAY PNP - Mayor</option>
-                  <option value="CMDTE PNP">CMDTE PNP - Comandante</option>
-                  <option value="CRNL PNP">CRNL PNP - Coronel</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label>Tipo de solicitud *</label>
-                <select id="tipoCaso" onchange="mostrarCamposPorPlataforma()">
-                  <option value="Meta">Meta</option>
-                  <option value="Otros">Otros</option>
-                </select>
-              </div>
-
-              <div class="field" id="campoPlataforma">
-                <label>Medio / plataforma *</label>
-                <select id="redSocial" onchange="mostrarCamposPorPlataforma()">
-                  <option value="">Seleccione plataforma</option>
-                  <option value="WhatsApp">WhatsApp</option>
-                  <option value="Facebook">Facebook</option>
-                  <option value="Instagram">Instagram</option>
-                  <option value="TikTok">TikTok</option>
-                </select>
-              </div>
-
-              <div class="field whatsapp-field" id="campoNumeroWhatsApp">
-                <label>Número a solicitar información *</label>
-                <input id="numero" type="text" placeholder="Ingrese número telefónico de WhatsApp" />
-              </div>
-
-              <div class="field whatsapp-field" id="campoUnidadSolicitante">
-                <label>Unidad solicitante *</label>
-                <input id="unidad" type="text" placeholder="Unidad, área o dependencia solicitante" />
-              </div>
-
-              <div class="field amenaza-field" id="campoTipoAmenaza">
-                <label>Tipo de amenaza *</label>
-                <select id="tipoAmenaza">
-                  <option value="">Seleccione una opción</option>
-                  <option value="Emergencia">Emergencia</option>
-                  <option value="Acoso/Intimidación">Acoso/Intimidación</option>
-                  <option value="Seguridad infantil (riesgo potencial de daño)">Seguridad infantil (riesgo potencial de daño)</option>
-                  <option value="Fugitivo">Fugitivo</option>
-                  <option value="Persona desaparecida/secuestrada">Persona desaparecida/secuestrada</option>
-                  <option value="Menor desaparecido/secuestrado/fugitivo">Menor desaparecido/secuestrado/fugitivo</option>
-                  <option value="Agresión física">Agresión física</option>
-                  <option value="Posible falsificación">Posible falsificación</option>
-                  <option value="Suicidio">Suicidio</option>
-                  <option value="Actividad terrorista">Actividad terrorista</option>
-                  <option value="Amenazas de violencia">Amenazas de violencia</option>
-                  <option value="Amenazas">Amenazas</option>
-                  <option value="Explotación humana: amenaza inminente">Explotación humana: amenaza inminente</option>
-                  <option value="Preservación">Preservación</option>
-                  <option value="Otro">Otro</option>
-                </select>
-              </div>
-
-              <div class="field whatsapp-field" id="campoDelito">
-                <label>Delito relacionado *</label>
-                <select id="delito">
-                  <option value="">Seleccione delito</option>
-                  <option value="Extorsión">Extorsión</option>
-                  <option value="Estafa">Estafa</option>
-                  <option value="Amenazas">Amenazas</option>
-                  <option value="Chantaje">Chantaje</option>
-                  <option value="Suplantación de identidad">Suplantación de identidad</option>
-                  <option value="Acoso">Acoso</option>
-                  <option value="Difusión de material íntimo">Difusión de material íntimo</option>
-                  <option value="Grooming">Grooming</option>
-                  <option value="Otro">Otro</option>
-                </select>
-              </div>
-
-              <div class="field whatsapp-field" id="campoFechaSolicitud">
-                <label>Fecha *</label>
-                <input id="fecha" type="date" />
-              </div>
-
-              <div class="field whatsapp-field">
-                <label>Código / N° de oficio / expediente</label>
-                <input id="codigoReferencia" type="text" placeholder="Ej. N° de oficio, expediente, referencia u otro" />
-              </div>
-
-              <div class="field two admin-only">
-                <label>Vinculaciones / resultados internos</label>
-                <input id="vinculacion" type="text" placeholder="Solo administrador: resultados, vinculaciones o atención realizada" />
-              </div>
-
-              <div class="field admin-only">
-                <label>Estado interno</label>
-                <select id="estado">
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Verificado">Verificado</option>
-                  <option value="Observado">Observado</option>
-                  <option value="Archivado">Archivado</option>
-                </select>
-              </div>
-
-              <input id="horaPedido" type="hidden" />
-
-              <div class="field full social-field" id="campoUrlAmenaza">
-                <label>URL de la red social *</label>
-                <input id="urlAmenaza" type="url" placeholder="Pegue la URL de la red social" />
-                <button type="button" class="btn btn-light" style="width:max-content;border:1px solid var(--gray-200);padding:8px 12px;margin-top:4px;" onclick="copiarUrlAmenazaFormulario()">Copiar URL</button>
-              </div>
-
-              <div class="field full" id="campoObservacion">
-                <label id="labelObservacion">Detalle del pedido / amenaza *</label>
-                <textarea id="observacion" placeholder="Describa la amenaza, pedido o motivo de la solicitud"></textarea>
-              </div>
-
-              <div class="field full">
-                <label>Subir oficio o archivos adjuntos</label>
-                <input id="archivos" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="previsualizarArchivos()" />
-                <div id="previewArchivos" class="preview-box"></div>
-                <p class="muted" style="margin-top:6px;">Puede seleccionar y adjuntar varios archivos a la vez: PDF, Word, Excel o imágenes del oficio/documento.</p>
-              </div>
-            </div>
-
-            <div class="toolbar">
-              <button class="btn btn-primary" onclick="guardarRegistro()">Enviar pedido / oficio</button>
-              <button class="btn btn-gold" onclick="limpiarFormulario()">Nuevo / limpiar</button>
-              <button class="btn btn-gray admin-only" onclick="goTo('tabla')">Ver registros</button>
-            </div>
-            <div id="mensajeEnvio" class="success-box">✅ Su pedido/oficio fue enviado correctamente. Será revisado por el administrador.</div>
+            <div class="search-inline"><input id="graphSearch" placeholder="Encontrar y enfocar una entidad"><button class="btn small" id="btnGraphSearch">Buscar</button></div>
+            <div class="control-group"><label class="switch"><input id="showDates" type="checkbox" checked> Fechas</label><label class="switch"><input id="showLabels" type="checkbox" checked> Etiquetas</label><button class="btn light small" id="btnCenter">Centrar</button><button class="btn light small" id="btnReorder">Reordenar</button><button class="btn light small" id="btnPNG">PNG</button><button class="btn light small" id="btnExpand">Expandir</button></div>
           </div>
-        </section>
-
-        <section class="panel admin-only" id="respaldo">
-          <div class="panel-header">
-            <div>
-              <h2>💾 Respaldo de información</h2>
-              <p>Exporta o importa una copia local en formato JSON.</p>
-            </div>
+          <div class="controls" style="grid-template-columns:1fr">
+            <div class="control-group" id="typeFilters"><button class="type-chip active" data-type="numero">Números</button><button class="type-chip active" data-type="imei">IMEI</button><button class="type-chip active" data-type="dni">DNI</button><button class="type-chip active" data-type="persona">Personas</button><button class="type-chip active" data-type="operadora">Operadoras</button><button class="type-chip active" data-type="custom">Otros</button></div>
           </div>
-          <div class="panel-body">
-            <div class="toolbar">
-              <button class="btn btn-gray" onclick="exportarDatos()">Exportar respaldo JSON</button>
-              <label class="btn btn-light" style="border:1px solid var(--gray-200);cursor:pointer;">
-                Importar JSON
-                <input id="importarArchivo" type="file" accept=".json" onchange="importarDatos()" style="display:none;" />
-              </label>
-            </div>
+          <div class="editor-bar">
+            <div class="selection-label" id="selectionLabel">Selección: <b>ninguna</b></div>
+            <button class="btn light small" id="btnEditSelected" disabled>✎ Editar</button>
+            <button class="btn red small" id="btnDeleteSelected" disabled>× Eliminar</button>
+            <button class="btn small" id="btnAddNode">+ Entidad</button>
+            <button class="btn small" id="btnAddEdge">+ Vínculo</button>
+            <button class="btn gold small" id="btnAddText">+ Escribir texto</button>
+            <button class="btn gray small" id="btnUndoEdit">Restaurar gráfico</button>
           </div>
-        </section>
-
-        <section class="panel admin-only" id="tabla">
-          <div class="panel-header">
-            <div>
-              <h2>📋 Base de registros</h2>
-              <p>Listado general de registros guardados en este navegador.</p>
-            </div>
-            <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Generar reporte</button>
+          <div id="graphWrap">
+            <svg id="graph" aria-label="Grafo de vinculaciones"></svg>
+            <div class="graph-empty" id="graphEmpty"><div class="empty-card"><b>Sin información para graficar</b><span>Carga un archivo, pega datos o agrega un registro manual. Las fechas de cada registro aparecerán en sus enlaces.</span></div></div>
+            <div class="graph-help"><b>Edición:</b> haz clic en un nodo, enlace o texto. Usa Editar o Eliminar. Arrastra entidades y textos para ordenarlos; doble clic en un nodo para ver solo sus vínculos.</div>
           </div>
+          <div class="legend"><span><i class="dot objective"></i>Objetivo</span><span><i class="dot numero"></i>Número</span><span><i class="dot imei"></i>IMEI</span><span><i class="dot dni"></i>DNI</span><span><i class="dot persona"></i>Persona</span><span><i class="dot operadora"></i>Operadora</span><span><i class="dot custom"></i>Manual</span></div>
+          <div class="detail-strip"><div class="detail-card" id="selectedDetail"><h3>Detalle de selección</h3><p>Selecciona una entidad, vínculo o texto del gráfico.</p></div><div class="detail-card" id="dateDetail"><h3>Fechas de vinculación</h3><p>Las fechas del enlace seleccionado aparecerán aquí.</p></div></div>
+        </div>
 
-          <div class="panel-body">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>N°</th>
-                    <th>Número a solicitar</th>
-                    <th>Solicitante</th>
-                    <th>WhatsApp solicitante</th>
-                    <th>Grado</th>
-                    <th>Unidad</th>
-                    <th>Resultados internos</th>
-                    <th>Tipo solicitud</th>
-                    <th>Medio</th>
-                    <th>Tipo amenaza</th>
-                    <th>Delito</th>
-                    <th>URL red social</th>
-                    <th>Estado</th>
-                    <th>Código</th>
-                    <th>Observación</th>
-                    <th>Fecha</th>
-                    <th>Hora solicitada</th>
-                    <th>Archivos</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="tablaRegistros"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <div class="view" id="tableView"><div class="table-wrap"><table><thead><tr><th>N°</th><th>Número</th><th>IMEI</th><th>DNI</th><th>Nombre</th><th>Operadora</th><th>Tipo</th><th>Fecha / hora</th><th>Observación</th><th>Acciones</th></tr></thead><tbody id="dataTable"></tbody></table></div></div>
+        <div class="view" id="timelineView"><div class="timeline" id="timeline"></div></div>
+        <div class="view" id="reportView"><div class="report" id="informe"><div class="btns no-print" style="margin-bottom:10px"><button class="btn blue" id="btnGenerateReport">Generar informe</button><button class="btn light" id="btnCopyReport">Copiar informe</button><button class="btn light" id="btnTxtReport">Descargar TXT</button></div><pre id="reportText">Carga información o realiza una búsqueda para generar el informe automático.</pre></div></div>
+      </section>
+    </section>
+  </main>
 
-        <section class="panel admin-only" id="reportes">
-          <div class="panel-header">
-            <div>
-              <h2>📄 Reportes operativos</h2>
-              <p>Genera una vista previa y exporta los registros filtrados o completos.</p>
-            </div>
-          </div>
+  <div class="modal" id="editorModal"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Editar</h3><button class="btn light small" id="modalClose">Cerrar</button></div><div class="modal-body" id="modalBody"></div><div class="modal-foot"><button class="btn light" id="modalCancel">Cancelar</button><button class="btn" id="modalSave">Guardar</button></div></div></div>
+  <div class="toast" id="toast"></div>
 
-          <div class="panel-body">
-            <p class="muted">
-              El reporte se genera con la tabla actualmente visible. Si primero realizas una búsqueda, el reporte saldrá solo con esos resultados.
-            </p>
+  <script>
+  (()=>{
+    "use strict";
+    const DATA_KEY="divincri_relacional_datos_v4";
+    const EDIT_KEY="divincri_relacional_ediciones_v4";
+    const typeColors={numero:"#1769aa",imei:"#158356",dni:"#c16a06",persona:"#7b51b8",operadora:"#227989",custom:"#596b60"};
+    const typeIcons={numero:"☎",imei:"▣",dni:"ID",persona:"●",operadora:"OP",custom:"+"};
+    const emptyEdits=()=>({hiddenNodes:[],hiddenEdges:[],nodeOverrides:{},edgeOverrides:{},customNodes:[],customEdges:[],annotations:[]});
+    let records=[];let edits=emptyEdits();let graphData={nodes:[],edges:[]};let filteredGraph={nodes:[],edges:[]};
+    let selected=null;let objectiveId=null;let graphMode="all";let enabledTypes=new Set(["numero","imei","dni","persona","operadora","custom"]);let currentModal=null;
+    let simulation=null,svg=null,rootG=null,zoomBehavior=null,currentTransform=d3.zoomIdentity;
 
-            <div class="toolbar no-print">
-              <button class="btn btn-blue" onclick="generarVistaPreviaReporte()">Vista previa</button>
-              <button class="btn btn-gold" onclick="exportarExcel()">Exportar a Excel</button>
-              <button class="btn btn-danger" onclick="exportarPDF()">Exportar a PDF</button>
-              <button class="btn btn-gray" onclick="cerrarVistaReporte()">Cerrar vista previa</button>
-            </div>
+    const $=id=>document.getElementById(id);
+    const clean=s=>String(s??"").trim();
+    const normalizeHeader=s=>clean(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
+    const digits=s=>clean(s).replace(/\D/g,"");
+    const uid=(p="id")=>`${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+    const esc=s=>clean(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+    function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),3200)}
 
-            <div id="vistaReporte" class="report-preview"></div>
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
+    function parseDateValue(v){
+      const s=clean(v);if(!s)return "";
+      if(/^\d{4}-\d{2}-\d{2}T/.test(s)){const d=new Date(s);return isNaN(d)?s:d.toLocaleString("es-PE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)){const [y,m,d]=s.split("-");return `${d}/${m}/${y}`}
+      if(/^\d+(\.\d+)?$/.test(s)&&Number(s)>25000&&window.XLSX){const o=XLSX.SSF.parse_date_code(Number(s));if(o)return `${String(o.d).padStart(2,"0")}/${String(o.m).padStart(2,"0")}/${o.y}${o.H||o.M?` ${String(o.H).padStart(2,"0")}:${String(o.M).padStart(2,"0")}`:""}`}
+      return s;
+    }
+    function dateSortValue(v){const s=clean(v);const m=s.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})(?:\D+(\d{1,2}):(\d{2}))?/);if(m){let y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime()}const d=Date.parse(s);return isNaN(d)?0:d}
+    function pick(row,names){const map={};Object.entries(row||{}).forEach(([k,v])=>map[normalizeHeader(k)]=v);for(const n of names){const key=normalizeHeader(n);if(map[key]!==undefined&&clean(map[key])!=="")return map[key]}return ""}
+    function normalizeRecord(row,source="manual"){
+      const numero=digits(pick(row,["numero","número","telefono","teléfono","celular","msisdn","linea","línea"]));
+      const imei=digits(pick(row,["imei","equipo","imei_equipo"]));
+      const dni=digits(pick(row,["dni","documento","documento_identidad","doc"]));
+      const nombre=clean(pick(row,["nombre","titular","persona","abonado","nombre_titular"]));
+      const operadora=clean(pick(row,["operadora","operador","empresa","carrier"]));
+      const tipo=clean(pick(row,["tipo","relacion","relación","vinculacion","vinculación","evento"]))||"Vinculación";
+      const fecha_hora=parseDateValue(pick(row,["fecha_hora","fecha y hora","fecha","fecha_vinculacion","fecha de vinculacion","timestamp","date","hora"]));
+      const observacion=clean(pick(row,["observacion","observación","detalle","nota","descripcion","descripción"]));
+      return {id:clean(row.id)||uid("r"),numero,imei,dni,nombre,operadora,tipo,fecha_hora,observacion,source:clean(row.source)||source};
+    }
+    function isUseful(r){return !!(r.numero||r.imei||r.dni||r.nombre||r.operadora)}
 
-  <div class="modal" id="modalFicha">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Ficha de registro</h3>
-        <button class="btn btn-light" onclick="cerrarFicha()">Cerrar</button>
-      </div>
-      <div class="modal-body" id="contenidoFicha"></div>
-    </div>
-  </div>
+    function loadStorage(){
+      try{const d=JSON.parse(localStorage.getItem(DATA_KEY)||"null");if(Array.isArray(d))records=d.map(r=>normalizeRecord(r,r.source)).filter(isUseful)}catch(e){}
+      if(!records.length){
+        for(let i=0;i<localStorage.length;i++){
+          const key=localStorage.key(i);if(key===DATA_KEY||key===EDIT_KEY)continue;
+          try{const raw=JSON.parse(localStorage.getItem(key));const candidates=Array.isArray(raw)?raw:Array.isArray(raw?.records)?raw.records:Array.isArray(raw?.registros)?raw.registros:Array.isArray(raw?.data)?raw.data:null;if(candidates&&candidates.some(x=>x&&typeof x==="object"&&(x.imei||x.numero||x.dni||x.fecha_hora))){records=candidates.map(r=>normalizeRecord(r,"importado_local")).filter(isUseful);break}}catch(e){}
+        }
+      }
+      try{const e=JSON.parse(localStorage.getItem(EDIT_KEY)||"null");if(e&&typeof e==="object")edits={...emptyEdits(),...e}}catch(e){}
+    }
+    function saveStorage(){localStorage.setItem(DATA_KEY,JSON.stringify(records));localStorage.setItem(EDIT_KEY,JSON.stringify(edits))}
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      setDoc,
-      deleteDoc,
-      onSnapshot,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    function entityId(type,value){return `${type}:${clean(value).toLowerCase()}`}
+    function buildGraph(){
+      const nodeMap=new Map(),edgeMap=new Map();
+      const addNode=(type,value,meta={})=>{value=clean(value);if(!value)return null;const id=entityId(type,value);if(!nodeMap.has(id))nodeMap.set(id,{id,type,label:value,rawLabel:value,degree:0,dates:new Set(),records:new Set(),note:"",custom:false,...meta});const n=nodeMap.get(id);return n};
+      const addEdge=(a,b,relation,date,note="",recordId="")=>{if(!a||!b||a.id===b.id)return;const pair=[a.id,b.id].sort();const base=`edge:${pair[0]}|${pair[1]}|${clean(relation)||"Vinculación"}`;if(!edgeMap.has(base))edgeMap.set(base,{id:base,source:a.id,target:b.id,relation:clean(relation)||"Vinculación",dates:new Set(),notes:new Set(),count:0,recordIds:new Set(),custom:false});const e=edgeMap.get(base);if(date)e.dates.add(parseDateValue(date));if(note)e.notes.add(note);if(recordId)e.recordIds.add(recordId);e.count++};
+      records.forEach(r=>{
+        const nNum=addNode("numero",r.numero),nImei=addNode("imei",r.imei),nDni=addNode("dni",r.dni),nPer=addNode("persona",r.nombre),nOp=addNode("operadora",r.operadora);
+        [nNum,nImei,nDni,nPer,nOp].filter(Boolean).forEach(n=>{if(r.fecha_hora)n.dates.add(r.fecha_hora);n.records.add(r.id)});
+        const rel=r.tipo||"Vinculación";
+        if(nNum&&nImei)addEdge(nNum,nImei,rel,r.fecha_hora,r.observacion,r.id);
+        if(nNum&&nDni)addEdge(nNum,nDni,"Abonado / DNI",r.fecha_hora,r.observacion,r.id);
+        if(nDni&&nPer)addEdge(nDni,nPer,"Identidad",r.fecha_hora,r.observacion,r.id);
+        else if(nNum&&nPer)addEdge(nNum,nPer,"Titular",r.fecha_hora,r.observacion,r.id);
+        if(nNum&&nOp)addEdge(nNum,nOp,"Operadora",r.fecha_hora,r.observacion,r.id);
+        if(!nNum&&nImei&&nDni)addEdge(nImei,nDni,rel,r.fecha_hora,r.observacion,r.id);
+      });
+      edits.customNodes.forEach(c=>{if(!nodeMap.has(c.id))nodeMap.set(c.id,{...c,custom:true,degree:0,dates:new Set(c.dates||[]),records:new Set()})});
+      edits.customEdges.forEach(c=>{if(nodeMap.has(c.source)&&nodeMap.has(c.target))edgeMap.set(c.id,{...c,custom:true,relation:c.relation||"Vínculo manual",dates:new Set(c.dates||[c.date].filter(Boolean)),notes:new Set(c.notes||[c.note].filter(Boolean)),count:1,recordIds:new Set()})});
+      [...edgeMap.values()].forEach(e=>{const s=nodeMap.get(e.source),t=nodeMap.get(e.target);if(s)s.degree++;if(t)t.degree++});
+      let nodes=[...nodeMap.values()].filter(n=>!edits.hiddenNodes.includes(n.id)).map(n=>{const o=edits.nodeOverrides[n.id]||{};return {...n,...o,label:o.label||n.label,note:o.note??n.note,dates:[...n.dates],records:[...n.records]}});
+      const visibleIds=new Set(nodes.map(n=>n.id));
+      let edges=[...edgeMap.values()].filter(e=>visibleIds.has(e.source)&&visibleIds.has(e.target)&&!edits.hiddenEdges.includes(e.id)).map(e=>{const o=edits.edgeOverrides[e.id]||{};let dates=(o.dates||o.date)?[...(Array.isArray(o.dates)?o.dates:[o.date]).filter(Boolean)]:[...e.dates];return {...e,...o,relation:o.relation||o.label||e.relation,dates:[...new Set(dates.map(parseDateValue).filter(Boolean))],notes:[...e.notes],recordIds:[...e.recordIds]}});
+      graphData={nodes,edges};applyGraphFilters();updateMetrics();renderTable();renderTimeline();generateReport(false);
+    }
 
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    function applyGraphFilters(){
+      let nodes=graphData.nodes.filter(n=>enabledTypes.has(n.type));let ids=new Set(nodes.map(n=>n.id));let edges=graphData.edges.filter(e=>ids.has(e.source)&&ids.has(e.target));
+      if(graphMode!=="all"){
+        let target=objectiveId&&ids.has(objectiveId)?objectiveId:null;if(!target&&nodes.length)target=[...nodes].sort((a,b)=>b.degree-a.degree)[0].id;
+        if(target){const direct=new Set([target]);edges.forEach(e=>{if(e.source===target)direct.add(e.target);if(e.target===target)direct.add(e.source)});
+          if(graphMode==="direct"){nodes=nodes.filter(n=>direct.has(n.id));ids=new Set(nodes.map(n=>n.id));edges=edges.filter(e=>ids.has(e.source)&&ids.has(e.target))}
+          if(graphMode==="principal"){const second=new Set(direct);edges.forEach(e=>{if(direct.has(e.source))second.add(e.target);if(direct.has(e.target))second.add(e.source)});nodes=nodes.filter(n=>second.has(n.id));ids=new Set(nodes.map(n=>n.id));edges=edges.filter(e=>ids.has(e.source)&&ids.has(e.target))}
+          if(graphMode==="linked"){const linked=new Set(nodes.filter(n=>n.degree>=2).map(n=>n.id));edges.forEach(e=>{if(linked.has(e.source))linked.add(e.target);if(linked.has(e.target))linked.add(e.source)});nodes=nodes.filter(n=>linked.has(n.id));ids=new Set(nodes.map(n=>n.id));edges=edges.filter(e=>ids.has(e.source)&&ids.has(e.target))}
+        }
+      }
+      filteredGraph={nodes:nodes.map(n=>({...n})),edges:edges.map(e=>({...e}))};renderGraph();
+    }
 
-    /*
-      CONFIGURACIÓN FIREBASE
-      1) Crea tu proyecto en Firebase.
-      2) Agrega una app Web.
-      3) Copia aquí tu firebaseConfig real.
-      4) Activa Firestore Database.
-      5) Los archivos adjuntos se suben a Cloudinary con un preajuste sin firmar.
-      6) Seguridad: Firebase Authentication + reglas de Firestore.
-         Usuario público: solo crea pedidos. Administrador: lee, edita y elimina.
-    */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCDlz4fwWbfAEXQYrlarBs0B2zwDzdD454",
-      authDomain: "divincri-la-libertad.firebaseapp.com",
-      projectId: "divincri-la-libertad",
-      storageBucket: "divincri-la-libertad.firebasestorage.app",
-      messagingSenderId: "1004762981616",
-      appId: "1:1004762981616:web:e889f1cc1f4ce373d48e35",
-      measurementId: "G-4L4FS8NZHW"
-    };
+    function updateMetrics(){
+      const count=t=>graphData.nodes.filter(n=>n.type===t).length;$("mReg").textContent=records.length;$("mNum").textContent=count("numero");$("mImei").textContent=count("imei");$("mDni").textContent=count("dni");$("mPer").textContent=count("persona");$("mLinks").textContent=graphData.edges.length;$("graphNodeCount").textContent=`${filteredGraph.nodes.length} nodos`;$("graphEdgeCount").textContent=`${filteredGraph.edges.length} vínculos`;
+    }
 
-    const COLECCION_REGISTROS = "registros";
+    function renderGraph(){
+      const wrap=$("graphWrap"),w=wrap.clientWidth||900,h=wrap.clientHeight||690;svg=d3.select("#graph");svg.selectAll("*").remove();$("graphEmpty").style.display=filteredGraph.nodes.length?"none":"grid";if(!filteredGraph.nodes.length){updateMetrics();return}
+      svg.attr("viewBox",`0 0 ${w} ${h}`);const defs=svg.append("defs");defs.append("filter").attr("id","shadow").html('<feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.18"/>');
+      rootG=svg.append("g");zoomBehavior=d3.zoom().scaleExtent([.22,4]).on("zoom",ev=>{currentTransform=ev.transform;rootG.attr("transform",ev.transform)});svg.call(zoomBehavior).on("dblclick.zoom",null);
+      const nodes=filteredGraph.nodes,edges=filteredGraph.edges;const nodeById=new Map(nodes.map(n=>[n.id,n]));edges.forEach(e=>{e.source=nodeById.get(typeof e.source==="object"?e.source.id:e.source);e.target=nodeById.get(typeof e.target==="object"?e.target.id:e.target)});
+      const xTargets={dni:w*.17,persona:w*.12,numero:w*.42,imei:w*.68,operadora:w*.88,custom:w*.52};
+      simulation=d3.forceSimulation(nodes).force("link",d3.forceLink(edges).id(d=>d.id).distance(d=>100+Math.min(80,d.count*7)).strength(.55)).force("charge",d3.forceManyBody().strength(-410)).force("collision",d3.forceCollide().radius(46)).force("x",d3.forceX(d=>xTargets[d.type]||w*.5).strength(.28)).force("y",d3.forceY(h*.48).strength(.08));
+      const edgeG=rootG.append("g").attr("class","edges").selectAll("g").data(edges,d=>d.id).join("g").attr("class","edge-item");
+      edgeG.append("line").attr("class","edge-visible").attr("stroke",d=>edgeColor(d)).attr("stroke-width",d=>Math.min(4,1.5+Math.log2(d.count+1))).attr("stroke-dasharray",d=>/DNI|Identidad/i.test(d.relation)?"6 4":null).attr("opacity",.72);
+      edgeG.append("line").attr("class","edge-hit").attr("stroke","transparent").attr("stroke-width",18).style("cursor","pointer").on("click",(ev,d)=>{ev.stopPropagation();selectItem("edge",d.id)});
+      const labelG=edgeG.append("g").attr("class","edge-label").style("display",$("showLabels").checked?null:"none").style("cursor","pointer").on("click",(ev,d)=>{ev.stopPropagation();selectItem("edge",d.id)});
+      labelG.append("rect").attr("rx",6).attr("fill","rgba(255,255,255,.93)").attr("stroke","#d7e2da");
+      labelG.append("text").attr("text-anchor","middle").attr("font-size",8).attr("font-weight",900).attr("fill","#344d3f").each(function(d){const text=d3.select(this);text.append("tspan").attr("x",0).attr("dy",0).text(shortLabel(d.relation,25));const date=edgeDateLabel(d);if(date)text.append("tspan").attr("class","date-line").attr("x",0).attr("dy",11).attr("fill","#9a6203").text(date)});
+      labelG.each(function(){const g=d3.select(this),bb=g.select("text").node().getBBox();g.select("rect").attr("x",bb.x-5).attr("y",bb.y-3).attr("width",bb.width+10).attr("height",bb.height+6)});
+      const nodeG=rootG.append("g").attr("class","nodes").selectAll("g").data(nodes,d=>d.id).join("g").attr("class","node-item").style("cursor","pointer").call(d3.drag().on("start",dragstarted).on("drag",dragged).on("end",dragended)).on("click",(ev,d)=>{ev.stopPropagation();objectiveId=d.id;selectItem("node",d.id)}).on("dblclick",(ev,d)=>{ev.stopPropagation();objectiveId=d.id;graphMode="direct";syncModeButtons();applyGraphFilters()});
+      nodeG.append("circle").attr("r",d=>d.id===objectiveId?27:23).attr("fill",d=>d.id===objectiveId?"#c12b39":typeColors[d.type]||typeColors.custom).attr("stroke","#fff").attr("stroke-width",3).attr("filter","url(#shadow)");
+      nodeG.append("text").attr("class","node-icon").attr("text-anchor","middle").attr("dy",4).attr("fill","#fff").attr("font-size",d=>d.type==="dni"||d.type==="operadora"?8:13).attr("font-weight",950).text(d=>typeIcons[d.type]||"+");
+      nodeG.append("text").attr("class","node-type").attr("text-anchor","middle").attr("y",-33).attr("fill",d=>typeColors[d.type]||"#596b60").attr("font-size",7).attr("font-weight",950).text(d=>d.type.toUpperCase());
+      nodeG.append("text").attr("class","node-label").style("display",$("showLabels").checked?null:"none").attr("text-anchor","middle").attr("y",39).attr("fill","#253d30").attr("font-size",9).attr("font-weight",900).text(d=>shortLabel(d.label,20));
+      nodeG.append("title").text(d=>`${d.type.toUpperCase()}: ${d.label}\nVínculos: ${d.degree}\nFechas: ${(d.dates||[]).join(", ")||"Sin fecha"}`);
+      const annG=rootG.append("g").attr("class","annotations").selectAll("g").data(edits.annotations.filter(a=>!a.hidden),d=>d.id).join("g").attr("class","annotation-item").style("cursor","move").call(d3.drag().on("drag",(ev,d)=>{d.x=ev.x;d.y=ev.y;d3.select(ev.sourceEvent.target.closest("g")).attr("transform",`translate(${d.x},${d.y})`)}).on("end",()=>saveStorage())).on("click",(ev,d)=>{ev.stopPropagation();selectItem("annotation",d.id)}).attr("transform",d=>`translate(${d.x||w*.5},${d.y||h*.2})`);
+      annG.append("rect").attr("x",-75).attr("y",-24).attr("width",150).attr("height",48).attr("rx",9).attr("fill","#fff8d9").attr("stroke","#d4a52f").attr("filter","url(#shadow)");
+      annG.append("text").attr("text-anchor","middle").attr("fill","#654b10").attr("font-size",9).attr("font-weight",800).each(function(d){wrapSvgText(d3.select(this),d.text,0,-5,22)});
+      svg.on("click",()=>clearSelection());
+      simulation.on("tick",()=>{edgeG.selectAll("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);labelG.attr("transform",d=>`translate(${(d.source.x+d.target.x)/2},${(d.source.y+d.target.y)/2})`);nodeG.attr("transform",d=>`translate(${d.x},${d.y})`)});
+      setTimeout(()=>centerGraph(false),650);updateSelectionStyles();updateMetrics();
+      function dragstarted(ev,d){if(!ev.active)simulation.alphaTarget(.25).restart();d.fx=d.x;d.fy=d.y}
+      function dragged(ev,d){d.fx=ev.x;d.fy=ev.y}
+      function dragended(ev,d){if(!ev.active)simulation.alphaTarget(0);d.fx=ev.x;d.fy=ev.y}
+    }
+    function edgeColor(d){if(/DNI|Identidad|Titular/i.test(d.relation))return "#c16a06";if(/Operadora/i.test(d.relation))return "#227989";return "#397d5d"}
+    function edgeDateLabel(e){if(!$("showDates")?.checked)return "";const dates=e.dates||[];if(!dates.length)return "Sin fecha";return dates.length===1?dates[0]:`${dates[0]} · +${dates.length-1}`}
+    function shortLabel(s,n){s=clean(s);return s.length>n?s.slice(0,n-1)+"…":s}
+    function wrapSvgText(textSel,text,x,y,max){const words=clean(text).split(/\s+/);let line="",dy=0;words.forEach(word=>{const test=(line+" "+word).trim();if(test.length>max&&line){textSel.append("tspan").attr("x",x).attr("y",y+dy).text(line);line=word;dy+=12}else line=test});if(line)textSel.append("tspan").attr("x",x).attr("y",y+dy).text(line)}
 
-    // CLOUDINARY: archivos adjuntos gratis sin Firebase Storage
-    // Cloud name visto en tu panel de Cloudinary: dicours0i
-    // Preajuste creado en modo No firmado: divincri_unsigned
-    const CLOUDINARY_CLOUD_NAME = "dicours0i";
-    const CLOUDINARY_UPLOAD_PRESET = "divincri_unsigned";
+    function selectItem(kind,id){selected={kind,id};updateSelectionStyles();updateSelectionPanel()}
+    function clearSelection(){selected=null;updateSelectionStyles();updateSelectionPanel()}
+    function getSelectedObject(){if(!selected)return null;if(selected.kind==="node")return graphData.nodes.find(n=>n.id===selected.id);if(selected.kind==="edge")return graphData.edges.find(e=>e.id===selected.id);if(selected.kind==="annotation")return edits.annotations.find(a=>a.id===selected.id);return null}
+    function updateSelectionStyles(){if(!rootG)return;rootG.selectAll(".node-item circle").attr("stroke",d=>selected?.kind==="node"&&selected.id===d.id?"#f4bd27":"#fff").attr("stroke-width",d=>selected?.kind==="node"&&selected.id===d.id?5:3);rootG.selectAll(".edge-visible").attr("opacity",d=>selected?.kind==="edge"&&selected.id===d.id?1:.72).attr("stroke-width",d=>selected?.kind==="edge"&&selected.id===d.id?5:Math.min(4,1.5+Math.log2(d.count+1)));rootG.selectAll(".annotation-item rect").attr("stroke-width",d=>selected?.kind==="annotation"&&selected.id===d.id?3:1)}
+    function updateSelectionPanel(){
+      const obj=getSelectedObject(),edit=$("btnEditSelected"),del=$("btnDeleteSelected");edit.disabled=!obj;del.disabled=!obj;$("selectionLabel").innerHTML=`Selección: <b>${obj?esc(selected.kind+" · "+(obj.label||obj.relation||obj.text||obj.id)):"ninguna"}</b>`;
+      if(!obj){$("selectedDetail").innerHTML="<h3>Detalle de selección</h3><p>Selecciona una entidad, vínculo o texto del gráfico.</p>";$("dateDetail").innerHTML="<h3>Fechas de vinculación</h3><p>Las fechas del enlace seleccionado aparecerán aquí.</p>";return}
+      if(selected.kind==="node"){$("selectedDetail").innerHTML=`<h3>${esc(obj.type.toUpperCase())}</h3><p><b>${esc(obj.label)}</b></p><p>Vínculos: ${obj.degree||0}</p><p>${esc(obj.note||"Sin observación")}</p>`;renderDates(obj.dates||[])}
+      if(selected.kind==="edge"){$("selectedDetail").innerHTML=`<h3>Vínculo</h3><p><b>${esc(obj.relation)}</b></p><p>${esc(resolveNodeLabel(obj.source))} ↔ ${esc(resolveNodeLabel(obj.target))}</p><p>Coincidencias: ${obj.count||1}</p><p>${esc((obj.notes||[]).join(" · ")||obj.note||"Sin observación")}</p>`;renderDates(obj.dates||[])}
+      if(selected.kind==="annotation"){$("selectedDetail").innerHTML=`<h3>Texto libre</h3><p><b>${esc(obj.text)}</b></p><p>Puede arrastrarse y editarse.</p>`;renderDates([])}
+      function renderDates(ds){$("dateDetail").innerHTML=`<h3>Fechas de vinculación</h3>${ds.length?`<div class="dates-list">${ds.map(d=>`<span class="date-tag">${esc(d)}</span>`).join("")}</div>`:"<p>Sin fecha registrada.</p>"}`}
+    }
+    function resolveNodeLabel(n){const id=typeof n==="object"?n.id:n;return graphData.nodes.find(x=>x.id===id)?.label||id}
 
-    const KEY_REGISTROS = "divincri_registros_profesional";
-    const KEY_CONSULTAS = "divincri_consultas_profesional";
+    function centerGraph(animate=true){if(!svg||!rootG||!filteredGraph.nodes.length)return;const bounds=rootG.node().getBBox();const w=$("graphWrap").clientWidth,h=$("graphWrap").clientHeight;const scale=Math.max(.25,Math.min(1.35,.86/Math.max(bounds.width/w,bounds.height/h)));const tx=w/2-scale*(bounds.x+bounds.width/2),ty=h/2-scale*(bounds.y+bounds.height/2);const t=d3.zoomIdentity.translate(tx,ty).scale(scale);(animate?svg.transition().duration(450):svg).call(zoomBehavior.transform,t)}
+    function focusNode(id){const n=filteredGraph.nodes.find(x=>x.id===id);if(!n)return;objectiveId=id;selectItem("node",id);const w=$("graphWrap").clientWidth,h=$("graphWrap").clientHeight;svg.transition().duration(500).call(zoomBehavior.transform,d3.zoomIdentity.translate(w/2-n.x*1.35,h/2-n.y*1.35).scale(1.35))}
+    function searchGraph(){const q=clean($("graphSearch").value||$("mainSearch").value).toLowerCase();if(!q)return toast("Escribe un dato para buscar.");const n=graphData.nodes.find(x=>x.label.toLowerCase().includes(q)||x.id.toLowerCase().includes(q));if(!n)return toast("No se encontró la entidad.");if(!enabledTypes.has(n.type)){enabledTypes.add(n.type);syncTypeButtons()}graphMode="all";syncModeButtons();applyGraphFilters();setTimeout(()=>focusNode(n.id),250)}
 
-    // UID autorizado del administrador en Firebase Authentication.
-    // Este UID no es una contraseña; la seguridad real se aplica con Firebase Auth + reglas de Firestore.
-    const ADMIN_UID = "BVIZc8y2XifksQgCGVynf7iK0u93";
+    function openModal(kind,obj=null){currentModal={kind,obj};const body=$("modalBody");$("modalTitle").textContent=modalTitle(kind);body.innerHTML=modalFields(kind,obj);$("editorModal").classList.add("open")}
+    function closeModal(){currentModal=null;$("editorModal").classList.remove("open")}
+    function modalTitle(k){return({editNode:"Editar entidad",editEdge:"Editar vínculo y fecha",editAnnotation:"Editar texto",addNode:"Agregar entidad",addEdge:"Agregar vínculo",addText:"Escribir texto en el gráfico",editRecord:"Editar registro"})[k]||"Editar"}
+    function modalFields(k,o={}){
+      if(k==="editNode"||k==="addNode")return `<div class="modal-grid"><div><label>Tipo</label><select id="mdType" ${k==="editNode"&&!o.custom?"disabled":""}>${["numero","imei","dni","persona","operadora","custom"].map(t=>`<option ${o.type===t?"selected":""} value="${t}">${t}</option>`).join("")}</select></div><div><label>Texto / valor</label><input id="mdLabel" value="${esc(o.label||"")}"></div><div class="full"><label>Nota</label><textarea id="mdNote">${esc(o.note||"")}</textarea></div></div>`;
+      if(k==="editEdge")return `<div class="modal-grid"><div class="full"><label>Relación / texto del enlace</label><input id="mdRelation" value="${esc(o.relation||"")}"></div><div class="full"><label>Fechas de vinculación (una por línea)</label><textarea id="mdDates">${esc((o.dates||[]).join("\n"))}</textarea></div><div class="full"><label>Nota</label><textarea id="mdNote">${esc(o.note||(o.notes||[]).join(" · ")||"")}</textarea></div></div>`;
+      if(k==="addEdge"){const opts=graphData.nodes.map(n=>`<option value="${esc(n.id)}">${esc(n.type.toUpperCase()+" · "+n.label)}</option>`).join("");return `<div class="modal-grid"><div><label>Origen</label><select id="mdSource">${opts}</select></div><div><label>Destino</label><select id="mdTarget">${opts}</select></div><div class="full"><label>Relación</label><input id="mdRelation" value="Vinculación manual"></div><div><label>Fecha</label><input id="mdDate" type="datetime-local"></div><div><label>Nota</label><input id="mdNote"></div></div>`}
+      if(k==="addText"||k==="editAnnotation")return `<div class="modal-grid"><div class="full"><label>Texto que aparecerá en el gráfico</label><textarea id="mdText">${esc(o.text||"")}</textarea></div></div>`;
+      if(k==="editRecord")return `<div class="modal-grid"><div><label>Número</label><input id="mdNumero" value="${esc(o.numero)}"></div><div><label>IMEI</label><input id="mdImei" value="${esc(o.imei)}"></div><div><label>DNI</label><input id="mdDni" value="${esc(o.dni)}"></div><div><label>Nombre</label><input id="mdNombre" value="${esc(o.nombre)}"></div><div><label>Operadora</label><input id="mdOperadora" value="${esc(o.operadora)}"></div><div><label>Tipo / relación</label><input id="mdTipo" value="${esc(o.tipo)}"></div><div class="full"><label>Fecha y hora</label><input id="mdFecha" value="${esc(o.fecha_hora)}"></div><div class="full"><label>Observación</label><textarea id="mdObs">${esc(o.observacion)}</textarea></div></div>`;
+      return "";
+    }
+    function saveModal(){
+      if(!currentModal)return;const {kind,obj}=currentModal;
+      if(kind==="editNode"){edits.nodeOverrides[obj.id]={...(edits.nodeOverrides[obj.id]||{}),label:clean($("mdLabel").value)||obj.label,note:clean($("mdNote").value)};saveAndRefresh("Entidad editada.")}
+      if(kind==="addNode"){const label=clean($("mdLabel").value);if(!label)return toast("Escribe el valor de la entidad.");const type=$("mdType").value,id=`custom:${type}:${uid("n")}`;edits.customNodes.push({id,type,label,note:clean($("mdNote").value),custom:true});saveAndRefresh("Entidad agregada.")}
+      if(kind==="editEdge"){edits.edgeOverrides[obj.id]={...(edits.edgeOverrides[obj.id]||{}),relation:clean($("mdRelation").value)||obj.relation,dates:$("mdDates").value.split(/\n+/).map(parseDateValue).filter(Boolean),note:clean($("mdNote").value)};saveAndRefresh("Vínculo y fecha actualizados.")}
+      if(kind==="addEdge"){const source=$("mdSource").value,target=$("mdTarget").value;if(source===target)return toast("Origen y destino deben ser distintos.");const date=parseDateValue($("mdDate").value);edits.customEdges.push({id:uid("edge_manual"),source,target,relation:clean($("mdRelation").value)||"Vinculación manual",dates:date?[date]:[],note:clean($("mdNote").value),custom:true});saveAndRefresh("Vínculo agregado.")}
+      if(kind==="addText"){const text=clean($("mdText").value);if(!text)return toast("Escribe un texto.");edits.annotations.push({id:uid("txt"),text,x:$("graphWrap").clientWidth*.5,y:$("graphWrap").clientHeight*.18});saveAndRefresh("Texto agregado al gráfico.")}
+      if(kind==="editAnnotation"){obj.text=clean($("mdText").value)||obj.text;saveAndRefresh("Texto actualizado.")}
+      if(kind==="editRecord"){const i=records.findIndex(r=>r.id===obj.id);if(i>=0)records[i]=normalizeRecord({id:obj.id,numero:$("mdNumero").value,imei:$("mdImei").value,dni:$("mdDni").value,nombre:$("mdNombre").value,operadora:$("mdOperadora").value,tipo:$("mdTipo").value,fecha_hora:$("mdFecha").value,observacion:$("mdObs").value,source:obj.source},obj.source);saveAndRefresh("Registro actualizado.")}
+      closeModal();
+    }
+    function saveAndRefresh(msg){saveStorage();buildGraph();toast(msg)}
 
-    const FIREBASE_CONFIGURADO =
-      firebaseConfig.apiKey &&
-      !firebaseConfig.apiKey.includes("PEGA_AQUI") &&
-      firebaseConfig.projectId &&
-      !firebaseConfig.projectId.includes("TU-PROYECTO") &&
-      firebaseConfig.appId &&
-      !firebaseConfig.appId.includes("PEGA_AQUI");
+    function editSelected(){const o=getSelectedObject();if(!o)return;if(selected.kind==="node")openModal("editNode",o);if(selected.kind==="edge")openModal("editEdge",o);if(selected.kind==="annotation")openModal("editAnnotation",o)}
+    function deleteSelected(){const o=getSelectedObject();if(!o)return;if(!confirm(`¿Eliminar ${selected.kind} del gráfico? Los registros originales no se borrarán.`))return;if(selected.kind==="node"){const ci=edits.customNodes.findIndex(x=>x.id===o.id);if(ci>=0)edits.customNodes.splice(ci,1);else if(!edits.hiddenNodes.includes(o.id))edits.hiddenNodes.push(o.id);edits.customEdges=edits.customEdges.filter(e=>e.source!==o.id&&e.target!==o.id)}if(selected.kind==="edge"){const ci=edits.customEdges.findIndex(x=>x.id===o.id);if(ci>=0)edits.customEdges.splice(ci,1);else if(!edits.hiddenEdges.includes(o.id))edits.hiddenEdges.push(o.id)}if(selected.kind==="annotation")edits.annotations=edits.annotations.filter(a=>a.id!==o.id);selected=null;saveAndRefresh("Elemento eliminado del gráfico.")}
+    function restoreGraph(){if(!confirm("¿Restaurar todas las ediciones, elementos ocultos, vínculos manuales y textos del gráfico?"))return;edits=emptyEdits();selected=null;saveAndRefresh("Gráfico restaurado.")}
 
-    const CLOUDINARY_CONFIGURADO =
-      CLOUDINARY_CLOUD_NAME &&
-      CLOUDINARY_UPLOAD_PRESET &&
-      !CLOUDINARY_CLOUD_NAME.includes("PEGA_AQUI") &&
-      !CLOUDINARY_UPLOAD_PRESET.includes("PEGA_AQUI");
+    async function processFiles(replace){const files=[...$("fileInput").files];if(!files.length)return toast("Selecciona uno o más archivos.");let rows=[];for(const file of files){try{rows.push(...await readFile(file))}catch(e){console.error(e);toast(`No se pudo leer ${file.name}`)}}const normalized=rows.map(r=>normalizeRecord(r,files.map(f=>f.name).join(", "))).filter(isUseful);if(!normalized.length)return toast("No se encontraron registros reconocibles.");records=replace?normalized:[...normalized,...records];saveAndRefresh(`${normalized.length} registros procesados.`);$("fileInput").value=""}
+    async function readFile(file){const ext=file.name.split(".").pop().toLowerCase();if(["xlsx","xls"].includes(ext)){const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:"array",cellDates:false});let out=[];wb.SheetNames.forEach(n=>out.push(...XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:""})));return out}if(ext==="pdf")return parseLooseText(await readPdf(file));const text=await file.text();return parseDelimited(text)}
+    async function readPdf(file){if(!window.pdfjsLib)throw new Error("PDF.js no disponible");pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;let text="";for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i),c=await p.getTextContent();text+=c.items.map(x=>x.str).join(" ")+"\n"}return text}
+    function detectDelimiter(line){const opts=[",",";","\t","|"];return opts.sort((a,b)=>line.split(b).length-line.split(a).length)[0]}
+    function splitCSVLine(line,delim){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===delim&&!q){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(x=>x.trim())}
+    function parseDelimited(text){const lines=String(text).replace(/\r/g,"").split("\n").filter(x=>x.trim());if(!lines.length)return[];const delim=detectDelimiter(lines[0]);const headers=splitCSVLine(lines[0],delim);const hasHeader=headers.some(h=>/imei|numero|número|dni|fecha|operador|nombre/i.test(h));if(!hasHeader)return parseLooseText(text);return lines.slice(1).map(line=>{const vals=splitCSVLine(line,delim),o={};headers.forEach((h,i)=>o[h]=vals[i]||"");return o})}
+    function parseLooseText(text){const lines=String(text).replace(/\r/g,"").split("\n").filter(x=>x.trim());const out=[];for(const line of lines){const imei=(line.match(/\b\d{14,16}\b/g)||[])[0]||"";const all9=line.match(/\b9\d{8}\b/g)||[];const numero=all9[0]||"";const dni=(line.match(/\b\d{8}\b/g)||[]).find(x=>x!==numero)||"";const date=(line.match(/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?/g)||[])[0]||"";if(imei||numero||dni)out.push({imei,numero,dni,fecha_hora:date,observacion:line})}return out}
+    function pasteRows(replace){const text=$("pasteData").value;if(!clean(text))return toast("Pega datos primero.");const rows=parseDelimited(text).map(r=>normalizeRecord(r,"pegado")).filter(isUseful);if(!rows.length)return toast("No se reconocieron registros.");records=replace?rows:[...rows,...records];saveAndRefresh(`${rows.length} registros agregados.`)}
+    function addManual(){const row=normalizeRecord({numero:$("fNumero").value,imei:$("fImei").value,dni:$("fDni").value,fecha_hora:$("fFecha").value,nombre:$("fNombre").value,operadora:$("fOperadora").value,tipo:$("fTipo").value,observacion:$("fObservacion").value},"manual");if(!isUseful(row))return toast("Ingresa al menos una entidad.");records.unshift(row);["fNumero","fImei","fDni","fFecha","fNombre","fOperadora","fTipo","fObservacion"].forEach(id=>$(id).value="");saveAndRefresh("Registro manual agregado.")}
 
-    let appFirebase = null;
-    let db = null;
-    let auth = null;
-    let firebaseActivo = false;
-    let unsubscribeRegistros = null;
-    let usuarioActual = null;
-    let esAdministrador = false;
+    function renderTable(){const tb=$("dataTable");if(!records.length){tb.innerHTML='<tr><td colspan="10">No hay registros.</td></tr>';return}tb.innerHTML=records.map((r,i)=>`<tr><td>${i+1}</td><td><span class="tag n">${esc(r.numero||"—")}</span></td><td><span class="tag i">${esc(r.imei||"—")}</span></td><td><span class="tag d">${esc(r.dni||"—")}</span></td><td>${esc(r.nombre||"—")}</td><td>${esc(r.operadora||"—")}</td><td>${esc(r.tipo||"—")}</td><td>${esc(r.fecha_hora||"Sin fecha")}</td><td>${esc(r.observacion||"")}</td><td><div class="cell-actions"><button class="btn light small" data-edit-record="${r.id}">Editar</button><button class="btn red small" data-delete-record="${r.id}">Eliminar</button></div></td></tr>`).join("")}
+    function renderTimeline(){const el=$("timeline"),sorted=[...records].sort((a,b)=>dateSortValue(b.fecha_hora)-dateSortValue(a.fecha_hora));if(!sorted.length){el.innerHTML='<div class="empty-card"><b>Sin eventos</b><span>Agrega registros con fecha para construir la línea de tiempo.</span></div>';return}el.innerHTML=sorted.map(r=>`<div class="event"><div class="event-date">${esc(r.fecha_hora||"Sin fecha")}</div><div class="event-box"><b>${esc(r.numero||r.imei||r.dni||r.nombre||"Registro")}</b><p>${esc([r.tipo,r.imei&&`IMEI ${r.imei}`,r.dni&&`DNI ${r.dni}`,r.nombre,r.operadora].filter(Boolean).join(" · "))}</p></div></div>`).join("")}
+    function generateReport(force=true){
+      const target=objectiveId?graphData.nodes.find(n=>n.id===objectiveId):null;const dated=graphData.edges.filter(e=>e.dates?.length);const top=[...graphData.nodes].sort((a,b)=>b.degree-a.degree).slice(0,8);const text=["ÁREA DE ANÁLISIS DE INTELIGENCIA - DIVINCRI LA LIBERTAD","REPORTE TÉCNICO DE VINCULACIONES","",`Fecha de generación: ${new Date().toLocaleString("es-PE")}`,`Registros procesados: ${records.length}`,`Entidades: ${graphData.nodes.length}`,`Vínculos: ${graphData.edges.length}`,`Vínculos con fecha: ${dated.length}`,"",target?`OBJETIVO / ENTIDAD ENFOCADA\n${target.type.toUpperCase()}: ${target.label}\nVínculos directos: ${target.degree}\nFechas asociadas: ${(target.dates||[]).join(", ")||"Sin fecha"}\n`:"","ENTIDADES CON MAYOR VINCULACIÓN",...top.map((n,i)=>`${i+1}. ${n.type.toUpperCase()} ${n.label} — ${n.degree} vínculo(s)`),"","DETALLE DE VINCULACIONES",...graphData.edges.map((e,i)=>`${i+1}. ${resolveNodeLabel(e.source)} ↔ ${resolveNodeLabel(e.target)} | ${e.relation} | Fecha(s): ${(e.dates||[]).join(", ")||"Sin fecha"}`),"","INTERPRETACIÓN ANALÍTICA","Las coincidencias representan relaciones técnicas construidas con la información cargada. Las fechas mostradas corresponden a los registros aportados y deben corroborarse con fuentes oficiales y documentación de respaldo."].filter(x=>x!=="").join("\n");if(force||records.length)$("reportText").textContent=text;return text
+    }
 
-    let registros = [];
-    let consultas = Number(localStorage.getItem(KEY_CONSULTAS)) || 0;
-    let registroEditandoId = null;
-    let listaActual = registros;
+    function downloadBlob(content,name,type="text/plain;charset=utf-8"){const b=content instanceof Blob?content:new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),500)}
+    function exportCSV(){const headers=["imei","numero","fecha_hora","operadora","dni","nombre","tipo","observacion"];const csv=[headers.join(","),...records.map(r=>headers.map(h=>`"${clean(r[h]).replace(/"/g,'""')}"`).join(","))].join("\n");downloadBlob("\ufeff"+csv,`divincri_vinculaciones_${new Date().toISOString().slice(0,10)}.csv`,"text/csv;charset=utf-8")}
+    function exportJSON(){downloadBlob(JSON.stringify({sistema:"DIVINCRI La Libertad",fechaExportacion:new Date().toISOString(),records,edits},null,2),`divincri_respaldo_${new Date().toISOString().slice(0,10)}.json`,"application/json")}
+    async function exportPDF(){const {jsPDF}=window.jspdf||{};if(!jsPDF)return window.print();const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});doc.setFontSize(14);doc.text("ÁREA DE ANÁLISIS DE INTELIGENCIA - DIVINCRI LA LIBERTAD",14,15);doc.setFontSize(9);doc.text(`Reporte de vinculaciones — ${new Date().toLocaleString("es-PE")}`,14,21);doc.autoTable({startY:27,head:[["N°","Número","IMEI","DNI","Nombre","Operadora","Relación","Fecha"]],body:records.map((r,i)=>[i+1,r.numero,r.imei,r.dni,r.nombre,r.operadora,r.tipo,r.fecha_hora]),styles:{fontSize:6,cellPadding:1.5},headStyles:{fillColor:[8,71,42]}});doc.save(`informe_divincri_${new Date().toISOString().slice(0,10)}.pdf`)}
+    function exportPNG(){if(!svg)return;const clone=svg.node().cloneNode(true);clone.setAttribute("xmlns","http://www.w3.org/2000/svg");const xml=new XMLSerializer().serializeToString(clone),blob=new Blob([xml],{type:"image/svg+xml;charset=utf-8"}),url=URL.createObjectURL(blob),img=new Image();img.onload=()=>{const scale=2,canvas=document.createElement("canvas");canvas.width=$("graphWrap").clientWidth*scale;canvas.height=$("graphWrap").clientHeight*scale;const ctx=canvas.getContext("2d");ctx.fillStyle="#f8faf8";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);canvas.toBlob(b=>downloadBlob(b,`grafo_divincri_${new Date().toISOString().slice(0,10)}.png`,"image/png"))};img.src=url}
 
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("fecha").valueAsDate = new Date();
-      const horaInput = document.getElementById("horaPedido");
-      if(horaInput) horaInput.value = obtenerHoraActual();
-      mostrarCamposMeta();
-      iniciarSistema();
+    function clearBase(){if(!confirm("¿Eliminar todos los registros de la base local?"))return;records=[];edits=emptyEdits();objectiveId=null;selected=null;saveAndRefresh("Base limpiada.")}
+    function syncModeButtons(){document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===graphMode))}
+    function syncTypeButtons(){document.querySelectorAll(".type-chip").forEach(b=>b.classList.toggle("active",enabledTypes.has(b.dataset.type)))}
+    function setView(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===id));if(id==="graphView")setTimeout(()=>renderGraph(),50);if(id==="reportView")generateReport(true)}
+
+    document.addEventListener("click",e=>{
+      const tab=e.target.closest(".tab");if(tab)setView(tab.dataset.view);
+      const er=e.target.closest("[data-edit-record]");if(er){const r=records.find(x=>x.id===er.dataset.editRecord);if(r)openModal("editRecord",r)}
+      const dr=e.target.closest("[data-delete-record]");if(dr){if(confirm("¿Eliminar este registro de la base?")){records=records.filter(x=>x.id!==dr.dataset.deleteRecord);saveAndRefresh("Registro eliminado.")}}
     });
-
-    async function iniciarSistema(){
-      configurarVistaPorRol();
-
-      if(FIREBASE_CONFIGURADO){
-        try{
-          appFirebase = initializeApp(firebaseConfig);
-          db = getFirestore(appFirebase);
-          auth = getAuth(appFirebase);
-          firebaseActivo = true;
-          actualizarEstadoNube(CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa", true);
-
-          onAuthStateChanged(auth, async (user) => {
-            usuarioActual = user;
-            esAdministrador = !!(user && user.uid === ADMIN_UID);
-
-            if(user && !esAdministrador){
-              if(unsubscribeRegistros){
-                unsubscribeRegistros();
-                unsubscribeRegistros = null;
-              }
-              await signOut(auth);
-              usuarioActual = null;
-              esAdministrador = false;
-              configurarVistaPorRol();
-              prepararVistaPublica();
-              alert("Este usuario no está autorizado como administrador.");
-              return;
-            }
-
-            configurarVistaPorRol();
-
-            if(esAdministrador){
-              escucharRegistrosEnNube();
-            }else{
-              if(unsubscribeRegistros){
-                unsubscribeRegistros();
-                unsubscribeRegistros = null;
-              }
-              prepararVistaPublica();
-            }
-          });
-
-          return;
-        }catch(error){
-          console.error("Error inicializando Firebase:", error);
-          actualizarEstadoNube("Error Firebase: modo local", false);
-        }
-      }else{
-        actualizarEstadoNube("Firebase no configurado", false);
-      }
-
-      // Sin Firebase Auth no se habilita el panel administrador.
-      prepararVistaPublica();
-    }
-
-    function prepararVistaPublica(){
-      registros = [];
-      listaActual = [];
-      registroEditandoId = null;
-
-      const tbody = document.getElementById("tablaRegistros");
-      if(tbody){
-        tbody.innerHTML = "";
-      }
-
-      const actividad = document.getElementById("actividadReciente");
-      if(actividad){
-        actividad.innerHTML = `<p class="muted">Visible solo para administrador.</p>`;
-      }
-    }
-
-    function configurarVistaPorRol(){
-      document.querySelectorAll(".admin-only").forEach(el => {
-        el.style.display = esAdministrador ? "" : "none";
-      });
-
-      document.querySelectorAll(".public-only").forEach(el => {
-        el.style.display = esAdministrador ? "none" : "";
-      });
-
-      const estado = document.getElementById("estado");
-      if(estado && !esAdministrador){
-        estado.value = "Pendiente";
-      }
-
-      const vinculacion = document.getElementById("vinculacion");
-      if(vinculacion && !esAdministrador){
-        vinculacion.value = "";
-      }
-
-      mostrarCamposMeta();
-      actualizarEstadoNube(firebaseActivo ? (CLOUDINARY_CONFIGURADO ? "Nube Firebase + Cloudinary activa" : "Nube Firebase activa") : "Usuario solicitante", firebaseActivo);
-    }
-
-    function validarAdmin(){
-      if(esAdministrador) return true;
-      alert("Acceso restringido. Solo el administrador autenticado puede ver registros, reportes, editar o eliminar información.");
-      return false;
-    }
-
-    async function loginAdmin(){
-      if(!firebaseActivo || !auth){
-        alert("Firebase Authentication no está activo. Revisa la configuración de Firebase antes de ingresar como administrador.");
-        return;
-      }
-
-      const email = prompt("Ingrese el correo del administrador:");
-      if(email === null) return;
-
-      const password = prompt("Ingrese la contraseña del administrador:");
-      if(password === null) return;
-
-      try{
-        const credencial = await signInWithEmailAndPassword(auth, email.trim(), password);
-
-        if(!credencial.user || credencial.user.uid !== ADMIN_UID){
-          await signOut(auth);
-          alert("Usuario autenticado, pero no autorizado como administrador.");
-          return;
-        }
-
-        usuarioActual = credencial.user;
-        esAdministrador = true;
-        configurarVistaPorRol();
-        escucharRegistrosEnNube();
-        alert("Administrador conectado correctamente.");
-        goTo("tabla");
-      }catch(error){
-        console.error("Error de acceso administrador:", error);
-        alert("Acceso denegado. Verifique correo y contraseña del administrador.");
-      }
-    }
-
-    async function logoutAdmin(){
-      if(unsubscribeRegistros){
-        unsubscribeRegistros();
-        unsubscribeRegistros = null;
-      }
-
-      try{
-        if(auth){
-          await signOut(auth);
-        }
-      }catch(error){
-        console.error("Error cerrando sesión:", error);
-      }
-
-      usuarioActual = null;
-      esAdministrador = false;
-      registros = [];
-      listaActual = [];
-      configurarVistaPorRol();
-      prepararVistaPublica();
-      limpiarFormulario();
-      alert("Sesión de administrador cerrada.");
-      goTo("registro");
-    }
-
-    function actualizarEstadoNube(texto, activo){
-      const chip = document.querySelector(".user-chip");
-      if(chip){
-        const rol = esAdministrador ? "Administrador" : "Usuario solicitante";
-        const correo = esAdministrador && usuarioActual?.email ? ` · ${usuarioActual.email}` : "";
-        chip.innerHTML = `<span class="user-dot"></span>${escapeHTML(rol)}${escapeHTML(correo)} · ${escapeHTML(texto)}`;
-      }
-
-      const nota = document.querySelector(".sidebar-note");
-      if(nota){
-        if(esAdministrador && activo){
-          nota.innerHTML = `
-            <strong>Modo administrador:</strong><br />
-            Puede consultar registros, revisar oficios adjuntos, generar reportes, editar, archivar o eliminar pedidos.
-          `;
-        }else{
-          nota.innerHTML = `
-            <strong>Acceso público:</strong><br />
-            El usuario solo puede enviar su pedido u oficio. No se carga ni se muestra la base de registros.
-          `;
-        }
-      }
-    }
-
-    function escucharRegistrosEnNube(){
-      if(!esAdministrador) return;
-      if(!db) return;
-
-      if(unsubscribeRegistros){
-        unsubscribeRegistros();
-        unsubscribeRegistros = null;
-      }
-
-      const q = query(collection(db, COLECCION_REGISTROS), orderBy("creadoEn", "desc"));
-
-      unsubscribeRegistros = onSnapshot(q, (snapshot) => {
-        if(!esAdministrador) return;
-
-        registros = snapshot.docs.map(documento => normalizarRegistro({
-          id: documento.id,
-          ...documento.data()
-        }));
-
-        listaActual = registros;
-        guardarLocal();
-        mostrarRegistros(registros);
-        actualizarEstadisticas();
-        actualizarActividadReciente();
-      }, (error) => {
-        console.error("Error leyendo registros en Firebase:", error);
-        actualizarEstadoNube("Error de nube: modo local", false);
-
-        if(esAdministrador){
-          alert("No se pudo leer Firebase. Revisa tu configuración, las reglas de Firestore y el preajuste unsigned de Cloudinary.");
-          registros = JSON.parse(localStorage.getItem(KEY_REGISTROS)) || [];
-          listaActual = registros;
-          mostrarRegistros(registros);
-          actualizarEstadisticas();
-          actualizarActividadReciente();
-        }
-      });
-    }
-
-    function normalizarRegistro(r){
-      return {
-        id:String(r.id || ""),
-        numero:r.numero || "",
-        solicitante:r.solicitante || "",
-        whatsappSolicitante:r.whatsappSolicitante || "",
-        grado:r.grado || "",
-        unidad:r.unidad || "",
-        vinculacion:r.vinculacion || "",
-        tipoCaso:r.tipoCaso || "Meta",
-        redSocial:r.redSocial || "",
-        tipoAmenaza:r.tipoAmenaza || "",
-        delito:r.delito || "",
-        urlAmenaza:r.urlAmenaza || "",
-        estado:r.estado || "Pendiente",
-        fecha:r.fecha || "",
-        horaPedido:r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""),
-        codigoReferencia:r.codigoReferencia || "",
-        observacion:r.observacion || "",
-        archivos:Array.isArray(r.archivos) ? r.archivos : [],
-        creadoEn:r.creadoEn || "",
-        actualizadoEn:r.actualizadoEn || ""
-      };
-    }
-
-    function toggleSidebar(){
-      document.getElementById("sidebar").classList.toggle("open");
-    }
-
-    function goTo(id){
-      const seccionesAdmin = ["consulta", "tabla", "reportes", "respaldo"];
-      if(seccionesAdmin.includes(id) && !validarAdmin()){
-        return;
-      }
-
-      const el = document.getElementById(id);
-      if(el){
-        el.scrollIntoView({behavior:"smooth", block:"start"});
-      }
-      document.getElementById("sidebar").classList.remove("open");
-      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
-    }
-
-    function guardarLocal(){
-      localStorage.setItem(KEY_REGISTROS, JSON.stringify(registros));
-      localStorage.setItem(KEY_CONSULTAS, String(consultas));
-    }
-
-    function crearIdRegistro(){
-      return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    }
-
-    function limpiarParaFirebase(obj){
-      return JSON.parse(JSON.stringify(obj));
-    }
-
-    function limpiarNombreArchivo(nombre){
-      return String(nombre || "archivo")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-zA-Z0-9._-]/g, "_")
-        .slice(0, 120);
-    }
-
-    async function subirArchivoCloudinary(file, idRegistro){
-      // VERSIÓN FINAL: imágenes van por image/upload; PDF, Word, Excel y otros van por raw/upload.
-      // Esto evita fallas con auto/upload en algunos presets unsigned.
-      const resourceType = String(file.type || "").startsWith("image/") ? "image" : "raw";
-      const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-      console.log("Subiendo archivo a Cloudinary:", {
-        cloud:CLOUDINARY_CLOUD_NAME,
-        preset:CLOUDINARY_UPLOAD_PRESET,
-        endpoint,
-        nombre:file.name,
-        tipo:file.type,
-        tamano:file.size
-      });
-
-      const response = await fetch(endpoint, {
-        method:"POST",
-        body:formData
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if(!response.ok){
-        console.error("Respuesta Cloudinary:", data);
-        const detalle = data?.error?.message || JSON.stringify(data) || "No se pudo subir el archivo a Cloudinary.";
-        throw new Error("Cloudinary: " + detalle);
-      }
-
-      return {
-        nombre:file.name,
-        tipo:file.type || data.resource_type || "archivo",
-        tamano:file.size,
-        contenido:data.secure_url,
-        url:data.secure_url,
-        ruta:data.public_id,
-        publicId:data.public_id,
-        resourceType:data.resource_type || resourceType,
-        formato:data.format || "",
-        fechaSubida:new Date().toISOString(),
-        nube:"cloudinary"
-      };
-    }
-
-    async function subirArchivos(files, idRegistro){
-      if(!files || files.length === 0) return [];
-
-      if(firebaseActivo && CLOUDINARY_CONFIGURADO){
-        const lista = Array.from(files);
-        return Promise.all(lista.map(file => subirArchivoCloudinary(file, idRegistro)));
-      }
-
-      return convertirArchivosABase64(files);
-    }
-
-    async function guardarRegistroEnNube(registro){
-      const id = String(registro.id);
-      await setDoc(doc(db, COLECCION_REGISTROS, id), limpiarParaFirebase(registro));
-    }
-
-    async function eliminarRegistroEnNube(registro){
-      // Se elimina el registro de Firestore.
-      // En Cloudinary, por seguridad, los archivos subidos con preajuste sin firmar
-      // no se eliminan desde el navegador; solo se elimina la referencia del sistema.
-      await deleteDoc(doc(db, COLECCION_REGISTROS, String(registro.id)));
-    }
-
-    function actualizarEstadisticas(){
-      const solicitantes = new Set(
-        registros.map(r => (r.solicitante || "").trim().toLowerCase()).filter(Boolean)
-      );
-      const archivos = registros.reduce((acc, r) => acc + ((r.archivos || []).length), 0);
-      const verificados = registros.filter(r => r.estado === "Verificado").length;
-
-      document.getElementById("totalRegistros").textContent = registros.length;
-      document.getElementById("totalConsultas").textContent = consultas;
-      document.getElementById("totalSolicitantes").textContent = solicitantes.size;
-      document.getElementById("totalArchivos").textContent = archivos;
-      document.getElementById("totalVerificados").textContent = verificados;
-    }
-
-    function actualizarActividadReciente(){
-      const box = document.getElementById("actividadReciente");
-      const recientes = registros.slice(0, 5);
-
-      if(recientes.length === 0){
-        box.innerHTML = `<p class="muted">Aún no hay registros recientes.</p>`;
-        return;
-      }
-
-      box.innerHTML = recientes.map(r => `
-        <div style="padding:11px 0;border-bottom:1px solid var(--gray-200);">
-          <strong class="num-cell">${escapeHTML(r.numero || "")}</strong>
-          <p class="muted">${escapeHTML(r.solicitante || "Sin solicitante")} · ${formatearFecha(r.fecha || "")} · ${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</p>
-          <span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span>
-        </div>
-      `).join("");
-    }
-
-    function previsualizarArchivos(){
-      const input = document.getElementById("archivos");
-      const preview = document.getElementById("previewArchivos");
-
-      if(!input.files || input.files.length === 0){
-        preview.style.display = "none";
-        preview.innerHTML = "";
-        return;
-      }
-
-      preview.style.display = "block";
-      preview.innerHTML = `<strong>Archivos seleccionados:</strong><br>` +
-        Array.from(input.files).map((file, index) =>
-          `${index + 1}. ${escapeHTML(file.name)} - ${(file.size / 1024).toFixed(2)} KB`
-        ).join("<br>");
-    }
-
-    function convertirArchivosABase64(files){
-      return Promise.all(Array.from(files).map(file => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve({
-          nombre:file.name,
-          tipo:file.type,
-          tamano:file.size,
-          contenido:reader.result,
-          fechaSubida:new Date().toISOString(),
-          nube:"local-base64"
-        });
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      })));
-    }
-
-    async function guardarRegistro(){
-      const numero = document.getElementById("numero").value.trim();
-      const solicitante = document.getElementById("solicitante").value.trim();
-      const whatsappSolicitante = document.getElementById("whatsappSolicitante")?.value.trim() || "";
-      const grado = document.getElementById("grado").value.trim();
-      const unidad = document.getElementById("unidad").value.trim();
-      const vinculacion = esAdministrador ? document.getElementById("vinculacion").value.trim() : "";
-      const tipoCaso = document.getElementById("tipoCaso")?.value.trim() || "Meta";
-      let redSocial = document.getElementById("redSocial")?.value.trim() || "";
-      const tipoAmenaza = document.getElementById("tipoAmenaza")?.value.trim() || "";
-      const delito = document.getElementById("delito")?.value.trim() || "";
-      const urlAmenaza = document.getElementById("urlAmenaza")?.value.trim() || "";
-      const esWhatsApp = redSocial === "WhatsApp";
-      const esRedSocialMeta = ["Facebook", "Instagram", "TikTok"].includes(redSocial);
-      const estado = esAdministrador ? document.getElementById("estado").value : "Pendiente";
-      const fecha = document.getElementById("fecha").value;
-      const horaPedido = registroEditandoId === null ? obtenerHoraActual() : (document.getElementById("horaPedido")?.value || obtenerHoraActual());
-      const codigoReferencia = document.getElementById("codigoReferencia").value.trim();
-      const observacion = document.getElementById("observacion").value.trim();
-      const archivosInput = document.getElementById("archivos");
-
-      if(!solicitante){
-        alert("Ingrese el nombre del solicitante.");
-        return;
-      }
-
-      if(!grado){
-        alert("Seleccione el grado PNP del solicitante.");
-        return;
-      }
-
-      if(!tipoCaso){
-        alert("Seleccione el tipo de solicitud.");
-        return;
-      }
-
-      if(tipoCaso === "Meta" && !redSocial){
-        alert("Seleccione la plataforma: WhatsApp, Facebook, Instagram o TikTok.");
-        return;
-      }
-
-      if(esWhatsApp){
-        if(!numero){
-          alert("Ingrese el número de WhatsApp a solicitar información.");
-          return;
-        }
-
-        if(!unidad){
-          alert("Ingrese la unidad solicitante.");
-          return;
-        }
-
-        if(!tipoAmenaza){
-          alert("Seleccione el tipo de amenaza.");
-          return;
-        }
-
-        if(!delito){
-          alert("Seleccione el delito relacionado.");
-          return;
-        }
-
-        if(!fecha){
-          alert("Seleccione la fecha de la solicitud.");
-          return;
-        }
-      }
-
-      if(esRedSocialMeta && !tipoAmenaza){
-        alert("Seleccione el tipo de amenaza para la red social.");
-        return;
-      }
-
-      if(esRedSocialMeta && !urlAmenaza){
-        alert("Pegue la URL de la red social.");
-        return;
-      }
-
-      if(!observacion){
-        alert("Ingrese el detalle de la amenaza o pedido de información.");
-        return;
-      }
-
-      try{
-        const ahora = new Date().toISOString();
-        const id = registroEditandoId === null ? crearIdRegistro() : String(registroEditandoId);
-        const nuevosArchivos = await subirArchivos(archivosInput.files, id);
-
-        if(registroEditandoId === null){
-          const nuevoRegistro = {
-            id,
-            numero,
-            solicitante,
-            whatsappSolicitante,
-            grado,
-            unidad,
-            vinculacion,
-            tipoCaso,
-            redSocial,
-            tipoAmenaza,
-            delito,
-            urlAmenaza,
-            estado,
-            fecha,
-            horaPedido,
-            codigoReferencia,
-            observacion,
-            archivos:nuevosArchivos,
-            creadoEn:ahora,
-            actualizadoEn:ahora
-          };
-
-          if(firebaseActivo){
-            await guardarRegistroEnNube(nuevoRegistro);
-          }else{
-            registros.unshift(nuevoRegistro);
-          }
-        }else{
-          if(!validarAdmin()) return;
-
-          const index = registros.findIndex(r => String(r.id) === String(registroEditandoId));
-          if(index === -1){
-            alert("No se encontró el registro para editar.");
-            registroEditandoId = null;
-            return;
-          }
-
-          const actualizado = {
-            ...registros[index],
-            id,
-            numero,
-            solicitante,
-            whatsappSolicitante,
-            grado,
-            unidad,
-            vinculacion,
-            tipoCaso,
-            redSocial,
-            tipoAmenaza,
-            delito,
-            urlAmenaza,
-            estado,
-            fecha,
-            horaPedido,
-            codigoReferencia,
-            observacion,
-            archivos:[...(registros[index].archivos || []), ...nuevosArchivos],
-            actualizadoEn:ahora
-          };
-
-          if(firebaseActivo){
-            await guardarRegistroEnNube(actualizado);
-          }else{
-            registros[index] = actualizado;
-          }
-
-          registroEditandoId = null;
-        }
-
-        if(esAdministrador){
-          if(!firebaseActivo){
-            listaActual = registros;
-            guardarLocal();
-            mostrarRegistros(registros);
-            actualizarEstadisticas();
-            actualizarActividadReciente();
-          }
-          limpiarFormulario();
-          alert(firebaseActivo ? "Registro guardado correctamente en Firebase." : "Registro guardado correctamente en modo local.");
-        }else{
-          if(!firebaseActivo){
-            guardarLocal();
-          }
-          limpiarFormulario();
-          const mensaje = document.getElementById("mensajeEnvio");
-          if(mensaje){
-            mensaje.style.display = "block";
-            setTimeout(() => { mensaje.style.display = "none"; }, 7000);
-          }
-          alert(firebaseActivo ? "Pedido/oficio enviado correctamente. Será revisado por el administrador." : "Pedido guardado en modo local. Para que llegue al administrador debes usar Firebase activo.");
-        }
-      }catch(error){
-        console.error("Error guardando registro:", error);
-        alert("No se pudo enviar/guardar el pedido. Detalle: " + (error.message || error));
-      }
-    }
-
-    function mostrarRegistros(lista = registros){
-      if(!esAdministrador){
-        listaActual = [];
-        const tbodyPublico = document.getElementById("tablaRegistros");
-        if(tbodyPublico) tbodyPublico.innerHTML = "";
-        return;
-      }
-
-      listaActual = lista;
-      const tbody = document.getElementById("tablaRegistros");
-
-      if(lista.length === 0){
-        tbody.innerHTML = `<tr><td colspan="19" class="muted">No hay registros para mostrar.</td></tr>`;
-        actualizarEstadisticas();
-        return;
-      }
-
-      tbody.innerHTML = lista.map((r, index) => {
-        const idSeguro = escapeJS(String(r.id || ""));
-        const archivosHTML = (r.archivos || []).length
-          ? `<div class="file-list">${(r.archivos || []).map((a, i) => `
-              <div class="file-item">
-                <a href="${escapeAttr(a.contenido || a.url || "#")}" download="${escapeAttr(a.nombre)}" target="_blank">📎 ${escapeHTML(a.nombre)}</a>
-                <button class="file-remove" onclick="eliminarArchivo('${idSeguro}', ${i})">Eliminar</button>
-              </div>
-            `).join("")}</div>`
-          : `<span class="muted">Sin archivos</span>`;
-
-        const urlAmenazaHTML = r.urlAmenaza
-          ? `<div class="small-actions"><a class="small-btn btn-blue" href="${escapeAttr(r.urlAmenaza)}" target="_blank" rel="noopener">Abrir</a><button class="small-btn btn-gray" onclick="copiarTexto('${escapeJS(r.urlAmenaza)}')">Copiar</button></div>`
-          : `<span class="muted">Sin URL</span>`;
-
-        return `
-          <tr>
-            <td>${index + 1}</td>
-            <td><span class="num-cell">${escapeHTML(r.numero || "")}</span></td>
-            <td>${escapeHTML(r.solicitante || "")}</td>
-            <td>${escapeHTML(r.whatsappSolicitante || "")}</td>
-            <td>${escapeHTML(r.grado || "")}</td>
-            <td>${escapeHTML(r.unidad || "")}</td>
-            <td>${escapeHTML(r.vinculacion || "")}</td>
-            <td>${escapeHTML(r.tipoCaso || "")}</td>
-            <td>${escapeHTML(r.redSocial || "")}</td>
-            <td>${escapeHTML(r.tipoAmenaza || "")}</td>
-            <td>${escapeHTML(r.delito || "")}</td>
-            <td>${urlAmenazaHTML}</td>
-            <td><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></td>
-            <td>${escapeHTML(r.codigoReferencia || "")}</td>
-            <td>${escapeHTML(r.observacion || "")}</td>
-            <td>${formatearFecha(r.fecha || "")}</td>
-            <td>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</td>
-            <td>${archivosHTML}</td>
-            <td>
-              <div class="small-actions">
-                <button class="small-btn btn-blue" onclick="verFicha('${idSeguro}')">Ver</button>
-                <button class="small-btn btn-orange" onclick="editarRegistro('${idSeguro}')">Editar</button>
-                <button class="small-btn btn-danger" onclick="eliminarRegistro('${idSeguro}')">Eliminar</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
-
-      actualizarEstadisticas();
-    }
-
-    function buscarRegistro(){
-      if(!validarAdmin()) return;
-      const texto = document.getElementById("buscarTexto").value.trim().toLowerCase();
-      const estado = document.getElementById("filtroEstado").value;
-      const fecha = document.getElementById("filtroFecha").value;
-
-      consultas++;
-      guardarLocal();
-
-      const resultado = registros.filter(r => {
-        const coincideTexto = !texto || [
-          r.numero,
-          r.solicitante,
-          r.whatsappSolicitante,
-          r.grado,
-          r.unidad,
-          r.vinculacion,
-          r.tipoCaso,
-          r.redSocial,
-          r.tipoAmenaza,
-          r.delito,
-          r.urlAmenaza,
-          r.estado,
-          r.codigoReferencia,
-          r.observacion,
-          r.fecha,
-          r.horaPedido
-        ].some(v => String(v || "").toLowerCase().includes(texto));
-
-        const coincideEstado = !estado || r.estado === estado;
-        const coincideFecha = !fecha || r.fecha === fecha;
-
-        return coincideTexto && coincideEstado && coincideFecha;
-      });
-
-      mostrarRegistros(resultado);
-      actualizarEstadisticas();
-      goTo("tabla");
-
-      if(resultado.length === 0){
-        alert("No se encontraron coincidencias.");
-      }
-    }
-
-    function limpiarBusqueda(){
-      if(!validarAdmin()) return;
-      document.getElementById("buscarTexto").value = "";
-      document.getElementById("filtroEstado").value = "";
-      document.getElementById("filtroFecha").value = "";
-      mostrarRegistros(registros);
-    }
-
-    function editarRegistro(id){
-      if(!validarAdmin()) return;
-      const r = registros.find(x => String(x.id) === String(id));
-      if(!r){
-        alert("Registro no encontrado.");
-        return;
-      }
-
-      document.getElementById("numero").value = r.numero || "";
-      document.getElementById("solicitante").value = r.solicitante || "";
-      document.getElementById("whatsappSolicitante").value = r.whatsappSolicitante || "";
-      document.getElementById("grado").value = r.grado || "";
-      document.getElementById("unidad").value = r.unidad || "";
-      document.getElementById("vinculacion").value = r.vinculacion || "";
-      document.getElementById("tipoCaso").value = r.tipoCaso || "Meta";
-      document.getElementById("redSocial").value = r.redSocial || "";
-      document.getElementById("tipoAmenaza").value = r.tipoAmenaza || "";
-      document.getElementById("delito").value = r.delito || "";
-      document.getElementById("urlAmenaza").value = r.urlAmenaza || "";
-      mostrarCamposPorPlataforma();
-      document.getElementById("estado").value = r.estado || "Pendiente";
-      document.getElementById("fecha").value = r.fecha || "";
-      document.getElementById("horaPedido").value = r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || "") || obtenerHoraActual();
-      document.getElementById("codigoReferencia").value = r.codigoReferencia || "";
-      document.getElementById("observacion").value = r.observacion || "";
-
-      registroEditandoId = String(id);
-      goTo("registro");
-    }
-
-    async function eliminarRegistro(id){
-      if(!validarAdmin()) return;
-      if(!confirm("¿Está seguro de eliminar este registro?")) return;
-      const r = registros.find(x => String(x.id) === String(id));
-      if(!r) return;
-
-      try{
-        if(firebaseActivo){
-          await eliminarRegistroEnNube(r);
-        }else{
-          registros = registros.filter(x => String(x.id) !== String(id));
-          listaActual = registros;
-          guardarLocal();
-          mostrarRegistros(registros);
-          actualizarActividadReciente();
-        }
-      }catch(error){
-        console.error("Error eliminando registro:", error);
-        alert("No se pudo eliminar el registro en Firebase.");
-      }
-    }
-
-    async function eliminarArchivo(idRegistro, indexArchivo){
-      if(!validarAdmin()) return;
-      if(!confirm("¿Desea quitar este archivo adjunto del registro?")) return;
-      const r = registros.find(x => String(x.id) === String(idRegistro));
-      if(!r) return;
-
-      try{
-        // Esta acción quita el archivo de la ficha y de Firestore.
-        // El archivo en Cloudinary queda almacenado y puede borrarse manualmente desde Cloudinary si fuera necesario.
-        r.archivos.splice(indexArchivo, 1);
-        r.actualizadoEn = new Date().toISOString();
-
-        if(firebaseActivo){
-          await guardarRegistroEnNube(r);
-        }else{
-          guardarLocal();
-          mostrarRegistros(listaActual);
-          actualizarEstadisticas();
-        }
-      }catch(error){
-        console.error("Error quitando archivo:", error);
-        alert("No se pudo quitar el archivo del registro.");
-      }
-    }
-
-    function limpiarFormulario(){
-      document.getElementById("numero").value = "";
-      document.getElementById("solicitante").value = "";
-      document.getElementById("whatsappSolicitante").value = "";
-      document.getElementById("grado").value = "";
-      document.getElementById("unidad").value = "";
-      document.getElementById("vinculacion").value = "";
-      document.getElementById("tipoCaso").value = "Meta";
-      document.getElementById("redSocial").value = "";
-      document.getElementById("tipoAmenaza").value = "";
-      document.getElementById("delito").value = "";
-      document.getElementById("urlAmenaza").value = "";
-      mostrarCamposPorPlataforma();
-      document.getElementById("estado").value = "Pendiente";
-      document.getElementById("fecha").valueAsDate = new Date();
-      document.getElementById("horaPedido").value = obtenerHoraActual();
-      document.getElementById("codigoReferencia").value = "";
-      document.getElementById("observacion").value = "";
-      document.getElementById("archivos").value = "";
-      document.getElementById("previewArchivos").style.display = "none";
-      document.getElementById("previewArchivos").innerHTML = "";
-      registroEditandoId = null;
-    }
-
-    function verFicha(id){
-      if(!validarAdmin()) return;
-      const r = registros.find(x => String(x.id) === String(id));
-      if(!r){
-        alert("Registro no encontrado.");
-        return;
-      }
-
-      const archivos = (r.archivos || []).length
-        ? (r.archivos || []).map(a => `<p>📎 <a href="${escapeAttr(a.contenido || a.url || "#")}" download="${escapeAttr(a.nombre)}" target="_blank">${escapeHTML(a.nombre)}</a></p>`).join("")
-        : `<p>Sin archivos adjuntos</p>`;
-
-      const urlAmenazaFicha = r.urlAmenaza
-        ? `<p><a href="${escapeAttr(r.urlAmenaza)}" target="_blank" rel="noopener">${escapeHTML(r.urlAmenaza)}</a></p><button class="btn btn-gray" style="margin-top:8px;" onclick="copiarTexto('${escapeJS(r.urlAmenaza)}')">Copiar URL</button>`
-        : `<p>Sin URL registrada</p>`;
-
-      document.getElementById("contenidoFicha").innerHTML = `
-        <div class="detail-grid">
-          <div class="detail-item"><span>Número a solicitar</span><p>${escapeHTML(r.numero || "")}</p></div>
-          <div class="detail-item"><span>Solicitante</span><p>${escapeHTML(r.solicitante || "")}</p></div>
-          <div class="detail-item"><span>WhatsApp del solicitante</span><p>${escapeHTML(r.whatsappSolicitante || "")}</p></div>
-          <div class="detail-item"><span>Grado PNP</span><p>${escapeHTML(r.grado || "")}</p></div>
-          <div class="detail-item"><span>Unidad</span><p>${escapeHTML(r.unidad || "")}</p></div>
-          <div class="detail-item"><span>Estado</span><p><span class="badge ${escapeAttr(r.estado || "Pendiente")}">${escapeHTML(r.estado || "Pendiente")}</span></p></div>
-          <div class="detail-item full"><span>Vinculaciones / resultados</span><p>${escapeHTML(r.vinculacion || "")}</p></div>
-          <div class="detail-item"><span>Tipo de solicitud</span><p>${escapeHTML(r.tipoCaso || "")}</p></div>
-          <div class="detail-item"><span>Medio / plataforma</span><p>${escapeHTML(r.redSocial || "")}</p></div>
-          <div class="detail-item"><span>Tipo de amenaza</span><p>${escapeHTML(r.tipoAmenaza || "")}</p></div>
-          <div class="detail-item"><span>Delito relacionado</span><p>${escapeHTML(r.delito || "")}</p></div>
-          <div class="detail-item full"><span>URL de la red social</span>${urlAmenazaFicha}</div>
-          <div class="detail-item"><span>Código / referencia</span><p>${escapeHTML(r.codigoReferencia || "")}</p></div>
-          <div class="detail-item"><span>Fecha</span><p>${formatearFecha(r.fecha || "")}</p></div>
-          <div class="detail-item"><span>Hora solicitada</span><p>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</p></div>
-          <div class="detail-item"><span>Última actualización</span><p>${formatearFechaHora(r.actualizadoEn || "")}</p></div>
-          <div class="detail-item full"><span>Observación</span><p>${escapeHTML(r.observacion || "")}</p></div>
-          <div class="detail-item full"><span>Archivos adjuntos</span>${archivos}</div>
-        </div>
-      `;
-      document.getElementById("modalFicha").classList.add("open");
-    }
-
-    function cerrarFicha(){
-      document.getElementById("modalFicha").classList.remove("open");
-    }
-
-    function exportarDatos(){
-      if(!validarAdmin()) return;
-      const datos = {
-        sistema:"DIVINCRI La Libertad - Trujillo",
-        modo:firebaseActivo ? "Firebase Firestore + Cloudinary" : "LocalStorage",
-        registros,
-        consultas,
-        fechaExportacion:new Date().toISOString()
-      };
-      const blob = new Blob([JSON.stringify(datos, null, 2)], {type:"application/json"});
-      descargarBlob(blob, "respaldo_divincri_la_libertad.json");
-    }
-
-    function importarDatos(){
-      if(!validarAdmin()) return;
-      const archivo = document.getElementById("importarArchivo").files[0];
-      if(!archivo) return;
-
-      const mensaje = firebaseActivo
-        ? "Esto importará los registros del JSON a Firebase. Si un ID ya existe, se actualizará. ¿Desea continuar?"
-        : "Esto reemplazará la información local actual. ¿Desea continuar?";
-
-      if(!confirm(mensaje)) return;
-
-      const reader = new FileReader();
-      reader.onload = async e => {
-        try{
-          const data = JSON.parse(e.target.result);
-          const importados = Array.isArray(data.registros) ? data.registros : [];
-
-          if(firebaseActivo){
-            for(const r of importados){
-              const registro = normalizarRegistro({
-                ...r,
-                id:String(r.id || crearIdRegistro()),
-                actualizadoEn:new Date().toISOString()
-              });
-              await guardarRegistroEnNube(registro);
-            }
-            alert("Respaldo importado correctamente a Firebase.");
-          }else{
-            registros = importados.map(r => normalizarRegistro(r));
-            consultas = Number(data.consultas || 0);
-            listaActual = registros;
-            guardarLocal();
-            mostrarRegistros(registros);
-            actualizarEstadisticas();
-            actualizarActividadReciente();
-            alert("Respaldo importado correctamente.");
-          }
-        }catch(err){
-          console.error(err);
-          alert("Archivo JSON no válido o error importando datos.");
-        }
-      };
-      reader.readAsText(archivo);
-    }
-
-    function generarVistaPreviaReporte(){
-      if(!validarAdmin()) return;
-      const data = listaActual || registros;
-      const totalArchivos = data.reduce((acc, r) => acc + ((r.archivos || []).length), 0);
-      const verificados = data.filter(r => r.estado === "Verificado").length;
-      const pendientes = data.filter(r => r.estado === "Pendiente").length;
-      const fechaGeneracion = new Date().toLocaleString("es-PE");
-      const contenedor = document.getElementById("vistaReporte");
-
-      const filas = data.map((r, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${escapeHTML(r.numero || "")}</td>
-          <td>${escapeHTML(r.solicitante || "")}</td>
-          <td>${escapeHTML(r.whatsappSolicitante || "")}</td>
-          <td>${escapeHTML(r.grado || "")}</td>
-          <td>${escapeHTML(r.unidad || "")}</td>
-          <td>${escapeHTML(r.vinculacion || "")}</td>
-          <td>${escapeHTML(r.tipoCaso || "")}</td>
-          <td>${escapeHTML(r.redSocial || "")}</td>
-          <td>${escapeHTML(r.tipoAmenaza || "")}</td>
-          <td>${escapeHTML(r.delito || "")}</td>
-          <td>${escapeHTML(r.urlAmenaza || "")}</td>
-          <td>${escapeHTML(r.estado || "Pendiente")}</td>
-          <td>${escapeHTML(r.codigoReferencia || "")}</td>
-          <td>${escapeHTML(r.observacion || "")}</td>
-          <td>${formatearFecha(r.fecha || "")}</td>
-          <td>${formatearHora(r.horaPedido || obtenerHoraDesdeISO(r.creadoEn || ""))}</td>
-          <td>${(r.archivos || []).length}</td>
-        </tr>
-      `).join("");
-
-      contenedor.innerHTML = `
-        <div class="report-head">
-          <img src="./portada.png" alt="DIVINCRI" class="report-logo" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/perumaka1995/DIVINCRILALCONSULTA/main/portada.png';">
-          <div class="report-title">
-            <h2>REPORTE DE PEDIDOS Y OFICIOS</h2>
-            <p><strong>DIVINCRI LA LIBERTAD - TRUJILLO</strong></p>
-            <p>Sistema de pedidos, oficios, resultados internos y archivos adjuntos</p>
-            <p>Fecha de generación: ${escapeHTML(fechaGeneracion)}</p>
-            <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
-          </div>
-          <div style="width:92px;"></div>
-        </div>
-
-        <div class="report-metrics">
-          <div class="report-metric"><strong>${data.length}</strong>Total registros</div>
-          <div class="report-metric"><strong>${verificados}</strong>Verificados</div>
-          <div class="report-metric"><strong>${pendientes}</strong>Pendientes</div>
-          <div class="report-metric"><strong>${totalArchivos}</strong>Archivos</div>
-        </div>
-
-        <div class="table-wrap">
-          <table id="tablaReporte">
-            <thead>
-              <tr>
-                <th>N°</th>
-                <th>Número a solicitar</th>
-                <th>Solicitante</th>
-                <th>WhatsApp solicitante</th>
-                <th>Grado</th>
-                <th>Unidad</th>
-                <th>Resultados internos</th>
-                <th>Tipo solicitud</th>
-                <th>Medio</th>
-                <th>Tipo amenaza</th>
-                <th>Delito</th>
-                <th>URL red social</th>
-                <th>Estado</th>
-                <th>Código</th>
-                <th>Observación</th>
-                <th>Fecha</th>
-                <th>Hora solicitada</th>
-                <th>Archivos</th>
-              </tr>
-            </thead>
-            <tbody>${filas || `<tr><td colspan="18">No hay registros para mostrar.</td></tr>`}</tbody>
-          </table>
-        </div>
-
-        <p class="muted" style="margin-top:12px;">
-          Documento generado automáticamente desde el sistema DIVINCRI La Libertad - Trujillo.
-        </p>
-      `;
-
-      contenedor.style.display = "block";
-      goTo("reportes");
-    }
-
-    function cerrarVistaReporte(){
-      if(!validarAdmin()) return;
-      const contenedor = document.getElementById("vistaReporte");
-      contenedor.innerHTML = "";
-      contenedor.style.display = "none";
-    }
-
-    function exportarExcel(){
-      if(!validarAdmin()) return;
-      generarVistaPreviaReporte();
-      const tabla = document.getElementById("tablaReporte");
-      if(!tabla){
-        alert("Primero genere la vista previa.");
-        return;
-      }
-      const fecha = new Date().toISOString().slice(0,10);
-      const html = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office"
-              xmlns:x="urn:schemas-microsoft-com:office:excel"
-              xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="UTF-8"></head>
-        <body>
-          <h2>DIVINCRI LA LIBERTAD - TRUJILLO</h2>
-          <h3>Reporte de pedidos y oficios</h3>
-          <p>Fecha de generación: ${new Date().toLocaleString("es-PE")}</p>
-          <p>Origen de datos: ${firebaseActivo ? "Firebase Firestore / Cloudinary" : "LocalStorage"}</p>
-          ${tabla.outerHTML}
-        </body>
-        </html>
-      `;
-      const blob = new Blob([html], {type:"application/vnd.ms-excel;charset=utf-8;"});
-      descargarBlob(blob, `reporte_divincri_${fecha}.xls`);
-    }
-
-    function exportarPDF(){
-      if(!validarAdmin()) return;
-      generarVistaPreviaReporte();
-      setTimeout(() => window.print(), 350);
-    }
-
-    function descargarBlob(blob, nombre){
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nombre;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function obtenerHoraActual(){
-      const ahora = new Date();
-      const horas = String(ahora.getHours()).padStart(2, "0");
-      const minutos = String(ahora.getMinutes()).padStart(2, "0");
-      return `${horas}:${minutos}`;
-    }
-
-    function obtenerHoraDesdeISO(valor){
-      if(!valor) return "";
-      try{
-        const fecha = new Date(valor);
-        if(Number.isNaN(fecha.getTime())) return "";
-        const horas = String(fecha.getHours()).padStart(2, "0");
-        const minutos = String(fecha.getMinutes()).padStart(2, "0");
-        return `${horas}:${minutos}`;
-      }catch(e){
-        return "";
-      }
-    }
-
-    function formatearHora(hora){
-      if(!hora) return "";
-      const texto = String(hora);
-      const partes = texto.split(":");
-      if(partes.length >= 2) return `${partes[0]}:${partes[1]}`;
-      return texto;
-    }
-
-    function formatearFecha(fecha){
-      if(!fecha) return "";
-      const partes = String(fecha).split("-");
-      if(partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-      return fecha;
-    }
-
-    function formatearFechaHora(valor){
-      if(!valor) return "";
-      try{
-        return new Date(valor).toLocaleString("es-PE");
-      }catch(e){
-        return valor;
-      }
-    }
-
-    function mostrarCamposPorPlataforma(){
-      const tipoCaso = document.getElementById("tipoCaso")?.value || "Meta";
-      const redSocialSelect = document.getElementById("redSocial");
-      const campoPlataforma = document.getElementById("campoPlataforma");
-      const usaMeta = tipoCaso === "Meta";
-
-      if(campoPlataforma){
-        campoPlataforma.style.display = usaMeta ? "" : "none";
-      }
-
-      if(!usaMeta && redSocialSelect){
-        redSocialSelect.value = "";
-      }
-
-      const plataforma = usaMeta ? (redSocialSelect?.value || "") : "";
-      const esWhatsApp = plataforma === "WhatsApp";
-      const esRedSocialMeta = ["Facebook", "Instagram", "TikTok"].includes(plataforma);
-
-      document.querySelectorAll(".whatsapp-field").forEach(el => {
-        el.style.display = esWhatsApp ? "" : "none";
-      });
-
-      document.querySelectorAll(".amenaza-field").forEach(el => {
-        el.style.display = (esWhatsApp || esRedSocialMeta) ? "" : "none";
-      });
-
-      document.querySelectorAll(".social-field").forEach(el => {
-        el.style.display = esRedSocialMeta ? "" : "none";
-      });
-
-      const labelObservacion = document.getElementById("labelObservacion");
-      const observacion = document.getElementById("observacion");
-
-      if(!usaMeta){
-        if(labelObservacion) labelObservacion.textContent = "Detalle de otra solicitud *";
-        if(observacion) observacion.placeholder = "Describa el pedido, oficio u otra solicitud";
-        ["numero", "unidad", "tipoAmenaza", "delito", "urlAmenaza", "codigoReferencia", "fecha"].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.value = "";
-        });
-      }else if(esWhatsApp){
-        if(labelObservacion) labelObservacion.textContent = "Detalle del pedido de información por WhatsApp *";
-        if(observacion) observacion.placeholder = "Describa la amenaza, número vinculado, hechos relevantes o motivo del pedido";
-        const url = document.getElementById("urlAmenaza");
-        if(url) url.value = "";
-      }else if(esRedSocialMeta){
-        if(labelObservacion) labelObservacion.textContent = "Detalle de la amenaza en red social *";
-        if(observacion) observacion.placeholder = "Describa la amenaza encontrada en la red social";
-        ["numero", "unidad", "delito", "codigoReferencia"].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.value = "";
-        });
-      }else{
-        if(labelObservacion) labelObservacion.textContent = "Detalle del pedido / amenaza *";
-        if(observacion) observacion.placeholder = "Seleccione WhatsApp, Facebook, Instagram o TikTok y describa el pedido";
-        ["numero", "unidad", "tipoAmenaza", "delito", "urlAmenaza", "codigoReferencia"].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.value = "";
-        });
-      }
-    }
-
-    function mostrarCamposMeta(){
-      mostrarCamposPorPlataforma();
-    }
-
-    async function copiarTexto(texto){
-      if(!texto){
-        alert("No hay texto para copiar.");
-        return;
-      }
-
-      try{
-        if(navigator.clipboard && window.isSecureContext){
-          await navigator.clipboard.writeText(texto);
-        }else{
-          const temp = document.createElement("textarea");
-          temp.value = texto;
-          temp.style.position = "fixed";
-          temp.style.left = "-9999px";
-          document.body.appendChild(temp);
-          temp.focus();
-          temp.select();
-          document.execCommand("copy");
-          document.body.removeChild(temp);
-        }
-        alert("URL copiada correctamente.");
-      }catch(error){
-        console.error("Error copiando texto:", error);
-        alert("No se pudo copiar automáticamente. Copie la URL manualmente.");
-      }
-    }
-
-    function copiarUrlAmenazaFormulario(){
-      const url = document.getElementById("urlAmenaza")?.value.trim() || "";
-      copiarTexto(url);
-    }
-
-    function escapeHTML(texto){
-      if(texto === null || texto === undefined) return "";
-      return String(texto)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function escapeAttr(texto){
-      return escapeHTML(texto).replaceAll("`", "&#096;");
-    }
-
-    function escapeJS(texto){
-      return String(texto || "")
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r");
-    }
-
-    Object.assign(window, {
-      toggleSidebar,
-      goTo,
-      loginAdmin,
-      logoutAdmin,
-      guardarRegistro,
-      mostrarRegistros,
-      buscarRegistro,
-      limpiarBusqueda,
-      editarRegistro,
-      eliminarRegistro,
-      eliminarArchivo,
-      limpiarFormulario,
-      verFicha,
-      cerrarFicha,
-      exportarDatos,
-      importarDatos,
-      generarVistaPreviaReporte,
-      cerrarVistaReporte,
-      exportarExcel,
-      exportarPDF,
-      previsualizarArchivos,
-      mostrarCamposPorPlataforma,
-      mostrarCamposMeta,
-      copiarTexto,
-      copiarUrlAmenazaFormulario
-    });
+    $("btnSearch").onclick=()=>{const q=clean($("mainSearch").value).toLowerCase();if(!q)return toast("Escribe un dato para buscar.");const n=graphData.nodes.find(x=>x.label.toLowerCase().includes(q));if(!n)return toast("No se encontraron coincidencias.");objectiveId=n.id;graphMode="principal";syncModeButtons();setView("graphView");applyGraphFilters();setTimeout(()=>focusNode(n.id),250)};
+    $("btnFull").onclick=()=>{objectiveId=null;graphMode="all";syncModeButtons();applyGraphFilters();setView("graphView")};
+    $("btnAddFiles").onclick=()=>processFiles(false);$("btnReplaceFiles").onclick=()=>processFiles(true);$("btnPasteAdd").onclick=()=>pasteRows(false);$("btnPasteReplace").onclick=()=>pasteRows(true);$("btnManual").onclick=addManual;
+    $("btnCSV").onclick=exportCSV;$("btnJSON").onclick=exportJSON;$("btnPDF").onclick=exportPDF;$("btnClear").onclick=clearBase;
+    $("btnGraphSearch").onclick=searchGraph;$("graphSearch").onkeydown=e=>{if(e.key==="Enter")searchGraph()};
+    document.querySelectorAll(".mode-btn").forEach(b=>b.onclick=()=>{graphMode=b.dataset.mode;syncModeButtons();applyGraphFilters()});
+    document.querySelectorAll(".type-chip").forEach(b=>b.onclick=()=>{enabledTypes.has(b.dataset.type)?enabledTypes.delete(b.dataset.type):enabledTypes.add(b.dataset.type);syncTypeButtons();applyGraphFilters()});
+    $("showDates").onchange=renderGraph;$("showLabels").onchange=()=>{document.querySelectorAll(".node-label,.edge-label").forEach(el=>el.style.display=$("showLabels").checked?"":"none")};
+    $("btnCenter").onclick=()=>centerGraph();$("btnReorder").onclick=renderGraph;$("btnPNG").onclick=exportPNG;$("btnExpand").onclick=()=>{const el=$("graphView");if(!document.fullscreenElement)el.requestFullscreen?.();else document.exitFullscreen?.()};
+    $("btnEditSelected").onclick=editSelected;$("btnDeleteSelected").onclick=deleteSelected;$("btnAddNode").onclick=()=>openModal("addNode",{});$("btnAddEdge").onclick=()=>graphData.nodes.length>=2?openModal("addEdge",{}):toast("Primero agrega al menos dos entidades.");$("btnAddText").onclick=()=>openModal("addText",{});$("btnUndoEdit").onclick=restoreGraph;
+    $("modalClose").onclick=closeModal;$("modalCancel").onclick=closeModal;$("modalSave").onclick=saveModal;$("editorModal").onclick=e=>{if(e.target===$("editorModal"))closeModal()};
+    $("btnGenerateReport").onclick=()=>generateReport(true);$("btnCopyReport").onclick=async()=>{await navigator.clipboard.writeText(generateReport(true));toast("Informe copiado.")};$("btnTxtReport").onclick=()=>downloadBlob(generateReport(true),`informe_divincri_${new Date().toISOString().slice(0,10)}.txt`);
+    window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{if($("graphView").classList.contains("active"))renderGraph()},220)});
+    window.addEventListener("keydown",e=>{if((e.key==="Delete"||e.key==="Backspace")&&selected&&!$("editorModal").classList.contains("open")&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();deleteSelected()}if(e.key==="Escape")closeModal()});
+
+    loadStorage();buildGraph();updateSelectionPanel();
+  })();
   </script>
 </body>
 </html>
