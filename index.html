@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- Versión completa DIVINCRI: fechas en vínculos, edición de nodos/enlaces, contador de vistas e icono de celular mejorado. -->
+<!-- Versión completa DIVINCRI: vistas funcionales del grafo, fechas en vínculos, edición de nodos/enlaces y contador de visitas. -->
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Área de Análisis de Inteligencia - DIVINCRI La Libertad</title>
-  <meta name="description" content="Análisis relacional editable de números, IMEI, DNI, personas y operadoras, con fechas visibles en las vinculaciones.">
+  <meta name="description" content="Análisis relacional editable con vistas de telaraña redonda, jerárquica, red de fuerza, matriz y modo automático.">
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
@@ -35,6 +35,7 @@
     .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:9px 10px;border-bottom:1px solid var(--line);background:#f5f8f6}.tab{min-height:34px;padding:0 12px;border:1px solid #d2ded6;border-radius:9px;color:#43564b;background:#fff;box-shadow:none;font-size:9px;font-weight:900}.tab.active{color:#fff;background:linear-gradient(180deg,var(--pnp-600),var(--pnp-800));border-color:var(--pnp-700)}.view{display:none}.view.active{display:block}
     .graph-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line);background:#fff}.graph-title b{display:block;color:var(--pnp-900);font-size:12px}.graph-title span{display:block;margin-top:3px;color:var(--muted);font-size:8px}.graph-counts{display:flex;gap:6px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;min-height:27px;padding:0 9px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#52645a;font-size:8px;font-weight:900}.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--pnp-500)}
     .controls{display:grid;grid-template-columns:auto minmax(220px,1fr) auto;gap:10px;align-items:center;padding:9px 11px;border-bottom:1px solid var(--line);background:#f7faf8}.control-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mode-btn,.type-chip{min-height:31px;padding:0 10px;border:1px solid #d1ded5;border-radius:9px;background:#fff;color:#475a4f;box-shadow:none;font-size:8px;font-weight:900}.mode-btn.active,.type-chip.active{color:#fff;background:var(--pnp-700);border-color:var(--pnp-700)}.search-inline{display:flex;gap:6px}.search-inline input{min-width:160px}.switch{display:inline-flex;align-items:center;gap:6px;color:#52645a;font-size:8px;font-weight:900}.switch input{width:auto}
+    .layout-view-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 11px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#f7faf8,#fffaf0)}.layout-view-bar.open{display:flex}.layout-view-title{display:flex;align-items:center;gap:7px;margin-right:auto;color:var(--pnp-800);font-size:8px;font-weight:950;text-transform:uppercase;letter-spacing:.45px}.layout-view-title strong{padding:5px 8px;border:1px solid #cfe0d4;border-radius:999px;background:#fff;color:#53675b;font-size:8px;text-transform:none;letter-spacing:0}.layout-buttons{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.layout-btn{min-height:34px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;border:1px solid #cfdcd3;border-radius:10px;background:#fff;color:#42564b;box-shadow:0 4px 10px rgba(3,36,22,.05);font-size:8px;font-weight:950}.layout-btn:hover{border-color:var(--pnp-500);transform:translateY(-1px)}.layout-btn.active{color:#fff;border-color:var(--pnp-700);background:linear-gradient(180deg,var(--pnp-600),var(--pnp-800));box-shadow:0 7px 16px rgba(3,36,22,.16)}.layout-btn .layout-ico{font-size:12px;line-height:1}.layout-note{width:100%;color:#6a786f;font-size:8px;line-height:1.4}.layout-note b{color:var(--pnp-800)}
     .editor-bar{position:relative;z-index:12;display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:11px 12px;border-top:1px solid #ead18b;border-bottom:1px solid #d7b34a;background:linear-gradient(90deg,#fff8dc,#ffffff 48%,#f1faf4);box-shadow:0 6px 16px rgba(3,36,22,.08)}.selection-label{margin-right:auto;min-width:220px;color:#485b50;font-size:9px}.selection-label b{color:var(--pnp-800)}.edit-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;color:#fff;background:linear-gradient(180deg,#198754,#0b6038);font-size:8px;font-weight:950;letter-spacing:.35px}.edit-badge:before{content:"";width:7px;height:7px;border-radius:50%;background:#8cffbd;box-shadow:0 0 0 3px rgba(140,255,189,.18)}.edge-relation-label text,.edge-date-label text{paint-order:stroke;stroke:#fff;stroke-width:2px;stroke-linejoin:round}.edge-date-label rect{filter:drop-shadow(0 3px 4px rgba(3,36,22,.18))}.edge-date-label .date-card{fill:#fff4c2;stroke:#c98600;stroke-width:1.4}.edge-date-label .date-icon-bg{fill:#c98600}.edge-date-label .date-icon-line{stroke:#fff;stroke-width:1.35;stroke-linecap:round;fill:none}.edge-date-label .date-text{fill:#704600;stroke:#fff8df;stroke-width:2.6px;font-size:10px;font-weight:950}.edge-relation-label rect{filter:drop-shadow(0 2px 3px rgba(3,36,22,.12))}.edge-item:hover .edge-visible{opacity:1}.phone-device{pointer-events:none}.quick-editor{padding:11px;border:1px solid #e6cf91;border-radius:12px;background:linear-gradient(145deg,#fffaf0,#f4fbf6)}.quick-editor h3{margin:0 0 5px;color:var(--pnp-800);font-size:10px}.quick-editor p{margin:0 0 9px;color:var(--muted);font-size:8px;line-height:1.45}.quick-editor .btn{margin:2px 0}.demo-loader{margin-bottom:12px;background:linear-gradient(145deg,#f7fbf8,#fff9e8)}.demo-loader .btn{flex:1}.counter-note{margin-top:5px;color:var(--muted);font-size:7px;line-height:1.25}
     #graphWrap{position:relative;height:730px;overflow:hidden;background:radial-gradient(circle at 52% 45%,rgba(15,119,70,.08),transparent 34%),linear-gradient(rgba(8,71,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(8,71,42,.035) 1px,transparent 1px),#f8faf8;background-size:auto,30px 30px,30px 30px;cursor:grab}#graphWrap:active{cursor:grabbing}#graph{width:100%;height:100%;display:block}.graph-empty{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}.empty-card{max-width:420px;padding:24px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.94);box-shadow:var(--shadow);text-align:center}.empty-card b{display:block;color:var(--pnp-900);font-size:13px}.empty-card span{display:block;margin-top:7px;color:var(--muted);font-size:9px;line-height:1.5}.graph-help{position:absolute;left:12px;bottom:12px;z-index:10;max-width:430px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.92);color:#637269;font-size:8px;line-height:1.4;box-shadow:var(--shadow-sm);pointer-events:none}.graph-help b{color:var(--pnp-800)}
     .legend{display:flex;gap:6px;flex-wrap:wrap;padding:9px 11px;border-top:1px solid var(--line);background:#fff}.legend span{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;color:#506157;font-size:8px;font-weight:850}.dot{width:10px;height:10px;border-radius:3px}.numero{background:var(--blue)}.imei{background:var(--green)}.dni{background:var(--orange)}.persona{background:var(--purple)}.operadora{background:var(--teal)}.custom{background:#596b60}.objective{background:var(--red)}
@@ -46,7 +47,7 @@
     #graphView:fullscreen{width:100vw;height:100vh;overflow:auto;background:#f7faf8}#graphView:fullscreen #graphWrap{height:calc(100vh - 226px)}
     @media(max-width:1180px){.metrics{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:280px 1fr}.controls{grid-template-columns:1fr}.sidebar{position:relative;top:auto;max-height:none}}
     @media(max-width:900px){.layout{grid-template-columns:1fr}.detail-strip{grid-template-columns:1fr}.nav{display:none}#graphWrap{height:600px}}
-    @media(max-width:620px){main{padding:12px}.top{padding:8px 12px}.metrics{grid-template-columns:repeat(2,1fr)}.row,.modal-grid{grid-template-columns:1fr}.modal-grid .full{grid-column:auto}.graph-head{align-items:flex-start;flex-direction:column}#graphWrap{height:540px}.editor-bar .btn{flex:1}.controls{padding:8px}.search-inline{width:100%}.search-inline input{min-width:0}.detail-strip{padding:8px}}
+    @media(max-width:620px){main{padding:12px}.top{padding:8px 12px}.metrics{grid-template-columns:repeat(2,1fr)}.row,.modal-grid{grid-template-columns:1fr}.modal-grid .full{grid-column:auto}.graph-head{align-items:flex-start;flex-direction:column}#graphWrap{height:540px}.editor-bar .btn{flex:1}.controls{padding:8px}.search-inline{width:100%}.search-inline input{min-width:0}.detail-strip{padding:8px}.layout-view-bar{align-items:stretch}.layout-view-title{width:100%}.layout-buttons{display:grid;grid-template-columns:1fr 1fr;width:100%}.layout-btn{width:100%}}
     @media print{.top,.notice,.metrics,.sidebar,.tabs,.controls,.editor-bar,.legend,.detail-strip,.btns,.no-print{display:none!important}body{background:#fff}main{padding:0}.layout{display:block}.panel{border:0;box-shadow:none}.view{display:none!important}#reportView{display:block!important}.report pre{border:0;font-size:10px}}
   </style>
 </head>
@@ -133,10 +134,21 @@
               <button class="mode-btn active" data-mode="all">Todo</button><button class="mode-btn" data-mode="principal">Principal</button><button class="mode-btn" data-mode="direct">Directos</button><button class="mode-btn" data-mode="linked">Más vinculados</button>
             </div>
             <div class="search-inline"><input id="graphSearch" placeholder="Encontrar y enfocar una entidad"><button class="btn small" id="btnGraphSearch">Buscar</button></div>
-            <div class="control-group"><label class="switch"><input id="showDates" type="checkbox" checked> Fechas</label><label class="switch"><input id="showLabels" type="checkbox" checked> Etiquetas</label><button class="btn light small" id="btnCenter">Centrar</button><button class="btn light small" id="btnReorder">Reordenar</button><button class="btn light small" id="btnPNG">PNG</button><button class="btn light small" id="btnExpand">Expandir</button></div>
+            <div class="control-group"><label class="switch"><input id="showDates" type="checkbox" checked> Fechas</label><label class="switch"><input id="showLabels" type="checkbox" checked> Etiquetas</label><button class="btn blue small" id="btnViews" type="button" aria-expanded="false" aria-controls="layoutViewBar">▦ Vistas</button><button class="btn light small" id="btnCenter">Centrar</button><button class="btn light small" id="btnReorder">Reordenar</button><button class="btn light small" id="btnPNG">PNG</button><button class="btn light small" id="btnExpand">Expandir</button></div>
           </div>
           <div class="controls" style="grid-template-columns:1fr">
             <div class="control-group" id="typeFilters"><button class="type-chip active" data-type="numero">Números</button><button class="type-chip active" data-type="imei">IMEI</button><button class="type-chip active" data-type="dni">DNI</button><button class="type-chip active" data-type="persona">Personas</button><button class="type-chip active" data-type="operadora">Operadoras</button><button class="type-chip active" data-type="custom">Otros</button></div>
+          </div>
+          <div class="layout-view-bar" id="layoutViewBar">
+            <div class="layout-view-title">Vistas del grafo <strong id="currentLayoutLabel">Automático</strong></div>
+            <div class="layout-buttons" id="layoutButtons">
+              <button class="layout-btn" type="button" data-layout="radial"><span class="layout-ico">◉</span>Telaraña redonda</button>
+              <button class="layout-btn" type="button" data-layout="hierarchy"><span class="layout-ico">♜</span>Telaraña jerárquica</button>
+              <button class="layout-btn" type="button" data-layout="force"><span class="layout-ico">✣</span>Red fuerza</button>
+              <button class="layout-btn" type="button" data-layout="matrix"><span class="layout-ico">▦</span>Matriz</button>
+              <button class="layout-btn active" type="button" data-layout="auto"><span class="layout-ico">⟳</span>Automático</button>
+            </div>
+            <div class="layout-note"><b>Cambio real de distribución:</b> cada botón recalcula la posición de los nodos del archivo cargado sin modificar ni borrar sus registros.</div>
           </div>
           <div class="editor-bar" id="editorBar">
             <span class="edit-badge">MODO EDICIÓN ACTIVO</span>
@@ -174,7 +186,8 @@
     const EDIT_KEY="divincri_relacional_ediciones_v5";
     const VIEW_KEY="divincri_vistas_local_v1";
     const VIEW_SESSION_KEY="divincri_vista_sesion_v1";
-    const APP_VERSION="6.2";
+    const LAYOUT_KEY="divincri_distribucion_grafo_v1";
+    const APP_VERSION="6.3";
     const typeColors={numero:"#1769aa",imei:"#158356",dni:"#c16a06",persona:"#7b51b8",operadora:"#227989",custom:"#596b60"};
     const typeIcons={numero:"",imei:"▣",dni:"ID",persona:"●",operadora:"OP",custom:"+"};
     const DEMO_RECORDS=[
@@ -187,6 +200,8 @@
     const emptyEdits=()=>({hiddenNodes:[],hiddenEdges:[],nodeOverrides:{},edgeOverrides:{},customNodes:[],customEdges:[],annotations:[]});
     let records=[];let edits=emptyEdits();let graphData={nodes:[],edges:[]};let filteredGraph={nodes:[],edges:[]};
     let selected=null;let objectiveId=null;let graphMode="all";let enabledTypes=new Set(["numero","imei","dni","persona","operadora","custom"]);let currentModal=null;
+    const VALID_LAYOUTS=new Set(["radial","hierarchy","force","matrix","auto"]);
+    let layoutMode=localStorage.getItem(LAYOUT_KEY)||"auto";if(!VALID_LAYOUTS.has(layoutMode))layoutMode="auto";
     let simulation=null,svg=null,rootG=null,zoomBehavior=null,currentTransform=d3.zoomIdentity;
 
     const $=id=>document.getElementById(id);
@@ -275,6 +290,100 @@
       $("mReg").textContent=records.length;$("mNum").textContent=count("numero");$("mImei").textContent=count("imei");$("mDni").textContent=count("dni");$("mPer").textContent=count("persona");$("mLinks").textContent=graphData.edges.length;$("graphNodeCount").textContent=`${filteredGraph.nodes.length} nodos`;$("graphEdgeCount").textContent=`${filteredGraph.edges.length} vínculos`;$("graphDateCount").textContent=`${dated} con fecha`;
     }
 
+    const layoutNames={radial:"Telaraña redonda",hierarchy:"Telaraña jerárquica",force:"Red fuerza",matrix:"Matriz",auto:"Automático"};
+    const edgeNodeId=value=>typeof value==="object"?value?.id:value;
+    function getLayoutRoot(nodes){
+      return nodes.find(n=>n.id===objectiveId)||[...nodes].sort((a,b)=>(b.degree||0)-(a.degree||0)||String(a.label).localeCompare(String(b.label)))[0]||null;
+    }
+    function graphLevels(nodes,edges,rootId){
+      const adjacency=new Map(nodes.map(n=>[n.id,new Set()]));
+      edges.forEach(e=>{const a=edgeNodeId(e.source),b=edgeNodeId(e.target);if(adjacency.has(a)&&adjacency.has(b)){adjacency.get(a).add(b);adjacency.get(b).add(a)}});
+      const levels=new Map();
+      if(rootId&&adjacency.has(rootId)){
+        const queue=[rootId];levels.set(rootId,0);
+        for(let i=0;i<queue.length;i++){
+          const current=queue[i],next=(levels.get(current)||0)+1;
+          adjacency.get(current).forEach(id=>{if(!levels.has(id)){levels.set(id,next);queue.push(id)}});
+        }
+      }
+      const last=levels.size?Math.max(...levels.values()):0;
+      nodes.filter(n=>!levels.has(n.id)).forEach(n=>levels.set(n.id,last+1));
+      return levels;
+    }
+    function resolveLayoutMode(nodes){
+      if(layoutMode!=="auto")return layoutMode;
+      if(nodes.length<=14)return "radial";
+      if(nodes.length>=46)return "matrix";
+      const maxDegree=Math.max(0,...nodes.map(n=>n.degree||0));
+      if(maxDegree>=4&&maxDegree>=nodes.length*.22)return "hierarchy";
+      return "force";
+    }
+    function setLayoutTargets(mode,nodes,edges,w,h){
+      const marginX=Math.max(72,Math.min(120,w*.09)),marginY=Math.max(68,Math.min(105,h*.10));
+      if(mode==="radial"){
+        const root=getLayoutRoot(nodes),levels=graphLevels(nodes,edges,root?.id),groups=new Map();
+        nodes.forEach(n=>{const level=levels.get(n.id)||0;if(!groups.has(level))groups.set(level,[]);groups.get(level).push(n)});
+        const maxRadius=Math.max(120,Math.min(w,h)*.42);
+        [...groups.entries()].sort((a,b)=>a[0]-b[0]).forEach(([level,group])=>{
+          group.sort((a,b)=>(a.type||"").localeCompare(b.type||"")||String(a.label).localeCompare(String(b.label)));
+          if(level===0&&group.length===1){group[0].tx=w/2;group[0].ty=h/2;return}
+          const radius=Math.min(maxRadius,Math.max(105,Math.min(w,h)*(.15+level*.115)));
+          const offset=level%2?-.5:0;
+          group.forEach((n,i)=>{const angle=-Math.PI/2+((i+offset)*Math.PI*2/Math.max(1,group.length));n.tx=w/2+Math.cos(angle)*radius;n.ty=h/2+Math.sin(angle)*radius});
+        });
+      }else if(mode==="hierarchy"){
+        const root=getLayoutRoot(nodes),levels=graphLevels(nodes,edges,root?.id),groups=new Map();
+        nodes.forEach(n=>{const level=levels.get(n.id)||0;if(!groups.has(level))groups.set(level,[]);groups.get(level).push(n)});
+        const levelKeys=[...groups.keys()].sort((a,b)=>a-b),maxLevel=Math.max(1,...levelKeys);
+        levelKeys.forEach(level=>{
+          const group=groups.get(level).sort((a,b)=>(b.degree||0)-(a.degree||0)||String(a.label).localeCompare(String(b.label)));
+          const y=marginY+(h-marginY*2)*(level/maxLevel);
+          group.forEach((n,i)=>{n.tx=marginX+(w-marginX*2)*((i+1)/(group.length+1));n.ty=y});
+        });
+      }else if(mode==="matrix"){
+        const order=["persona","dni","numero","imei","operadora","custom"],groups=order.map(type=>[type,nodes.filter(n=>n.type===type)]).filter(([,g])=>g.length);
+        groups.forEach(([type,group],col)=>{
+          group.sort((a,b)=>String(a.label).localeCompare(String(b.label)));
+          const x=marginX+(w-marginX*2)*((col+.5)/Math.max(1,groups.length));
+          group.forEach((n,row)=>{n.tx=x;n.ty=marginY+(h-marginY*2)*((row+1)/(group.length+1))});
+        });
+      }
+      if(mode!=="force")nodes.forEach(n=>{n.x=n.tx??w/2;n.y=n.ty??h/2;n.vx=0;n.vy=0;n.fx=null;n.fy=null});
+    }
+    function createGraphSimulation(mode,nodes,edges,w,h){
+      if(mode==="force"){
+        nodes.forEach(n=>{n.fx=null;n.fy=null});
+        return d3.forceSimulation(nodes)
+          .force("link",d3.forceLink(edges).id(d=>d.id).distance(d=>112+Math.min(95,(d.count||1)*8)).strength(.58))
+          .force("charge",d3.forceManyBody().strength(-520))
+          .force("collision",d3.forceCollide().radius(54))
+          .force("center",d3.forceCenter(w/2,h/2))
+          .force("x",d3.forceX(w/2).strength(.025))
+          .force("y",d3.forceY(h/2).strength(.025));
+      }
+      setLayoutTargets(mode,nodes,edges,w,h);
+      const linkStrength=mode==="matrix"?.015:mode==="hierarchy"?.07:.09;
+      const targetStrength=mode==="matrix"?.98:.88;
+      return d3.forceSimulation(nodes)
+        .alpha(.55).alphaDecay(.085)
+        .force("link",d3.forceLink(edges).id(d=>d.id).distance(95).strength(linkStrength))
+        .force("charge",d3.forceManyBody().strength(mode==="matrix"?-18:-65))
+        .force("collision",d3.forceCollide().radius(mode==="matrix"?45:50).strength(.9))
+        .force("x",d3.forceX(d=>d.tx).strength(targetStrength))
+        .force("y",d3.forceY(d=>d.ty).strength(targetStrength));
+    }
+    function syncLayoutButtons(effective=null){
+      document.querySelectorAll(".layout-btn").forEach(b=>b.classList.toggle("active",b.dataset.layout===layoutMode));
+      const label=$("currentLayoutLabel");
+      if(label)label.textContent=layoutMode==="auto"&&effective?`Automático · ${layoutNames[effective]}`:(layoutNames[layoutMode]||"Automático");
+    }
+    function setGraphLayout(mode){
+      if(!VALID_LAYOUTS.has(mode))return;
+      layoutMode=mode;localStorage.setItem(LAYOUT_KEY,layoutMode);syncLayoutButtons();
+      setView("graphView");
+      toast(`Vista aplicada: ${layoutNames[mode]}.`);
+    }
+
     function renderGraph(){
       const wrap=$("graphWrap"),w=wrap.clientWidth||900,h=wrap.clientHeight||690;
       svg=d3.select("#graph");
@@ -296,13 +405,10 @@
         e.target=nodeById.get(typeof e.target==="object"?e.target.id:e.target);
       });
 
-      const xTargets={dni:w*.17,persona:w*.12,numero:w*.42,imei:w*.68,operadora:w*.88,custom:w*.52};
-      simulation=d3.forceSimulation(nodes)
-        .force("link",d3.forceLink(edges).id(d=>d.id).distance(d=>118+Math.min(90,d.count*8)).strength(.52))
-        .force("charge",d3.forceManyBody().strength(-470))
-        .force("collision",d3.forceCollide().radius(52))
-        .force("x",d3.forceX(d=>xTargets[d.type]||w*.5).strength(.28))
-        .force("y",d3.forceY(h*.48).strength(.08));
+      const effectiveLayout=resolveLayoutMode(nodes);
+      simulation?.stop?.();
+      simulation=createGraphSimulation(effectiveLayout,nodes,edges,w,h);
+      syncLayoutButtons(effectiveLayout);
 
       const edgeG=rootG.append("g").attr("class","edges").selectAll("g")
         .data(edges,d=>d.id).join("g").attr("class","edge-item");
@@ -399,7 +505,7 @@
         nodeG.attr("transform",d=>`translate(${d.x},${d.y})`);
       });
 
-      setTimeout(()=>centerGraph(false),700);
+      setTimeout(()=>centerGraph(false),resolveLayoutMode(nodes)==="force"?700:180);
       updateSelectionStyles();
       updateMetrics();
 
@@ -522,8 +628,10 @@
     $("btnGraphSearch").onclick=searchGraph;$("graphSearch").onkeydown=e=>{if(e.key==="Enter")searchGraph()};
     document.querySelectorAll(".mode-btn").forEach(b=>b.onclick=()=>{graphMode=b.dataset.mode;syncModeButtons();applyGraphFilters()});
     document.querySelectorAll(".type-chip").forEach(b=>b.onclick=()=>{enabledTypes.has(b.dataset.type)?enabledTypes.delete(b.dataset.type):enabledTypes.add(b.dataset.type);syncTypeButtons();applyGraphFilters()});
+    document.querySelectorAll(".layout-btn").forEach(b=>b.onclick=()=>setGraphLayout(b.dataset.layout));
+    $("btnViews").onclick=()=>{const bar=$("layoutViewBar"),open=!bar.classList.contains("open");bar.classList.toggle("open",open);$("btnViews").setAttribute("aria-expanded",String(open))};
     $("showDates").onchange=renderGraph;$("showLabels").onchange=()=>{document.querySelectorAll(".node-label,.edge-relation-label").forEach(el=>el.style.display=$("showLabels").checked?"":"none")};
-    $("btnCenter").onclick=()=>centerGraph();$("btnReorder").onclick=renderGraph;$("btnPNG").onclick=exportPNG;$("btnExpand").onclick=()=>{const el=$("graphView");if(!document.fullscreenElement)el.requestFullscreen?.();else document.exitFullscreen?.()};
+    $("btnCenter").onclick=()=>centerGraph();$("btnReorder").onclick=()=>{renderGraph();toast(`Distribución recalculada: ${layoutNames[layoutMode]}.`)};$("btnPNG").onclick=exportPNG;$("btnExpand").onclick=()=>{const el=$("graphView");if(!document.fullscreenElement)el.requestFullscreen?.();else document.exitFullscreen?.()};
     $("btnEditSelected").onclick=editSelected;$("btnDeleteSelected").onclick=deleteSelected;$("btnAddNode").onclick=()=>openModal("addNode",{});$("btnAddEdge").onclick=()=>graphData.nodes.length>=2?openModal("addEdge",{}):toast("Primero agrega al menos dos entidades.");$("btnAddText").onclick=()=>openModal("addText",{});$("btnUndoEdit").onclick=restoreGraph;
     $("btnSideAddNode").onclick=()=>openModal("addNode",{});$("btnSideAddEdge").onclick=()=>graphData.nodes.length>=2?openModal("addEdge",{}):toast("Primero agrega al menos dos entidades.");$("btnSideAddText").onclick=()=>openModal("addText",{});$("btnSideEdit").onclick=editSelected;$("btnSideDelete").onclick=deleteSelected;
     $("modalClose").onclick=closeModal;$("modalCancel").onclick=closeModal;$("modalSave").onclick=saveModal;$("editorModal").onclick=e=>{if(e.target===$("editorModal"))closeModal()};
@@ -555,7 +663,7 @@
       }
     }
 
-    initPageViews();loadStorage();buildGraph();updateSelectionPanel();
+    syncLayoutButtons();initPageViews();loadStorage();buildGraph();updateSelectionPanel();
   })();
   </script>
 </body>
