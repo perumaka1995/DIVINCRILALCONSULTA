@@ -1151,12 +1151,10 @@
 
 <!-- FIREBASE ANALYTICS DE ACTIVIDAD -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getApps, getApp, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, doc, setDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/*
- PEGA AQUÍ LOS DATOS QUE TE ENTREGA FIREBASE
-*/
 const firebaseConfig = {
   apiKey: "AIzaSyA03iY_yM21W3yeBaOk9lWwv2X9uzvXvOc",
   authDomain: "divincrilal.firebaseapp.com",
@@ -1168,127 +1166,125 @@ const firebaseConfig = {
 };
 
 let db = null;
-
-try {
-  const app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-} catch(e) {
-  console.log("Firebase pendiente de configuración");
-}
-
-
-window.registrarActividad = async function(evento, datos={}){
-
-  if(!db) return;
-
-  try{
-
-    let sesionActual = null;
-    try { sesionActual = JSON.parse(localStorage.getItem("DIVINCRI_USER_SESSION") || "null"); } catch(e) {}
-
-    await addDoc(collection(db,"actividad"),{
-
-      evento:evento,
-
-      usuario:sesionActual?.username || "SIN_IDENTIFICAR",
-
-      sesionId:sesionActual?.id || "",
-
-      datos:datos,
-
-      fecha:new Date().toISOString(),
-
-      navegador:navigator.userAgent,
-
-      pantalla:
-      window.innerWidth+"x"+window.innerHeight
-
-    });
-
-  }catch(error){
-
-    console.log(error);
-
-  }
-
+let auth = null;
+const firebaseState = {
+  ready:false,
+  authenticated:false,
+  uid:"",
+  error:"",
+  errorCode:"",
+  lastReadOk:null,
+  lastWriteOk:null
 };
 
+function setFirebaseError(error, context="Firebase"){
+  firebaseState.errorCode=String(error?.code||"");
+  firebaseState.error=`${context}: ${error?.message||String(error||"Error desconocido")}`;
+  console.error(firebaseState.error,error);
+}
 
-// Sesiones de usuarios de prueba. Funciona cuando Firebase está configurado
-// y las reglas de Firestore permiten leer/escribir la colección usuarios_prueba.
-window.guardarUsuarioPruebaFirebase = async function(sesion){
-  if(!db || !sesion?.id) return false;
+window.divincriFirebaseReady = (async()=>{
   try{
-    await setDoc(doc(db,"usuarios_prueba",sesion.id),{
-      ...sesion,
-      actualizadoISO:new Date().toISOString()
-    },{merge:true});
+    const app=getApps().length?getApp():initializeApp(firebaseConfig);
+    db=getFirestore(app);
+    auth=getAuth(app);
+    if(!auth.currentUser){
+      await signInAnonymously(auth);
+    }
+    firebaseState.ready=true;
+    firebaseState.authenticated=!!auth.currentUser;
+    firebaseState.uid=auth.currentUser?.uid||"";
+    firebaseState.error="";
+    firebaseState.errorCode="";
+    window.dispatchEvent(new CustomEvent("divincri:firebase-auth-ready",{detail:{uid:firebaseState.uid}}));
+    return {ok:true,uid:firebaseState.uid};
+  }catch(error){
+    setFirebaseError(error,"No se pudo autenticar de forma anónima");
+    window.dispatchEvent(new CustomEvent("divincri:firebase-auth-error",{detail:{error:firebaseState.error,code:firebaseState.errorCode}}));
+    return {ok:false,error:firebaseState.error,code:firebaseState.errorCode};
+  }
+})();
+
+window.obtenerEstadoFirebase=function(){return {...firebaseState}};
+
+async function ensureFirebase(){
+  const result=await window.divincriFirebaseReady;
+  if(!result?.ok||!db||!auth?.currentUser){
+    throw new Error(firebaseState.error||"Firebase no está autenticado.");
+  }
+  return {db,auth,uid:auth.currentUser.uid};
+}
+
+window.registrarActividad = async function(evento, datos={}){
+  try{
+    const firebase=await ensureFirebase();
+    let sesionActual=null;
+    try{sesionActual=JSON.parse(localStorage.getItem("DIVINCRI_USER_SESSION")||"null")}catch(e){}
+    await addDoc(collection(firebase.db,"actividad"),{
+      evento:String(evento||"ACTIVIDAD"),
+      usuario:sesionActual?.username||"SIN_IDENTIFICAR",
+      sesionId:sesionActual?.id||"",
+      firebaseUid:firebase.uid,
+      datos:datos&&typeof datos==="object"?datos:{valor:String(datos??"")},
+      fecha:new Date().toISOString(),
+      navegador:navigator.userAgent,
+      pantalla:window.innerWidth+"x"+window.innerHeight,
+      pagina:location.pathname||"/"
+    });
+    firebaseState.lastWriteOk=true;
     return true;
   }catch(error){
-    console.log("No se pudo guardar usuario de prueba en Firebase",error);
+    firebaseState.lastWriteOk=false;
+    setFirebaseError(error,"No se pudo registrar la actividad global");
+    return false;
+  }
+};
+
+window.guardarUsuarioPruebaFirebase = async function(sesion){
+  if(!sesion?.id)return false;
+  try{
+    const firebase=await ensureFirebase();
+    await setDoc(doc(firebase.db,"usuarios_prueba",sesion.id),{
+      ...sesion,
+      firebaseUid:firebase.uid,
+      actualizadoISO:new Date().toISOString()
+    },{merge:true});
+    firebaseState.lastWriteOk=true;
+    return true;
+  }catch(error){
+    firebaseState.lastWriteOk=false;
+    setFirebaseError(error,"No se pudo guardar la sesión global");
     return false;
   }
 };
 
 window.obtenerUsuariosPruebaFirebase = async function(){
-  if(!db) return [];
   try{
-    const consulta=query(
-      collection(db,"usuarios_prueba"),
-      orderBy("fechaIngresoISO","desc"),
-      limit(100)
-    );
+    const firebase=await ensureFirebase();
+    const consulta=query(collection(firebase.db,"usuarios_prueba"),orderBy("fechaIngresoISO","desc"),limit(500));
     const snap=await getDocs(consulta);
+    firebaseState.lastReadOk=true;
+    firebaseState.error="";
+    firebaseState.errorCode="";
     return snap.docs.map(d=>({id:d.id,...d.data()}));
   }catch(error){
-    console.log("No se pudo leer usuarios de prueba desde Firebase",error);
+    firebaseState.lastReadOk=false;
+    setFirebaseError(error,"No se pudieron leer las sesiones globales");
     return [];
   }
 };
 
+// Registra una vista de página global. Espera la autenticación anónima antes de escribir.
+window.registrarActividad("ENTRADA",{pagina:location.pathname||"/",origen:document.referrer||"DIRECTO"});
 
-// Entrada
-registrarActividad("ENTRADA",{
- pagina:location.pathname
-});
-
-
-// Tiempo de permanencia
-
-const inicioSesion = Date.now();
-
-
+const inicioSesion=Date.now();
 window.addEventListener("beforeunload",()=>{
-
- const segundos =
- Math.floor(
- (Date.now()-inicioSesion)/1000
- );
-
-
- registrarActividad("SALIDA",{
-   tiempo_segundos:segundos
- });
-
+  const segundos=Math.floor((Date.now()-inicioSesion)/1000);
+  window.registrarActividad("SALIDA",{tiempo_segundos:segundos});
 });
-
-
-// Captura errores
-
-window.addEventListener("error",(e)=>{
-
- registrarActividad("ERROR",{
-
-  mensaje:e.message,
-
-  archivo:e.filename,
-
-  linea:e.lineno
-
- });
-
+window.addEventListener("error",e=>{
+  window.registrarActividad("ERROR",{mensaje:e.message,archivo:e.filename,linea:e.lineno});
 });
-
 </script>
 <!-- FIN FIREBASE -->
 
@@ -1486,21 +1482,45 @@ window.addEventListener("error",(e)=>{
       <header class="users-modal-head">
         <div class="users-modal-title">
           <div class="users-modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.3-6 5.5-6s5 2 5.5 6M16 7.5a2.6 2.6 0 0 1 0 5.1M16.5 14c2.5.3 3.8 2 4 5"/></svg></div>
-          <div><b id="usersModalTitle">Registro de usuarios de prueba</b><span>Sesiones identificadas dentro del sistema</span></div>
+          <div><b id="usersModalTitle">Analítica global de accesos</b><span>Vistas y sesiones de todos los dispositivos</span></div>
         </div>
         <button class="users-modal-close" id="usersModalClose" type="button" aria-label="Cerrar">×</button>
       </header>
-      <div class="users-summary">
-        <div class="users-summary-card"><span>Sesiones registradas</span><b id="usersTotalCount">0</b></div>
-        <div class="users-summary-card"><span>Activos recientemente</span><b id="usersActiveCount">0</b></div>
-        <div class="users-summary-card"><span>Usuarios distintos</span><b id="usersUniqueCount">0</b></div>
+      <div class="users-summary global-users-summary">
+        <div class="users-summary-card global-primary"><span>Vistas globales</span><b id="globalPageViews">0</b><small>Aperturas desde todos los dispositivos</small></div>
+        <div class="users-summary-card"><span>Sesiones iniciadas</span><b id="usersTotalCount">0</b><small>Ingresos con usuario</small></div>
+        <div class="users-summary-card"><span>Usuarios distintos</span><b id="usersUniqueCount">0</b><small>Alias únicos registrados</small></div>
+        <div class="users-summary-card"><span>Activos recientemente</span><b id="usersActiveCount">0</b><small>Actividad en los últimos 15 minutos</small></div>
+        <div class="users-summary-card"><span>Vistas de hoy</span><b id="globalTodayViews">0</b><small>Desde las 00:00</small></div>
+        <div class="users-summary-card"><span>Duración promedio</span><b id="globalAvgDuration">0 min</b><small>Promedio aproximado por sesión</small></div>
       </div>
-      <div class="users-modal-tools">
-        <span id="usersDataOrigin">Mostrando el registro disponible en este navegador.</span>
-        <button class="light" id="refreshUsersButton" type="button">↻ Actualizar</button>
+      <div class="users-modal-tools global-analytics-tools">
+        <span id="usersDataOrigin">Consultando la actividad global almacenada en Firebase.</span>
+        <div class="global-analytics-actions">
+          <label for="globalAnalyticsPeriod">Periodo del gráfico</label>
+          <select id="globalAnalyticsPeriod" aria-label="Periodo del gráfico de ingresos">
+            <option value="7">7 días</option>
+            <option value="14" selected>14 días</option>
+            <option value="30">30 días</option>
+          </select>
+          <button class="light" id="refreshUsersButton" type="button">↻ Actualizar</button>
+        </div>
       </div>
+      <div class="firebase-admin-setup" id="firebaseAdminSetup">
+        <div><b>Identificador seguro de este navegador administrador</b><span>UID Firebase: <code id="firebaseBrowserUid">Conectando…</code></span></div>
+        <button class="light" id="copyFirebaseUidButton" type="button">Copiar UID</button>
+      </div>
+      <section class="global-analytics-panel" aria-labelledby="globalAnalyticsTitle">
+        <div class="global-analytics-head">
+          <div><b id="globalAnalyticsTitle">Ingresos globales por día</b><span>Vistas reales registradas desde todos los navegadores y dispositivos.</span></div>
+          <span class="global-live-badge" id="globalAnalyticsBadge">Firebase</span>
+        </div>
+        <div class="global-visits-chart" id="globalVisitsChart"><div class="global-chart-empty">Cargando actividad global…</div></div>
+        <div class="global-analytics-status" id="globalAnalyticsStatus">Conectando con Firebase Firestore…</div>
+      </section>
+      <div class="users-table-section-title"><b>Sesiones identificadas</b><span>Últimos usuarios registrados en la plataforma</span></div>
       <div class="users-table-wrap" id="usersTableWrap"></div>
-      <div class="users-modal-note">Modo de prueba: el panel aparece al ingresar como <b>ADMINISTRADOR</b>. Con Firebase configurado, intenta consolidar las sesiones de distintos dispositivos; sin Firebase, muestra el historial guardado en este navegador.</div>
+      <div class="users-modal-note">Panel global disponible para <b>ADMINISTRADOR</b>. Los datos se consolidan desde Firebase Firestore, por lo que incluyen accesos realizados desde otros equipos y navegadores. Si Firebase bloquea la lectura, el panel indicará que deben revisarse sus reglas de seguridad.</div>
     </section>
   </div>
 
@@ -1549,9 +1569,9 @@ window.addEventListener("error",(e)=>{
       <a href="#grafo">Grafo</a>
       <a href="#informe">Informe</a>
 
-      <button class="nav-user-admin" id="navUserAdmin" type="button" title="Ver usuarios registrados">
+      <button class="nav-user-admin" id="navUserAdmin" type="button" title="Ver analítica global de accesos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.3-6 5.5-6s5 2 5.5 6M16 7.5a2.6 2.6 0 0 1 0 5.1M16.5 14c2.5.3 3.8 2 4 5"/></svg>
-        Usuarios
+        Analítica
       </button>
       <div class="session-area" id="sessionArea">
         <button class="user-session-button" id="userSessionButton" type="button" aria-expanded="false">
@@ -1566,7 +1586,7 @@ window.addEventListener("error",(e)=>{
             <div class="session-dropdown-kpi"><span>Estado</span><b>En línea</b></div>
           </div>
           <div class="session-dropdown-actions">
-            <button class="light" id="dropdownUsersButton" type="button" style="display:none">Ver usuarios de prueba</button>
+            <button class="light" id="dropdownUsersButton" type="button" style="display:none">Ver analítica global</button>
             <button class="red" id="logoutUserButton" type="button">Cerrar sesión</button>
           </div>
         </div>
@@ -3957,7 +3977,7 @@ function installGraphUpgradeUI(){
             <path d="M2.5 20c.7-5.2 10.3-5.2 11 0M13.5 20c.4-3.8 7.6-3.8 8 0"/>
           </svg>
         </div>
-        <div class="metric-copy"><span>Ingresos</span><b id="mVisits">0</b><small>Sesiones en este navegador</small></div>
+        <div class="metric-copy"><span>Vistas globales</span><b id="mVisits">0</b><small>Consultando todos los dispositivos…</small></div>
       </div>`);
   }
 
@@ -5304,9 +5324,15 @@ document.addEventListener("mouseover",function(e){
     storeCurrentSession(session);
     updateSessionUI();
     closeGate();
-    syncFirebase(session);
+    const synced=await syncFirebase(session);
     if(typeof window.registrarActividad==="function")window.registrarActividad("INICIO_SESION_USUARIO",{username,fechaIngresoISO:session.fechaIngresoISO});
-    if(typeof window.toast==="function")window.toast("Bienvenido, "+username+". Sesión identificada correctamente.");
+    if(typeof window.toast==="function"){
+      if(synced)window.toast("Bienvenido, "+username+". Sesión registrada globalmente.");
+      else{
+        const firebaseStatus=typeof window.obtenerEstadoFirebase==="function"?window.obtenerEstadoFirebase():null;
+        window.toast("Ingresaste al sistema, pero Firebase no guardó esta sesión global. "+(firebaseStatus?.error||"Revisa Authentication y las reglas de Firestore."));
+      }
+    }
     startTimers();
   }
 
@@ -5379,12 +5405,18 @@ document.addEventListener("mouseover",function(e){
     if(typeof window.obtenerUsuariosPruebaFirebase==="function"){
       try{firebaseUsers=await window.obtenerUsuariosPruebaFirebase()}catch(e){firebaseUsers=[]}
     }
-    if(firebaseUsers.length){
-      renderUsers(firebaseUsers,"Datos consolidados desde Firebase Firestore.");
+    const firebaseStatus=typeof window.obtenerEstadoFirebase==="function"?window.obtenerEstadoFirebase():null;
+    if(firebaseStatus?.lastReadOk===true){
+      renderUsers(firebaseUsers,"Datos globales consolidados desde Firebase Firestore.");
     }else{
-      renderUsers(readUsers(),"Mostrando el registro disponible en este navegador. Configura Firebase para consolidar otros dispositivos.");
+      const uid=firebaseStatus?.uid?` UID Firebase de este navegador: ${firebaseStatus.uid}.`:"";
+      const reason=firebaseStatus?.error||"Firebase no autorizó la consulta.";
+      renderUsers(readUsers(),`SOLO SE MUESTRAN DATOS DE ESTE NAVEGADOR. ${reason}${uid}`);
     }
     if(refresh){refresh.disabled=false;refresh.textContent="↻ Actualizar";}
+    if(typeof window.refreshGlobalAnalyticsDashboard==="function"){
+      window.refreshGlobalAnalyticsDashboard(true);
+    }
   }
 
   function openUsersModal(){
@@ -5918,6 +5950,325 @@ document.addEventListener("mouseover",function(e){
 })();
 </script>
 <!-- ================= FIN GRAFO PROFESIONAL V8 ================= -->
+
+
+<!-- ================= ANALÍTICA GLOBAL DE ACCESOS FIREBASE ================= -->
+<style id="global-access-analytics-style">
+  .global-users-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .users-summary-card{position:relative;overflow:hidden}
+  .users-summary-card small{display:block;margin-top:5px;color:#87938c;font-size:7.5px;line-height:1.35;font-weight:750}
+  .users-summary-card.global-primary{border-color:#bdd5c5;background:linear-gradient(145deg,#eef8f1,#fff)}
+  .users-summary-card.global-primary::after{content:"";position:absolute;width:70px;height:70px;right:-28px;top:-31px;border-radius:50%;background:rgba(19,128,79,.09)}
+  .global-analytics-tools{align-items:flex-end}
+  .global-analytics-actions{display:flex;align-items:flex-end;gap:7px;flex-wrap:wrap}
+  .global-analytics-actions label{margin:0 0 4px;color:#75837b;font-size:7.5px}
+  .global-analytics-actions select{width:auto;min-width:96px;min-height:34px;padding:0 28px 0 10px;border-radius:10px;font-size:9px}
+  .global-analytics-panel{margin:14px 16px;border:1px solid #dce7df;border-radius:15px;background:linear-gradient(180deg,#fff,#f8fbf9);overflow:hidden;box-shadow:0 8px 24px rgba(3,29,18,.055)}
+  .global-analytics-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #e1e9e3}
+  .global-analytics-head b{display:block;color:var(--pnp-900);font-size:11px}
+  .global-analytics-head span{display:block;margin-top:3px;color:#74827a;font-size:8.5px}
+  .global-live-badge{display:inline-flex!important;align-items:center;gap:6px;min-height:25px;padding:0 9px;border-radius:999px;color:#0d6b41!important;background:#e7f6ed;font-size:8px!important;font-weight:900!important;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+  .global-live-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:#37b66c;box-shadow:0 0 0 3px rgba(55,182,108,.13)}
+  .global-live-badge.error{color:#9b2530!important;background:#fdecef}.global-live-badge.error::before{background:#c93c48;box-shadow:0 0 0 3px rgba(201,60,72,.12)}
+  .global-visits-chart{height:210px;display:flex;align-items:flex-end;gap:7px;padding:22px 14px 12px;overflow-x:auto;background:linear-gradient(rgba(7,61,37,.035) 1px,transparent 1px);background-size:100% 42px}
+  .global-chart-column{height:100%;min-width:34px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+  .global-chart-value{color:#355044;font-size:8px;font-weight:950;line-height:1}
+  .global-chart-bar-wrap{width:100%;height:145px;display:flex;align-items:flex-end;justify-content:center}
+  .global-chart-bar{width:min(25px,70%);min-height:3px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--pnp-500),var(--pnp-800));box-shadow:0 6px 12px rgba(7,61,37,.17);transition:height .25s ease,filter .18s ease}
+  .global-chart-column:hover .global-chart-bar{filter:brightness(1.12)}
+  .global-chart-label{color:#75837b;font-size:7.5px;font-weight:850;white-space:nowrap}
+  .global-chart-empty{width:100%;align-self:center;color:#75837b;text-align:center;font-size:9px}
+  .global-analytics-status{padding:9px 13px;border-top:1px solid #e1e9e3;color:#718077;background:#f8fbf9;font-size:8px;line-height:1.45}
+  .global-analytics-status.error{color:#9b2530;background:#fff4f5}
+  .firebase-admin-setup{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 16px 0;padding:10px 12px;border:1px solid #dce7df;border-radius:12px;background:#f7faf8}
+  .firebase-admin-setup b{display:block;color:var(--pnp-900);font-size:9px}.firebase-admin-setup span{display:block;margin-top:4px;color:#68786f;font-size:8px;line-height:1.45}.firebase-admin-setup code{user-select:all;padding:2px 5px;border-radius:5px;color:#0d6b41;background:#e7f6ed;font-size:8px}.firebase-admin-setup button{min-height:31px;box-shadow:none;white-space:nowrap}
+  .firebase-admin-setup.error{border-color:#efc7cc;background:#fff4f5}.firebase-admin-setup.error b{color:#9b2530}
+  .firebase-admin-setup.ready{border-color:#bddcc8;background:#eef8f1}
+  .users-table-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:3px 16px 10px;color:#617168}
+  .users-table-section-title b{color:var(--pnp-900);font-size:10px}.users-table-section-title span{font-size:8px}
+  @media(max-width:760px){.global-users-summary{grid-template-columns:repeat(2,1fr)}.global-analytics-tools{align-items:flex-start}.global-analytics-actions{width:100%}.global-visits-chart{height:190px}.global-chart-bar-wrap{height:125px}}
+  @media(max-width:480px){.global-users-summary{grid-template-columns:1fr}.global-analytics-head,.users-table-section-title{align-items:flex-start;flex-direction:column}.global-chart-column{min-width:29px}}
+</style>
+
+<script type="module" id="global-access-analytics-firebase-module">
+import { getApps, getApp, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, query, orderBy, limit, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const GLOBAL_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA03iY_yM21W3yeBaOk9lWwv2X9uzvXvOc",
+  authDomain: "divincrilal.firebaseapp.com",
+  projectId: "divincrilal",
+  storageBucket: "divincrilal.firebasestorage.app",
+  messagingSenderId: "987165828282",
+  appId: "1:987165828282:web:b3add7efe17a0f44fd8e83",
+  measurementId: "G-4CW1Y7516J"
+};
+
+let globalAnalyticsDB = null;
+let globalAnalyticsAuth = null;
+try {
+  const app = getApps().length ? getApp() : initializeApp(GLOBAL_FIREBASE_CONFIG);
+  globalAnalyticsDB = getFirestore(app);
+  globalAnalyticsAuth = getAuth(app);
+} catch (error) {
+  console.error("No fue posible iniciar Firebase para la analítica global", error);
+}
+
+async function ensureGlobalFirebase(){
+  if(window.divincriFirebaseReady){
+    const shared=await window.divincriFirebaseReady;
+    if(!shared?.ok)throw new Error(shared?.error||"Firebase no pudo autenticar el navegador.");
+  }else if(globalAnalyticsAuth&&!globalAnalyticsAuth.currentUser){
+    await signInAnonymously(globalAnalyticsAuth);
+  }
+  if(!globalAnalyticsDB)throw new Error("Firebase Firestore no está disponible.");
+  return globalAnalyticsDB;
+}
+
+const safeDate = value => {
+  const date = new Date(value || 0);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+const dayKey = date => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+window.obtenerAnaliticaGlobalFirebase = async function(options = {}) {
+  try{await ensureGlobalFirebase()}catch(error){return {ok:false,error:error?.message||String(error)}}
+  const days = Math.max(7, Math.min(30, Number(options.days) || 14));
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const fromDate = new Date(todayStart);
+  fromDate.setDate(fromDate.getDate() - (days - 1));
+
+  try {
+    const activityRef = collection(globalAnalyticsDB, "actividad");
+    const usersRef = collection(globalAnalyticsDB, "usuarios_prueba");
+
+    const [viewsResult, loginResult, recentResult, usersResult] = await Promise.allSettled([
+      getCountFromServer(query(activityRef, where("evento", "==", "ENTRADA"))),
+      getCountFromServer(query(activityRef, where("evento", "==", "INICIO_SESION_USUARIO"))),
+      getDocs(query(activityRef, where("fecha", ">=", fromDate.toISOString()), orderBy("fecha", "asc"), limit(5000))),
+      getDocs(query(usersRef, orderBy("fechaIngresoISO", "desc"), limit(5000)))
+    ]);
+
+    const errors = [viewsResult, loginResult, recentResult, usersResult]
+      .filter(result => result.status === "rejected")
+      .map(result => result.reason?.message || String(result.reason || "Error de lectura"));
+
+    const totalViews = viewsResult.status === "fulfilled" ? viewsResult.value.data().count : 0;
+    const exactSessionCount = loginResult.status === "fulfilled" ? loginResult.value.data().count : 0;
+    const recentEvents = recentResult.status === "fulfilled"
+      ? recentResult.value.docs.map(docSnap => ({ id:docSnap.id, ...docSnap.data() }))
+      : [];
+    const sessions = usersResult.status === "fulfilled"
+      ? usersResult.value.docs.map(docSnap => ({ id:docSnap.id, ...docSnap.data() }))
+      : [];
+
+    const seriesMap = new Map();
+    for (let i = 0; i < days; i++) {
+      const date = new Date(fromDate);
+      date.setDate(fromDate.getDate() + i);
+      seriesMap.set(dayKey(date), { key:dayKey(date), date, views:0, sessions:0 });
+    }
+
+    let todayViews = 0;
+    let todaySessions = 0;
+    for (const event of recentEvents) {
+      const date = safeDate(event.fecha);
+      if (!date) continue;
+      const item = seriesMap.get(dayKey(date));
+      if (event.evento === "ENTRADA") {
+        if (item) item.views += 1;
+        if (date >= todayStart) todayViews += 1;
+      }
+      if (event.evento === "INICIO_SESION_USUARIO") {
+        if (item) item.sessions += 1;
+        if (date >= todayStart) todaySessions += 1;
+      }
+    }
+
+    const uniqueUsers = new Set(
+      sessions.map(item => String(item.username || "").trim().toLowerCase()).filter(Boolean)
+    ).size;
+    const activeWindow = 15 * 60 * 1000;
+    const activeUsers = new Set(sessions.filter(item => {
+      const last = safeDate(item.ultimaActividadISO || item.fechaIngresoISO);
+      return item.estado === "ACTIVO" && last && (Date.now() - last.getTime()) <= activeWindow;
+    }).map(item => String(item.username || item.id || "").trim().toLowerCase()).filter(Boolean)).size;
+
+    const durations = sessions.map(item => {
+      const start = safeDate(item.fechaIngresoISO);
+      const end = safeDate(item.fechaSalidaISO || item.ultimaActividadISO);
+      if (!start || !end) return null;
+      const minutes = Math.round((end.getTime() - start.getTime()) / 60000);
+      return minutes >= 0 && minutes <= 24 * 60 ? minutes : null;
+    }).filter(value => value !== null);
+    const averageMinutes = durations.length
+      ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)
+      : 0;
+
+    return {
+      ok: errors.length < 4,
+      totalViews,
+      totalSessions: exactSessionCount || sessions.length,
+      uniqueUsers,
+      activeUsers,
+      todayViews,
+      todaySessions,
+      averageMinutes,
+      days,
+      series:[...seriesMap.values()].map(item => ({
+        date:item.key,
+        label:new Intl.DateTimeFormat("es-PE", { day:"2-digit", month:"short" }).format(item.date).replace(".", ""),
+        views:item.views,
+        sessions:item.sessions
+      })),
+      sessions,
+      partial:errors.length > 0,
+      errors
+    };
+  } catch (error) {
+    console.error("Error al obtener la analítica global", error);
+    return { ok:false, error:error?.message || "No se pudo consultar la analítica global." };
+  }
+};
+
+window.dispatchEvent(new CustomEvent("divincri:global-analytics-ready"));
+</script>
+
+<script id="global-access-analytics-ui-script">
+(function(){
+  "use strict";
+  let loading=false;
+  let lastLoaded=0;
+
+  const el=id=>document.getElementById(id);
+  const number=value=>Math.max(0,Number(value)||0).toLocaleString("es-PE");
+  const duration=minutes=>{
+    const value=Math.max(0,Number(minutes)||0);
+    if(value<60)return `${value} min`;
+    const hours=Math.floor(value/60), rest=value%60;
+    return rest?`${hours} h ${rest} min`:`${hours} h`;
+  };
+  const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+
+  function refreshFirebaseIdentity(isReady=false,isError=false){
+    const state=typeof window.obtenerEstadoFirebase==="function"?window.obtenerEstadoFirebase():{};
+    const uid=state?.uid||"No disponible";
+    const code=el("firebaseBrowserUid");if(code)code.textContent=uid;
+    const box=el("firebaseAdminSetup");
+    if(box){box.classList.toggle("ready",!!isReady);box.classList.toggle("error",!!isError)}
+    return state;
+  }
+
+  function renderGlobalChart(series){
+    const chart=el("globalVisitsChart");
+    if(!chart)return;
+    if(!Array.isArray(series)||!series.length){
+      chart.innerHTML='<div class="global-chart-empty">Todavía no existen vistas registradas para este periodo.</div>';
+      return;
+    }
+    const max=Math.max(1,...series.map(item=>Number(item.views)||0));
+    chart.innerHTML=series.map(item=>{
+      const value=Math.max(0,Number(item.views)||0);
+      const height=value?Math.max(4,Math.round((value/max)*140)):3;
+      return `<div class="global-chart-column" title="${escapeHTML(item.label)}: ${number(value)} vistas, ${number(item.sessions)} sesiones">
+        <span class="global-chart-value">${number(value)}</span>
+        <div class="global-chart-bar-wrap"><div class="global-chart-bar" style="height:${height}px"></div></div>
+        <span class="global-chart-label">${escapeHTML(item.label)}</span>
+      </div>`;
+    }).join("");
+  }
+
+  function setStatus(message,isError=false){
+    const status=el("globalAnalyticsStatus");
+    if(status){status.textContent=message;status.classList.toggle("error",isError)}
+    const badge=el("globalAnalyticsBadge");
+    if(badge){badge.textContent=isError?"Sin acceso":"Firebase en línea";badge.classList.toggle("error",isError)}
+  }
+
+  function updateMainMetric(totalViews){
+    const metric=el("mVisits");
+    if(metric){
+      metric.textContent=number(totalViews);
+      const small=metric.closest(".metric-copy")?.querySelector("small");
+      if(small)small.textContent="Vistas de todos los dispositivos";
+    }
+  }
+
+  async function refreshGlobalAnalytics(force=false){
+    if(loading)return;
+    if(!force&&Date.now()-lastLoaded<60000)return;
+    if(typeof window.obtenerAnaliticaGlobalFirebase!=="function"){
+      setStatus("Esperando la conexión con Firebase…",false);
+      return;
+    }
+    loading=true;
+    const refresh=el("refreshUsersButton");
+    const original=refresh?.textContent;
+    if(refresh){refresh.disabled=true;refresh.textContent="Consultando…"}
+    setStatus("Consultando vistas y sesiones de todos los dispositivos…",false);
+    try{
+      const days=Number(el("globalAnalyticsPeriod")?.value||14);
+      const data=await window.obtenerAnaliticaGlobalFirebase({days});
+      if(!data?.ok){
+        throw new Error(data?.error||data?.errors?.join(" · ")||"Firebase no permitió leer la actividad global.");
+      }
+      el("globalPageViews")&&(el("globalPageViews").textContent=number(data.totalViews));
+      el("usersTotalCount")&&(el("usersTotalCount").textContent=number(data.totalSessions));
+      el("usersUniqueCount")&&(el("usersUniqueCount").textContent=number(data.uniqueUsers));
+      el("usersActiveCount")&&(el("usersActiveCount").textContent=number(data.activeUsers));
+      el("globalTodayViews")&&(el("globalTodayViews").textContent=number(data.todayViews));
+      el("globalAvgDuration")&&(el("globalAvgDuration").textContent=duration(data.averageMinutes));
+      renderGlobalChart(data.series);
+      updateMainMetric(data.totalViews);
+      const origin=el("usersDataOrigin");
+      if(origin)origin.textContent=`Datos globales consolidados desde Firebase · ${number(data.todaySessions)} sesiones iniciadas hoy.`;
+      const partial=data.partial?" Algunos indicadores son parciales porque una consulta fue bloqueada.":"";
+      setStatus(`Última actualización: ${new Intl.DateTimeFormat("es-PE",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())}.${partial}`,false);
+      refreshFirebaseIdentity(true,false);
+      lastLoaded=Date.now();
+    }catch(error){
+      console.error(error);
+      setStatus(`No se pudieron leer las visitas globales: ${error.message} Revisa las reglas de Firestore para las colecciones actividad y usuarios_prueba.`,true);
+      const origin=el("usersDataOrigin");
+      const state=refreshFirebaseIdentity(false,true);
+      if(origin)origin.textContent=`Firebase no autorizó la lectura global. ${state?.uid?"Copia el UID mostrado y autorízalo en la colección admins de Firestore.":"Activa Authentication anónima y revisa las reglas de Firestore."}`;
+    }finally{
+      loading=false;
+      if(refresh){refresh.disabled=false;refresh.textContent=original||"↻ Actualizar"}
+    }
+  }
+
+  window.refreshGlobalAnalyticsDashboard=refreshGlobalAnalytics;
+  window.addEventListener("divincri:global-analytics-ready",()=>refreshGlobalAnalytics(true));
+  document.addEventListener("DOMContentLoaded",()=>{
+    el("globalAnalyticsPeriod")?.addEventListener("change",()=>refreshGlobalAnalytics(true));
+    el("refreshUsersButton")?.addEventListener("click",()=>setTimeout(()=>refreshGlobalAnalytics(true),20));
+    el("navUserAdmin")?.addEventListener("click",()=>setTimeout(()=>refreshGlobalAnalytics(true),80));
+    el("dropdownUsersButton")?.addEventListener("click",()=>setTimeout(()=>refreshGlobalAnalytics(true),80));
+    el("copyFirebaseUidButton")?.addEventListener("click",async()=>{
+      const state=refreshFirebaseIdentity(false,false);
+      if(!state?.uid){window.toast?.("Firebase todavía no generó un UID para este navegador.");return}
+      try{await navigator.clipboard.writeText(state.uid);window.toast?.("UID Firebase copiado.")}catch(e){window.prompt("Copia este UID Firebase:",state.uid)}
+    });
+    window.addEventListener("divincri:firebase-auth-ready",()=>refreshFirebaseIdentity(false,false));
+    window.addEventListener("divincri:firebase-auth-error",()=>refreshFirebaseIdentity(false,true));
+    refreshFirebaseIdentity(false,false);
+    setTimeout(()=>{
+      let session=null;
+      try{session=JSON.parse(localStorage.getItem("DIVINCRI_USER_SESSION")||"null")}catch(e){}
+      if(String(session?.username||"").toUpperCase()==="ADMINISTRADOR")refreshGlobalAnalytics(true);
+    },500);
+  });
+})();
+</script>
+<!-- ================= FIN ANALÍTICA GLOBAL DE ACCESOS ================= -->
 
 </body>
 </html>
